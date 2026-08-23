@@ -804,6 +804,7 @@
                     <button onclick="clearAbsences()" style="background:#111111; color:#e2e4e9; padding:10px 22px; border-radius:12px; font-weight:bold; border:2px solid #5A2B81; cursor:pointer; font-size: 1.1rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">Clear Absences</button>
                     <button onclick="clearPointsData()" style="background:#111111; color:#e2e4e9; padding:10px 22px; border-radius:12px; font-weight:bold; border:2px solid #5A2B81; cursor:pointer; font-size: 1.1rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">Clear Points</button>
                     <button onclick="copyTrackerData()" style="background:#e2e4e9; color:#111; padding:10px 22px; border-radius:12px; font-weight:bold; border:2px solid #c0c2c9; cursor:pointer; font-size: 1.1rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">Copy Scores</button>
+                    <button id="trackerUndoBtn" onclick="undoLastPointsChange()" style="display:none; background:#e2e4e9; color:#5A2B81; padding:10px 22px; border-radius:12px; font-weight:bold; border:2px solid #5A2B81; cursor:pointer; font-size: 1.1rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">↩️ Undo</button>
                 </div>
             </div>
             <!-- Expanded Grid Columns for More Name Space -->
@@ -831,6 +832,16 @@
             <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
                 <button onclick="saveSettings()" style="background: #5A2B81; color: #ffffff; border: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 1.3rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">Save & Connect</button>
                 <button onclick="toggleModal('settingsModal')" class="close-btn" style="margin-top: 0; padding: 12px 30px; font-size: 1.3rem;">Cancel</button>
+            </div>
+
+            <h3 style="color: #5A2B81; margin: 22px 0 6px 0; text-align: left; font-size: 1.3rem; border-top: 2px solid #c0c2c9; padding-top: 16px;">Backup &amp; Restore</h3>
+            <p style="color:#555; font-size: clamp(0.85rem, 1vw, 1.1rem); text-align:left; margin:0 0 10px 0; line-height:1.4;">
+                Saves points, attendance, checklists, and played-question history to a file — useful before clearing browser data, or to carry your data to a different computer.
+            </p>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <button onclick="downloadBackup()" style="background:#5A2B81; color:#fff; border:none; padding:10px 22px; border-radius:12px; font-weight:bold; cursor:pointer; font-size:1.05rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">⬇️ Download Backup</button>
+                <button onclick="document.getElementById('restoreFileInput').click()" style="background:#e2e4e9; color:#111; border:2px solid #c0c2c9; padding:10px 22px; border-radius:12px; font-weight:bold; cursor:pointer; font-size:1.05rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">⬆️ Restore from File</button>
+                <input type="file" id="restoreFileInput" accept="application/json" style="display:none;" onchange="restoreBackup(this)">
             </div>
         </div>
     </div>
@@ -880,7 +891,10 @@
             <div class="lb-chart" id="leaderboardContainer"></div>
             
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-                <button onclick="resetAllPoints()" style="background: transparent; color: #111111; border: 2px solid #111111; padding: 8px 20px; font-size: 1.1rem; border-radius: 20px; font-weight: bold; cursor: pointer;">Reset Scores</button>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="resetAllPoints()" style="background: transparent; color: #111111; border: 2px solid #111111; padding: 8px 20px; font-size: 1.1rem; border-radius: 20px; font-weight: bold; cursor: pointer;">Reset Scores</button>
+                    <button id="pointsUndoBtn" onclick="undoLastPointsChange()" style="display:none; background: transparent; color: #5A2B81; border: 2px solid #5A2B81; padding: 8px 20px; font-size: 1.1rem; border-radius: 20px; font-weight: bold; cursor: pointer;">↩️ Undo</button>
+                </div>
                 <button class="close-btn" onclick="togglePointsModal()" style="margin: 0; padding: 10px 25px; font-size: 1.2rem;">Close</button>
             </div>
         </div>
@@ -897,6 +911,7 @@
         
         <div style="display: flex; gap: 15px; margin-top: clamp(15px, 2vh, 25px); justify-content: center; flex-wrap: wrap;">
             <button id="wheelToggleBtn" onclick="toggleWheelMode()" style="background: #5A2B81; color: #ffffff; border: 2px solid #ffffff; padding: clamp(10px, 1.5vh, 16px) clamp(24px, 2.5vw, 40px); font-size: clamp(1.1rem, 1.5vw, 1.8rem); border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">Mode: Students</button>
+            <button onclick="resetWheelPicks()" style="background: #111111; color: #e2e4e9; border: 2px solid #5A2B81; padding: clamp(10px, 1.5vh, 16px) clamp(24px, 2.5vw, 40px); font-size: clamp(1.1rem, 1.5vw, 1.8rem); border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">Reset Picks</button>
             <button class="close-btn" onclick="closeWheelModal()" style="margin-top: 0;">Close</button>
         </div>
     </div>
@@ -1349,6 +1364,81 @@
             fetchGameVaultData();
         }
 
+        // ==================================================================
+        // BACKUP & RESTORE
+        // ------------------------------------------------------------------
+        // Everything the dashboard saves locally (points, attendance,
+        // checklists, played-question history) lives under one of these
+        // localStorage key prefixes. Backing up/restoring by prefix means
+        // a new feature that adds a new "titan_..." key is automatically
+        // covered without touching this code.
+        // ==================================================================
+        const DASHBOARD_STORAGE_PREFIXES = ['titan_', 'classPoints_', 'checklist_'];
+
+        function isDashboardStorageKey(key) {
+            return DASHBOARD_STORAGE_PREFIXES.some(prefix => key.startsWith(prefix));
+        }
+
+        function downloadBackup() {
+            const data = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (isDashboardStorageKey(key)) data[key] = localStorage.getItem(key);
+            }
+
+            const payload = {
+                source: 'Classroom Dashboard Backup',
+                exportedAt: new Date().toISOString(),
+                data: data
+            };
+
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dashboard-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function restoreBackup(fileInput) {
+            const file = fileInput.files && fileInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                let payload;
+                try {
+                    payload = JSON.parse(e.target.result);
+                } catch (err) {
+                    alert("Couldn't read that file — make sure it's a backup exported from this dashboard.");
+                    fileInput.value = '';
+                    return;
+                }
+
+                const data = payload && payload.data ? payload.data : payload;
+                const keys = Object.keys(data || {}).filter(isDashboardStorageKey);
+
+                if (keys.length === 0) {
+                    alert("That file doesn't contain any dashboard data to restore.");
+                    fileInput.value = '';
+                    return;
+                }
+
+                if (!confirm(`This will overwrite ${keys.length} saved item(s) — points, attendance, checklists, played-question history — with the values from this backup. Continue?`)) {
+                    fileInput.value = '';
+                    return;
+                }
+
+                keys.forEach(key => localStorage.setItem(key, data[key]));
+                alert("Backup restored! Reloading the dashboard...");
+                location.reload();
+            };
+            reader.readAsText(file);
+        }
+
         let schedule = [];
 
         async function fetchAgendaData() {
@@ -1594,6 +1684,14 @@
             
             let safeStudentId = student.replace(/['"\s]/g, '-');
             document.getElementById(`score-display-${safeStudentId}`).innerText = trackingData[student];
+
+            pushPointsUndo(() => {
+                let td = JSON.parse(localStorage.getItem('titan_tracker_' + classId) || '{}');
+                td[student] = (td[student] || 0) - change;
+                localStorage.setItem('titan_tracker_' + classId, JSON.stringify(td));
+                const el = document.getElementById(`score-display-${safeStudentId}`);
+                if (el) el.innerText = td[student];
+            });
         };
 
         window.clearAbsences = function() {
@@ -1632,6 +1730,39 @@
             });
         };
 
+        // ==================================================================
+        // POINTS UNDO
+        // ------------------------------------------------------------------
+        // One shared "undo last change" stack for both point systems —
+        // the whole-class Titan Cup points (updatePoints) and individual
+        // student participation points (logParticipation) — since both are
+        // the same mistake pattern: an accidental extra tap on + or -.
+        // Undo buttons live in both the Points and Tracker modals and call
+        // the same undoLastPointsChange(). History is in-memory only and
+        // clears on refresh, same as a normal undo stack.
+        // ==================================================================
+        let pointsUndoStack = [];
+
+        function pushPointsUndo(undoFn) {
+            pointsUndoStack.push(undoFn);
+            if (pointsUndoStack.length > 20) pointsUndoStack.shift();
+            updatePointsUndoButtons();
+        }
+
+        function undoLastPointsChange() {
+            const undoFn = pointsUndoStack.pop();
+            if (undoFn) undoFn();
+            updatePointsUndoButtons();
+        }
+
+        function updatePointsUndoButtons() {
+            const hasHistory = pointsUndoStack.length > 0;
+            const pointsBtn = document.getElementById('pointsUndoBtn');
+            const trackerBtn = document.getElementById('trackerUndoBtn');
+            if (pointsBtn) pointsBtn.style.display = hasHistory ? 'inline-flex' : 'none';
+            if (trackerBtn) trackerBtn.style.display = hasHistory ? 'inline-flex' : 'none';
+        }
+
         let currentClassPoints = 0;
         function togglePointsModal() {
             toggleModal('pointsModal');
@@ -1648,11 +1779,18 @@
         }
 
         function updatePoints(change) {
+            const classId = activeBlockData ? activeBlockData.id : null;
             currentClassPoints += change;
-            if(activeBlockData && activeBlockData.id) {
-                localStorage.setItem('classPoints_' + activeBlockData.id, currentClassPoints);
+            if(classId) {
+                localStorage.setItem('classPoints_' + classId, currentClassPoints);
             }
             renderLeaderboard();
+
+            pushPointsUndo(() => {
+                currentClassPoints -= change;
+                if (classId) localStorage.setItem('classPoints_' + classId, currentClassPoints);
+                renderLeaderboard();
+            });
         }
 
         function resetAllPoints() {
@@ -2151,6 +2289,35 @@
             }
         });
 
+        // --- ADDITIONAL SHORTCUTS (no Shift key) ---
+        // Space: start/pause the class timer. Right Arrow: advance to the next
+        // word/prompt in whichever mini-game (Hot Seat / Titan Says / Hivemind /
+        // Rapid Debate) is currently open. Skipped entirely while typing in a
+        // text field or the agenda's editable area, and while any Shift/Ctrl/
+        // Alt/Meta combo is held, so it never fights the shortcuts above or
+        // normal typing.
+        document.addEventListener('keydown', function(event) {
+            if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) return;
+
+            const target = event.target;
+            const isTyping = target && (
+                target.tagName === 'INPUT' ||
+                target.tagName === 'TEXTAREA' ||
+                target.isContentEditable
+            );
+            if (isTyping) return;
+
+            if (event.code === 'Space') {
+                event.preventDefault();
+                toggleTimer();
+            } else if (event.code === 'ArrowRight') {
+                const openGameKey = Object.keys(MINI_GAME_CONFIGS).find(key =>
+                    document.getElementById(MINI_GAME_CONFIGS[key].containerId).style.display === 'flex'
+                );
+                if (openGameKey) nextMiniGamePrompt(openGameKey);
+            }
+        });
+
         function fireBigConfetti() {
             confetti({ particleCount: 300, spread: 140, startVelocity: 45, origin: { y: 0.6 }, colors: ['#5A2B81', '#C0C2C9', '#FFFFFF'] });
         }
@@ -2280,6 +2447,22 @@
         let spinTimeout = null;
         let isGroupWheelMode = false;
 
+        // No-repeat tracking: which items have already been picked, scoped to the
+        // current wheel mode (students vs groups) and the active class period, so
+        // switching periods or modes naturally gets a fresh wheel.
+        function getWheelStorageKey() {
+            let periodId = activeBlockData ? activeBlockData.id.toString() : "TESTING";
+            let mode = isGroupWheelMode ? 'groups' : 'students';
+            return `titan_wheel_played_${mode}_${periodId}`;
+        }
+
+        function resetWheelPicks() {
+            localStorage.removeItem(getWheelStorageKey());
+            const winnerDisplay = document.getElementById('wheelWinnerDisplay');
+            winnerDisplay.innerText = isGroupWheelMode ? "SPIN THE GROUPS" : "SPIN THE WHEEL";
+            winnerDisplay.style.color = '#fff';
+        }
+
         function getActiveWheelItems() {
             if (isGroupWheelMode) {
                 let groups = [];
@@ -2403,9 +2586,20 @@
             let items = getActiveWheelItems();
             if (items.length === 0) return;
 
+            const playedKey = getWheelStorageKey();
+            let playedItems = JSON.parse(localStorage.getItem(playedKey) || '[]');
+            let availableItems = items.filter(item => !playedItems.includes(item));
+
             const winnerDisplay = document.getElementById('wheelWinnerDisplay');
             const wheel = document.getElementById('spinningWheel');
             clearTimeout(spinTimeout);
+
+            if (availableItems.length === 0) {
+                winnerDisplay.innerText = "ALL PICKED! HIT RESET.";
+                winnerDisplay.style.color = '#ffffff';
+                return;
+            }
+
             winnerDisplay.innerText = "SPINNING...";
             winnerDisplay.style.color = '#e2e4e9';
 
@@ -2413,7 +2607,10 @@
             let randomDuration = 3.5 + Math.random() * 2.5; 
             wheel.style.transition = `transform ${randomDuration}s cubic-bezier(0.1, 0.8, 0.1, 1)`;
 
-            let randomIndex = Math.floor(Math.random() * items.length);
+            // Pick only from the not-yet-played items, but find that item's position
+            // on the full wheel so the pointer actually lands on its slice.
+            let winner = availableItems[Math.floor(Math.random() * availableItems.length)];
+            let randomIndex = items.indexOf(winner);
             let sliceDeg = 360 / items.length;
             let targetAngle = (randomIndex * sliceDeg) + (sliceDeg / 2);
             let rotationOffset = 360 - targetAngle;
@@ -2424,8 +2621,10 @@
             wheel.style.transform = `rotate(${currentRotation}deg)`;
 
             spinTimeout = setTimeout(() => {
-                winnerDisplay.innerText = items[randomIndex] + "!";
+                winnerDisplay.innerText = winner + "!";
                 winnerDisplay.style.color = '#ffffff';
+                playedItems.push(winner);
+                localStorage.setItem(playedKey, JSON.stringify(playedItems));
             }, randomDuration * 1000); 
         }
 
