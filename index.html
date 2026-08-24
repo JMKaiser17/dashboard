@@ -21,8 +21,8 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #111111; 
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E"), radial-gradient(circle at 50% -20%, #2a1b38 0%, #111111 70%);
+            background-color: #0d0b12; 
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E"), radial-gradient(circle at 50% -20%, #3a2253 0%, #0d0b12 75%);
             margin: 0;
             padding: 1.5vh 1.5vw;
             display: flex;
@@ -37,8 +37,8 @@
         .dashboard-wrapper {
             background: 
                 url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E"), 
-                repeating-linear-gradient(-45deg, rgba(192, 194, 201, 0.05), rgba(192, 194, 201, 0.05) 2px, transparent 2px, transparent 16px),
-                linear-gradient(135deg, #532778 0%, #3e1b59 100%);
+                repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02) 2px, transparent 2px, transparent 16px),
+                linear-gradient(135deg, #48216c 0%, #29123c 100%);
             width: 100%;
             height: 100%;
             border-radius: clamp(12px, 1.8vw, 25px);
@@ -46,9 +46,10 @@
             display: flex;
             flex-direction: column;
             gap: clamp(8px, 1.5vh, 20px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.2), inset 0 0 20px rgba(90, 43, 129, 0.3);
             position: relative;
             min-height: 0;
+            border: 1px solid rgba(138, 82, 184, 0.3);
         }
 
         /* --- FLUID TOP BAR (UI Control Scaling) --- */
@@ -83,7 +84,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0px rgba(255, 255, 255, 0.8);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.35), inset 0 1px 0px rgba(255, 255, 255, 0.9);
             border: clamp(1.5px, 0.2vw, 3px) solid #111111; 
             transition: all 0.3s ease, transform 0.1s;
             gap: 2px;
@@ -102,7 +103,7 @@
         .class-pill:active { transform: scale(0.98); }
 
         .action-pill { cursor: pointer; }
-        .action-pill:hover { background: linear-gradient(145deg, #f0f0f0, #c0c2c9); }
+        .action-pill:hover { background: linear-gradient(145deg, #f0f0f0, #c0c2c9); transform: translateY(-1px); }
         
         .clock-pill { cursor: pointer; flex-shrink: 0; }
         .clock-pill:hover { background: linear-gradient(145deg, #f0f0f0, #c0c2c9); }
@@ -181,15 +182,16 @@
             border-radius: 12px;
             overflow: hidden;
             padding: clamp(6px, 1vh, 12px) 0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.6), inset 0 0 10px rgba(90, 43, 129, 0.2);
             position: relative;
             z-index: 2; 
             max-height: clamp(35px, 6vh, 60px); 
             cursor: pointer;
             flex-shrink: 0;
             transition: all 0.3s ease;
+            border: 1px solid rgba(138, 82, 184, 0.3);
         }
-        .ticker-wrap:hover { background-color: #1a1a1a; }
+        .ticker-wrap:hover { background-color: #181522; border-color: rgba(138, 82, 184, 0.6); }
         
         .ticker-move {
             display: inline-block;
@@ -259,18 +261,22 @@
             min-height: 0; 
         }
 
-        /* --- MASSIVE CONTENT SCALING --- */
+        /* --- CARD DIMENSION & STYLING --- */
         .card {
             background: linear-gradient(145deg, #ffffff, #e2e4e9);
             border-radius: clamp(12px, 1.5vw, 22px);
             padding: clamp(12px, 2vw, 32px);
             color: #111111; 
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35), inset 0 1.5px 0px rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45), inset 0 2px 0px rgba(255, 255, 255, 0.9), inset 0 -2px 5px rgba(0, 0, 0, 0.05);
             overflow-y: auto;
-            border-left: clamp(4px, 0.5vw, 8px) solid #111111; 
+            border-left: clamp(5px, 0.6vw, 10px) solid #5A2B81; 
             display: flex;
             flex-direction: column;
             min-height: 0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55), inset 0 2px 0px rgba(255, 255, 255, 0.9);
         }
         .card h2 {
             margin-top: 0;
@@ -279,9 +285,11 @@
             margin-bottom: clamp(10px, 1.5vh, 20px);
             font-weight: 700;
             line-height: 1.1;
+            letter-spacing: -0.5px;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.8);
         }
         
-        /* New Expandable Title Styling */
+        /* Expandable Title Styling */
         .expandable-title {
             cursor: pointer; 
             transition: opacity 0.2s; 
@@ -291,15 +299,15 @@
         }
         .expandable-title:hover { opacity: 0.7; }
         .expand-badge {
-            font-size: 0.4em; 
-            color: #111; 
-            background: #e2e4e9; 
-            padding: 6px 12px; 
+            font-size: 0.38em; 
+            color: #fff; 
+            background: #5A2B81; 
+            padding: 6px 14px; 
             border-radius: 20px; 
             font-weight: 800; 
             text-transform: uppercase; 
             letter-spacing: 1px; 
-            border: 2px solid #c0c2c9;
+            box-shadow: 0 3px 8px rgba(90, 43, 129, 0.4);
         }
 
         .card p, .card ul { 
@@ -344,12 +352,16 @@
             background: linear-gradient(145deg, #ffffff, #e2e4e9);
             border-radius: clamp(10px, 1.2vw, 18px); 
             padding: clamp(10px, 1.5vw, 20px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35), inset 0 1.5px 0px rgba(255, 255, 255, 0.8); 
-            border-left: clamp(4px, 0.5vw, 8px) solid #111111; 
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35), inset 0 1.5px 0px rgba(255, 255, 255, 0.9); 
+            border-left: clamp(4px, 0.5vw, 8px) solid #5A2B81; 
             overflow: hidden;
             display: flex; 
             flex-direction: column;
             min-height: 0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .sub-card:hover {
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.45), inset 0 1.5px 0px rgba(255, 255, 255, 0.9);
         }
         .sub-card h3 { 
             margin-top: 0; 
@@ -359,6 +371,7 @@
             font-weight: 700; 
             line-height: 1.1; 
             flex-shrink: 0;
+            letter-spacing: -0.3px;
         }
         .sub-card p, .sub-card ul { 
             font-size: clamp(1.05rem, 1.5vw, 2rem); 
@@ -368,13 +381,13 @@
         }
         .sub-card ul { padding-left: 1em; margin-bottom: 0; }
         
-        /* Updated Standards Text Styling */
         .standards-text { 
             color: #555; 
             font-style: italic; 
             margin-top: auto !important; 
             padding-top: 8px;
-            font-size: clamp(0.6rem, 0.8vw, 1rem); /* Base size, overridden by autoFit */
+            font-size: clamp(0.6rem, 0.8vw, 1rem); 
+            border-top: 1px dashed rgba(90, 43, 129, 0.2);
         }
 
         /* Shared Timer Section */
@@ -873,13 +886,13 @@
     </div>
     
     <!-- Warmup Expanded Overlay -->
-    <div class="modal" id="warmupModal" style="background: rgba(17, 17, 17, 0.98);">
-        <div class="leaderboard-wrapper" style="width: 95%; max-width: 1750px; max-height: 92vh; text-align: left; padding: clamp(20px, 3vw, 50px); display: flex; flex-direction: column; align-items: flex-start;">
-            <h1 style="color: #5A2B81; font-size: clamp(2.5rem, 4vw, 5.5rem); margin: 0 0 20px 0; font-weight: 900; text-transform: uppercase;">🔥 Warm-Up Activity</h1>
-            <div style="flex-grow: 1; overflow-y: auto; width: 100%; padding-right: 20px;">
-                <p id="warmupModalText" style="color: #111111; font-size: clamp(1.8rem, 2.5vw, 3.5rem); line-height: 1.5; white-space: pre-wrap; margin: 0; font-weight: 600;"></p>
+    <div class="modal" id="warmupModal" style="background: rgba(17, 17, 17, 0.96);">
+        <div class="leaderboard-wrapper" style="width: 95%; max-width: 1750px; height: 85vh; text-align: left; padding: clamp(20px, 3vw, 50px); display: flex; flex-direction: column; justify-content: space-between;">
+            <h1 style="color: #5A2B81; font-size: clamp(2.2rem, 3.5vw, 4.5rem); margin: 0 0 15px 0; font-weight: 900; text-transform: uppercase; flex-shrink: 0;">Warm-Up Activity</h1>
+            <div id="warmupModalTextContainer" style="flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; overflow: hidden; padding: 10px 0;">
+                <p id="warmupModalText" style="color: #111111; font-size: 3rem; line-height: 1.4; white-space: pre-wrap; margin: 0; font-weight: 600; text-align: center; width: 100%;">Loading...</p>
             </div>
-            <button class="close-btn" onclick="toggleModal('warmupModal')" style="margin-top: 30px; align-self: center; background: #5A2B81; color: white;">Close Fullscreen</button>
+            <button class="close-btn" onclick="toggleModal('warmupModal')" style="margin-top: 15px; align-self: center; background: #5A2B81; color: white; flex-shrink: 0;">Close Fullscreen</button>
         </div>
     </div>
 
@@ -1098,7 +1111,7 @@
             </div>
 
             <div class="card card-warmup">
-                <h2 class="expandable-title" onclick="toggleModal('warmupModal')" title="Expand Full Screen">
+                <h2 class="expandable-title" onclick="toggleWarmupModal()" title="Expand Full Screen">
                     Warm-Up Activity
                     <span class="expand-badge">⛶ Expand</span>
                 </h2>
@@ -1295,11 +1308,34 @@
                     closeWheelModal();
                 } else if (event.target.id === 'trackerModal') {
                     toggleModal('trackerModal'); 
+                } else if (event.target.id === 'warmupModal') {
+                    toggleModal('warmupModal');
                 } else {
                     event.target.classList.remove('active');
                 }
             }
         });
+
+        function toggleWarmupModal() {
+            toggleModal('warmupModal');
+            if (document.getElementById('warmupModal').classList.contains('active')) {
+                autoFitModalText();
+            }
+        }
+
+        function autoFitModalText() {
+            const container = document.getElementById('warmupModalTextContainer');
+            const el = document.getElementById('warmupModalText');
+            if (!container || !el) return;
+
+            el.style.fontSize = '4rem'; 
+            let currentSize = 64; 
+
+            while ((el.scrollHeight > container.clientHeight || el.scrollWidth > container.clientWidth) && currentSize > 18) {
+                currentSize -= 2;
+                el.style.fontSize = currentSize + 'px';
+            }
+        }
 
         // --- WEB AUDIO API (CHIMES) ---
         let audioCtx;
@@ -2398,7 +2434,7 @@
                 if (event.key.toLowerCase() === 'b') togglePointsModal();
                 if (event.key.toLowerCase() === 'm') toggleModal('timerModal');
                 if (event.key.toLowerCase() === 'e') toggleModal('examModal');
-                if (event.key.toLowerCase() === 'w') toggleModal('warmupModal');
+                if (event.key.toLowerCase() === 'w') toggleWarmupModal();
                 if (event.key.toLowerCase() === 'o') {
                     document.getElementById('customSheetUrlInput').value = getActiveCsvUrl();
                     document.getElementById('gameVaultUrlInput').value = localStorage.getItem('titan_game_url') || "";
