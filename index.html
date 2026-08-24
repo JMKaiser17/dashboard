@@ -717,18 +717,23 @@
             100% { background: #e2e4e9; }
         }
 
+        .tracker-name-wrap {
+            display: flex; flex-direction: column; justify-content: center; flex-grow: 1; min-width: 0; align-items: flex-start;
+        }
+
         .tracker-name { 
             font-size: clamp(0.85rem, 1vw, 1.15rem); font-weight: 700; color: #111; 
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
         }
         
         .hp-timer {
-            font-size: clamp(0.75rem, 0.9vw, 0.95rem); 
+            font-size: clamp(0.7rem, 0.8vw, 0.9rem); 
             color: #5A2B81; 
             font-weight: 800; 
             white-space: nowrap;
             font-variant-numeric: tabular-nums;
-            margin-right: 4px;
+            margin-top: -2px;
+            line-height: 1;
         }
 
         .t-hp-btn {
@@ -1672,12 +1677,12 @@
                 row.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 10px; flex-grow: 1; min-width: 0;">
                         <button class="t-hp-btn ${hpButtonStyle}" onclick="toggleHallPass('${safeStudentJS}', '${classId}')" title="Hall Pass">🚪</button>
-                        <div class="tracker-name" title="Click to mark absent/present" style="${nameStyle}" onclick="toggleAbsent('${safeStudentJS}', '${classId}')">${student}</div>
+                        <div class="tracker-name-wrap">
+                            <div class="tracker-name" title="Click to mark absent/present" style="${nameStyle}" onclick="toggleAbsent('${safeStudentJS}', '${classId}')">${student}</div>
+                            ${hpTimerDisplay}
+                        </div>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-                        ${hpTimerDisplay}
-                        <div class="tracker-score-display" id="score-display-${safeStudentId}">${score}</div>
-                    </div>
+                    <div class="tracker-score-display" id="score-display-${safeStudentId}">${score}</div>
                     <div class="tracker-actions">
                         <button class="t-btn t-minus" onclick="logParticipation('${safeStudentJS}', -1, '${classId}')">-</button>
                         <button class="t-btn t-plus" onclick="logParticipation('${safeStudentJS}', 1, '${classId}')">+</button>
