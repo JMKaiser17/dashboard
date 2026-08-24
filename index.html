@@ -717,17 +717,18 @@
             100% { background: #e2e4e9; }
         }
 
-        .tracker-name-wrap {
-            display: flex; flex-direction: column; justify-content: center; flex-grow: 1; min-width: 0;
-        }
-
         .tracker-name { 
             font-size: clamp(0.85rem, 1vw, 1.15rem); font-weight: 700; color: #111; 
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
         }
         
         .hp-timer {
-            font-size: 0.75rem; color: #5A2B81; font-weight: 700; margin-top: -2px;
+            font-size: clamp(0.75rem, 0.9vw, 0.95rem); 
+            color: #5A2B81; 
+            font-weight: 800; 
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+            margin-right: 4px;
         }
 
         .t-hp-btn {
@@ -1662,7 +1663,7 @@
                 let safeStudentId = student.replace(/['"\s]/g, '-');
                 
                 let hpButtonStyle = isOut ? 'active' : '';
-                let hpTimerDisplay = isOut ? `<div class="hp-timer" id="hp-timer-${safeStudentId}">Out...</div>` : `<div class="hp-timer" id="hp-timer-${safeStudentId}" style="display:none;"></div>`;
+                let hpTimerDisplay = isOut ? `<div class="hp-timer" id="hp-timer-${safeStudentId}">⏱️ Out...</div>` : `<div class="hp-timer" id="hp-timer-${safeStudentId}" style="display:none;"></div>`;
                 
                 let row = document.createElement('div');
                 row.className = 'tracker-row';
@@ -1671,12 +1672,12 @@
                 row.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 10px; flex-grow: 1; min-width: 0;">
                         <button class="t-hp-btn ${hpButtonStyle}" onclick="toggleHallPass('${safeStudentJS}', '${classId}')" title="Hall Pass">🚪</button>
-                        <div class="tracker-name-wrap">
-                            <div class="tracker-name" title="Click to mark absent/present" style="${nameStyle}" onclick="toggleAbsent('${safeStudentJS}', '${classId}')">${student}</div>
-                            ${hpTimerDisplay}
-                        </div>
+                        <div class="tracker-name" title="Click to mark absent/present" style="${nameStyle}" onclick="toggleAbsent('${safeStudentJS}', '${classId}')">${student}</div>
                     </div>
-                    <div class="tracker-score-display" id="score-display-${safeStudentId}">${score}</div>
+                    <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+                        ${hpTimerDisplay}
+                        <div class="tracker-score-display" id="score-display-${safeStudentId}">${score}</div>
+                    </div>
                     <div class="tracker-actions">
                         <button class="t-btn t-minus" onclick="logParticipation('${safeStudentJS}', -1, '${classId}')">-</button>
                         <button class="t-btn t-plus" onclick="logParticipation('${safeStudentJS}', 1, '${classId}')">+</button>
@@ -1731,7 +1732,7 @@
                         let elapsedMs = Date.now() - hpData[student];
                         let mins = Math.floor(elapsedMs / 60000);
                         let secs = Math.floor((elapsedMs % 60000) / 1000);
-                        timerEl.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                        timerEl.innerText = `⏱️ ${mins}:${secs < 10 ? '0' : ''}${secs}`;
                         
                         // Apply the pulsing purple warning at the 5-minute mark (300,000 ms)
                         if (elapsedMs > 300000 && rowEl) { 
