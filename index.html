@@ -2689,6 +2689,7 @@
 
         function autoFitCardText() {
             const textElements = [
+                document.getElementById('warmupText'),
                 document.getElementById('eqText'),
                 document.getElementById('remindersItems'),
                 document.getElementById('spotlightText')
@@ -2697,7 +2698,7 @@
             textElements.forEach(el => {
                 if (!el) return;
                 el.style.fontSize = ''; 
-                let parentCard = el.closest('.sub-card');
+                let parentCard = el.closest('.sub-card, .card');
                 if (!parentCard) return;
 
                 let currentSize = parseFloat(window.getComputedStyle(el).fontSize);
