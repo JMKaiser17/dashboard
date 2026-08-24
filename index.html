@@ -12,7 +12,7 @@
     
     <!-- Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- CSV Parsing Library (handles quoted/multi-line cells correctly, unlike a manual split) -->
+    <!-- CSV Parsing Library -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <style>
         /* Hide scrollbars globally while preserving scroll functionality */
@@ -324,7 +324,7 @@
             padding: clamp(10px, 1.5vw, 20px);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35), inset 0 1.5px 0px rgba(255, 255, 255, 0.8); 
             border-left: clamp(4px, 0.5vw, 8px) solid #111111; 
-            overflow: hidden; /* Scroll disabled to allow auto-resizing text */
+            overflow: hidden;
             display: flex; 
             flex-direction: column;
             min-height: 0;
@@ -347,7 +347,7 @@
         .sub-card ul { padding-left: 1em; margin-bottom: 0; }
         .standards-text { font-size: clamp(0.85rem, 1.1vw, 1.4rem) !important; color: #555; font-style: italic; margin-top: 8px !important; }
 
-        /* Shared Timer Section globally redefined */
+        /* Shared Timer Section */
         .timer-section { width: 100%; }
         .timer-controls { display: flex; gap: 8px; margin-bottom: 8px; }
         .timer-controls button {
@@ -686,16 +686,57 @@
         .lb-pts { color: #fff; font-weight: bold; font-size: clamp(0.9rem, 1.2vw, 1.5rem); font-variant-numeric: tabular-nums;}
 
         /* --- ROSTER / PARTICIPATION TRACKER --- */
+        #trackerContainer {
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); 
+            gap: clamp(6px, 1vh, 12px); 
+            max-height: 74vh; 
+            overflow-y: auto; 
+            padding-right: 6px; 
+            align-content: start;
+        }
+
         .tracker-row { 
             display: flex; justify-content: space-between; align-items: center; 
-            background: #e2e4e9; padding: clamp(4px, 0.6vh, 8px) clamp(8px, 1vw, 12px); border-radius: 8px; 
-            border-left: 4px solid #5A2B81; box-shadow: 0 2px 4px rgba(0,0,0,0.15); 
+            background: #e2e4e9; 
+            padding: clamp(2px, 0.4vh, 6px) clamp(8px, 1vw, 12px); 
+            border-radius: 8px; 
+            border-left: 4px solid #5A2B81; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15); 
             gap: 8px; 
+            transition: background 0.3s;
         }
+        
+        .tracker-row.hallpass-warning {
+            animation: pulseWarning 2s infinite;
+        }
+        
+        @keyframes pulseWarning {
+            0% { background: #e2e4e9; }
+            50% { background: #d4b5ec; } 
+            100% { background: #e2e4e9; }
+        }
+
+        .tracker-name-wrap {
+            display: flex; flex-direction: column; justify-content: center; flex-grow: 1; min-width: 0;
+        }
+
         .tracker-name { 
-            font-size: clamp(0.9rem, 1.15vw, 1.35rem); font-weight: 700; color: #111; 
-            flex-grow: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
+            font-size: clamp(0.85rem, 1vw, 1.15rem); font-weight: 700; color: #111; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
         }
+        
+        .hp-timer {
+            font-size: 0.75rem; color: #5A2B81; font-weight: 700; margin-top: -2px;
+        }
+
+        .t-hp-btn {
+            background: transparent; border: 1px solid #c0c2c9; border-radius: 6px; 
+            cursor: pointer; padding: 2px 6px; font-size: 1rem; transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .t-hp-btn.active { background: #5A2B81; border-color: #5A2B81; }
+
         .tracker-score-display {
             font-size: clamp(1.1rem, 1.4vw, 1.7rem); font-weight: 900; color: #5A2B81;
             min-width: 35px; text-align: center; font-variant-numeric: tabular-nums; flex-shrink: 0;
@@ -799,7 +840,7 @@
     <div class="modal" id="trackerModal">
         <div class="leaderboard-wrapper" style="width: 95%; max-width: 1750px; max-height: 92vh; padding: clamp(16px, 2vw, 28px);">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #c0c2c9; padding-bottom: 12px; margin-bottom: 14px;">
-                <h1 class="lb-header" style="text-align: left; font-size: clamp(1.6rem, 2.2vw, 2.8rem);">📋 Live Tracker</h1>
+                <h1 class="lb-header" style="text-align: left; font-size: clamp(1.6rem, 2.2vw, 2.8rem);">📋 Class Roster</h1>
                 <div style="display:flex; gap:12px;">
                     <button onclick="clearAbsences()" style="background:#111111; color:#e2e4e9; padding:10px 22px; border-radius:12px; font-weight:bold; border:2px solid #5A2B81; cursor:pointer; font-size: 1.1rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">Clear Absences</button>
                     <button onclick="clearPointsData()" style="background:#111111; color:#e2e4e9; padding:10px 22px; border-radius:12px; font-weight:bold; border:2px solid #5A2B81; cursor:pointer; font-size: 1.1rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">Clear Points</button>
@@ -807,8 +848,8 @@
                     <button id="trackerUndoBtn" onclick="undoLastPointsChange()" style="display:none; background:#e2e4e9; color:#5A2B81; padding:10px 22px; border-radius:12px; font-weight:bold; border:2px solid #5A2B81; cursor:pointer; font-size: 1.1rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">↩️ Undo</button>
                 </div>
             </div>
-            <!-- Expanded Grid Columns for More Name Space -->
-            <div id="trackerContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: clamp(8px, 1.2vh, 16px); max-height: 74vh; overflow-y: auto; padding-right: 6px; align-content: start;">
+            
+            <div id="trackerContainer">
                 <!-- Roster rows load here -->
             </div>
             <button class="close-btn" onclick="toggleModal('trackerModal')" style="margin-top: 15px; align-self: center;">Close Board</button>
@@ -974,8 +1015,8 @@
 
         <!-- Top Navigation Bar -->
         <div class="top-bar">
-            <div class="pill class-pill" onclick="toggleGameMode()">
-                <div class="pill-subtitle">Today's Schedule</div>
+            <div class="pill class-pill" onclick="toggleTrackerModal()">
+                <div class="pill-subtitle" id="classPillSubtitle">Today's Schedule</div>
                 <div class="current-class" id="classTitle">Loading...</div>
             </div>
             
@@ -1263,8 +1304,6 @@
         let isMarketTicker = false;
         
         let gameVaultData = []; 
-        // Word/prompt lists for the four "quick prompt" mini-games, keyed by game.
-        // Populated by loadMiniGamePrompts() — see MINI_GAME_CONFIGS below.
         let miniGameLists = { hotseat: [], titansays: [], hivemind: [], debate: [] };
 
         const coreMarketAnchors = [
@@ -1364,15 +1403,6 @@
             fetchGameVaultData();
         }
 
-        // ==================================================================
-        // BACKUP & RESTORE
-        // ------------------------------------------------------------------
-        // Everything the dashboard saves locally (points, attendance,
-        // checklists, played-question history) lives under one of these
-        // localStorage key prefixes. Backing up/restoring by prefix means
-        // a new feature that adds a new "titan_..." key is automatically
-        // covered without touching this code.
-        // ==================================================================
         const DASHBOARD_STORAGE_PREFIXES = ['titan_', 'classPoints_', 'checklist_'];
 
         function isDashboardStorageKey(key) {
@@ -1458,7 +1488,6 @@
             }
         }
 
-        // --- FETCH & PARSE GAME VAULT ---
         async function fetchGameVaultData() {
             const gameUrl = localStorage.getItem('titan_game_url');
             if (!gameUrl) return;
@@ -1472,24 +1501,6 @@
             }
         }
 
-        // ==================================================================
-        // CSV INGESTION (Google Sheets → dashboard data)
-        // ------------------------------------------------------------------
-        // Uses PapaParse instead of a manual comma-split so that quoted
-        // cells containing commas or line breaks parse correctly. Columns
-        // are read by HEADER NAME (case/space-insensitive) rather than by
-        // position, so reordering or inserting a column in the sheet no
-        // longer silently breaks the dashboard.
-        //
-        // Expected headers — Schedule sheet:
-        //   Date, ID, Title, Start, End, Roster, EQ, Standards, Warmup,
-        //   Agenda, Reminders, Message, Spotlight, GameCode, Resources
-        // Expected headers — Game Vault sheet:
-        //   ID, Type, Title, Pack, Category, Prompt, Answer, Value, Status
-        // ==================================================================
-
-        // Case/space-insensitive lookup so "Start Time" and "start_time"
-        // both resolve to a header named "Start".
         function getCol(row, name) {
             const target = name.toLowerCase().replace(/[\s_]+/g, '');
             const key = Object.keys(row).find(k => k.toLowerCase().replace(/[\s_]+/g, '') === target);
@@ -1616,7 +1627,6 @@
             modal.classList.toggle('active');
         }
 
-        // --- TRACKER & ABSENCE LOGIC ---
         function toggleTrackerModal() {
             toggleModal('trackerModal');
             if (document.getElementById('trackerModal').classList.contains('active')) {
@@ -1629,13 +1639,14 @@
             container.innerHTML = '';
             
             if (!activeBlockData || !activeBlockData.roster || activeBlockData.roster.length === 0) {
-                container.innerHTML = '<p style="text-align:center; font-size: 1.5rem; padding: 20px; color: #111;">No active roster available for this period.</p>';
+                container.innerHTML = '<p style="text-align:center; font-size: 1.5rem; padding: 20px; color: #111; grid-column: 1 / -1;">No active roster available for this period.</p>';
                 return;
             }
 
             let classId = activeBlockData.id;
             let trackingData = JSON.parse(localStorage.getItem('titan_tracker_' + classId) || '{}');
             let absentList = JSON.parse(localStorage.getItem('titan_absent_' + classId) || '[]');
+            let hpData = JSON.parse(localStorage.getItem('titan_hallpass_active_' + classId) || '{}');
 
             activeBlockData.roster.forEach(student => {
                 if (trackingData[student] === undefined) {
@@ -1644,15 +1655,27 @@
                 
                 let score = trackingData[student];
                 let isAbsent = absentList.includes(student);
-                let nameStyle = `cursor: pointer; transition: all 0.2s; text-decoration: ${isAbsent ? 'line-through' : 'none'}; opacity: ${isAbsent ? '0.4' : '1'};`;
+                let isOut = hpData[student] !== undefined;
                 
+                let nameStyle = `cursor: pointer; transition: all 0.2s; text-decoration: ${isAbsent ? 'line-through' : 'none'}; opacity: ${isAbsent ? '0.4' : '1'};`;
                 let safeStudentJS = student.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                 let safeStudentId = student.replace(/['"\s]/g, '-');
                 
+                let hpButtonStyle = isOut ? 'active' : '';
+                let hpTimerDisplay = isOut ? `<div class="hp-timer" id="hp-timer-${safeStudentId}">Out...</div>` : `<div class="hp-timer" id="hp-timer-${safeStudentId}" style="display:none;"></div>`;
+                
                 let row = document.createElement('div');
                 row.className = 'tracker-row';
+                if (isOut) row.id = `tracker-row-${safeStudentId}`;
+                
                 row.innerHTML = `
-                    <div class="tracker-name" title="Click to mark absent/present" style="${nameStyle}" onclick="toggleAbsent('${safeStudentJS}', '${classId}')">${student}</div>
+                    <div style="display: flex; align-items: center; gap: 10px; flex-grow: 1; min-width: 0;">
+                        <button class="t-hp-btn ${hpButtonStyle}" onclick="toggleHallPass('${safeStudentJS}', '${classId}')" title="Hall Pass">🚪</button>
+                        <div class="tracker-name-wrap">
+                            <div class="tracker-name" title="Click to mark absent/present" style="${nameStyle}" onclick="toggleAbsent('${safeStudentJS}', '${classId}')">${student}</div>
+                            ${hpTimerDisplay}
+                        </div>
+                    </div>
                     <div class="tracker-score-display" id="score-display-${safeStudentId}">${score}</div>
                     <div class="tracker-actions">
                         <button class="t-btn t-minus" onclick="logParticipation('${safeStudentJS}', -1, '${classId}')">-</button>
@@ -1661,7 +1684,64 @@
                 `;
                 container.appendChild(row);
             });
+            updateHallPassIndicators();
         }
+
+        // --- HALL PASS LOGIC ---
+        window.toggleHallPass = function(student, classId) {
+            let hpKey = 'titan_hallpass_active_' + classId;
+            let hpData = JSON.parse(localStorage.getItem(hpKey) || '{}');
+            
+            if (hpData[student]) {
+                delete hpData[student]; // Check them back in
+            } else {
+                hpData[student] = Date.now(); // Send them out
+            }
+            
+            localStorage.setItem(hpKey, JSON.stringify(hpData));
+            renderTracker();
+        };
+
+        function updateHallPassIndicators() {
+            if (!activeBlockData) return;
+            let classId = activeBlockData.id;
+            let hpData = JSON.parse(localStorage.getItem('titan_hallpass_active_' + classId) || '{}');
+            let outCount = Object.keys(hpData).length;
+            
+            // Update the Main Class Pill Subtitle
+            let subtitleEl = document.getElementById('classPillSubtitle');
+            if (subtitleEl) {
+                if (outCount > 0) {
+                    subtitleEl.innerText = `📍 ${outCount} Student${outCount > 1 ? 's' : ''} Out`;
+                    subtitleEl.style.color = '#5A2B81'; 
+                } else {
+                    subtitleEl.innerText = "Today's Schedule";
+                    subtitleEl.style.color = '#444';
+                }
+            }
+
+            // Update the live timers if the modal is currently open
+            if (document.getElementById('trackerModal').classList.contains('active')) {
+                Object.keys(hpData).forEach(student => {
+                    let safeStudentId = student.replace(/['"\s]/g, '-');
+                    let timerEl = document.getElementById(`hp-timer-${safeStudentId}`);
+                    let rowEl = document.getElementById(`tracker-row-${safeStudentId}`);
+                    
+                    if (timerEl) {
+                        let elapsedMs = Date.now() - hpData[student];
+                        let mins = Math.floor(elapsedMs / 60000);
+                        let secs = Math.floor((elapsedMs % 60000) / 1000);
+                        timerEl.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                        
+                        // Apply the pulsing purple warning at the 5-minute mark (300,000 ms)
+                        if (elapsedMs > 300000 && rowEl) { 
+                            rowEl.classList.add('hallpass-warning');
+                        }
+                    }
+                });
+            }
+        }
+        setInterval(updateHallPassIndicators, 1000);
 
         window.toggleAbsent = function(student, classId) {
             let absentKey = 'titan_absent_' + classId;
@@ -1730,17 +1810,6 @@
             });
         };
 
-        // ==================================================================
-        // POINTS UNDO
-        // ------------------------------------------------------------------
-        // One shared "undo last change" stack for both point systems —
-        // the whole-class Titan Cup points (updatePoints) and individual
-        // student participation points (logParticipation) — since both are
-        // the same mistake pattern: an accidental extra tap on + or -.
-        // Undo buttons live in both the Points and Tracker modals and call
-        // the same undoLastPointsChange(). History is in-memory only and
-        // clears on refresh, same as a normal undo stack.
-        // ==================================================================
         let pointsUndoStack = [];
 
         function pushPointsUndo(undoFn) {
@@ -2063,7 +2132,6 @@
                 document.getElementById('jeopardyContainer').style.display = 'flex';
                 renderJeopardyBoard(packId); 
             } else if (MINI_GAME_CONFIGS[gameType]) {
-                // Hot Seat, Titan Says, Hivemind, Rapid Debate all share one loader — see MINI_GAME_CONFIGS below.
                 loadMiniGamePrompts(gameType, currentPeriod);
             }
         }
@@ -2267,35 +2335,50 @@
             }
         }
 
+        // --- KEYBOARD SHORTCUTS ---
         document.addEventListener('keydown', function(event) {
-            if (event.shiftKey && event.key.toLowerCase() === 'c') fireBigConfetti();
-            if (event.shiftKey && event.key.toLowerCase() === 't') toggleModal('tardyModal');
-            if (event.shiftKey && event.key.toLowerCase() === 'z') toggleFocusMode(); 
-            if (event.shiftKey && event.key.toLowerCase() === 'p') toggleSlideMode(); 
-            if (event.shiftKey && event.key.toLowerCase() === 'g') toggleGameStage(); 
-            if (event.shiftKey && event.key.toLowerCase() === 'r') toggleTrackerModal(); 
-            if (event.shiftKey && event.key.toLowerCase() === 'd') toggleModal('eyesUpModal'); 
-            if (event.shiftKey && event.key.toLowerCase() === 'b') togglePointsModal();
-            if (event.shiftKey && event.key.toLowerCase() === 'm') toggleModal('timerModal');
-            if (event.shiftKey && event.key.toLowerCase() === 'e') toggleModal('examModal');
-            if (event.shiftKey && event.key.toLowerCase() === 'o') {
-                document.getElementById('customSheetUrlInput').value = getActiveCsvUrl();
-                document.getElementById('gameVaultUrlInput').value = localStorage.getItem('titan_game_url') || "";
-                toggleModal('settingsModal');
+            if (event.shiftKey) {
+                if (event.key.toLowerCase() === 'c') fireBigConfetti();
+                if (event.key.toLowerCase() === 't') toggleModal('tardyModal');
+                if (event.key.toLowerCase() === 'z') toggleFocusMode(); 
+                if (event.key.toLowerCase() === 'p') toggleSlideMode(); 
+                if (event.key.toLowerCase() === 'g') toggleGameStage(); 
+                if (event.key.toLowerCase() === 'r') toggleTrackerModal(); 
+                if (event.key.toLowerCase() === 'd') toggleModal('eyesUpModal'); 
+                if (event.key.toLowerCase() === 'b') togglePointsModal();
+                if (event.key.toLowerCase() === 'm') toggleModal('timerModal');
+                if (event.key.toLowerCase() === 'e') toggleModal('examModal');
+                if (event.key.toLowerCase() === 'o') {
+                    document.getElementById('customSheetUrlInput').value = getActiveCsvUrl();
+                    document.getElementById('gameVaultUrlInput').value = localStorage.getItem('titan_game_url') || "";
+                    toggleModal('settingsModal');
+                }
+                if (event.key.toLowerCase() === 's') {
+                    const wModal = document.getElementById('wheelModal');
+                    if (wModal.classList.contains('active')) closeWheelModal(); else openWheelModal();
+                }
             }
-            if (event.shiftKey && event.key.toLowerCase() === 's') {
-                const wModal = document.getElementById('wheelModal');
-                if (wModal.classList.contains('active')) closeWheelModal(); else openWheelModal();
+            
+            // --- SOUNDBOARD SHORTCUTS ---
+            if (event.altKey) {
+                if (event.code === 'Digit1') {
+                    event.preventDefault();
+                    playTone(150, 0, 0.4, 0.2); 
+                    playTone(155, 0, 0.4, 0.2); 
+                } else if (event.code === 'Digit2') {
+                    event.preventDefault();
+                    playTone(800, 0, 0.2, 0.15); 
+                    playTone(1200, 0.1, 0.4, 0.15);
+                } else if (event.code === 'Digit3') {
+                    event.preventDefault();
+                    playTone(523.25, 0, 0.2, 0.15); 
+                    playTone(659.25, 0.2, 0.2, 0.15); 
+                    playTone(783.99, 0.4, 0.4, 0.15);
+                }
+                return;
             }
         });
 
-        // --- ADDITIONAL SHORTCUTS (no Shift key) ---
-        // Space: start/pause the class timer. Right Arrow: advance to the next
-        // word/prompt in whichever mini-game (Hot Seat / Titan Says / Hivemind /
-        // Rapid Debate) is currently open. Skipped entirely while typing in a
-        // text field or the agenda's editable area, and while any Shift/Ctrl/
-        // Alt/Meta combo is held, so it never fights the shortcuts above or
-        // normal typing.
         document.addEventListener('keydown', function(event) {
             if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) return;
 
@@ -2320,26 +2403,6 @@
 
         function fireBigConfetti() {
             confetti({ particleCount: 300, spread: 140, startVelocity: 45, origin: { y: 0.6 }, colors: ['#5A2B81', '#C0C2C9', '#FFFFFF'] });
-        }
-
-        function toggleGameMode() {
-            toggleModal('gameModal');
-            let gameUrlEl = document.getElementById('displayGameUrl');
-            let gameCodeEl = document.getElementById('displayGameCode');
-            
-            if (activeBlockData && activeBlockData.gameCode) {
-                let parts = activeBlockData.gameCode.split('|');
-                if (parts.length > 1) {
-                    gameUrlEl.innerText = parts[0].trim();
-                    gameCodeEl.innerText = "Code: " + parts[1].trim();
-                } else {
-                    gameUrlEl.innerText = "Go to the review site!";
-                    gameCodeEl.innerText = "Code: " + parts[0].trim();
-                }
-            } else {
-                gameUrlEl.innerText = "No review game active right now.";
-                gameCodeEl.innerText = "";
-            }
         }
 
         let targetGroupSize = 2;
@@ -2447,9 +2510,6 @@
         let spinTimeout = null;
         let isGroupWheelMode = false;
 
-        // No-repeat tracking: which items have already been picked, scoped to the
-        // current wheel mode (students vs groups) and the active class period, so
-        // switching periods or modes naturally gets a fresh wheel.
         function getWheelStorageKey() {
             let periodId = activeBlockData ? activeBlockData.id.toString() : "TESTING";
             let mode = isGroupWheelMode ? 'groups' : 'students';
@@ -2607,8 +2667,6 @@
             let randomDuration = 3.5 + Math.random() * 2.5; 
             wheel.style.transition = `transform ${randomDuration}s cubic-bezier(0.1, 0.8, 0.1, 1)`;
 
-            // Pick only from the not-yet-played items, but find that item's position
-            // on the full wheel so the pointer actually lands on its slice.
             let winner = availableItems[Math.floor(Math.random() * availableItems.length)];
             let randomIndex = items.indexOf(winner);
             let sliceDeg = 360 / items.length;
@@ -2628,7 +2686,6 @@
             }, randomDuration * 1000); 
         }
 
-        // --- AUTO-FIT TEXT HELPER ---
         function autoFitCardText() {
             const textElements = [
                 document.getElementById('eqText'),
@@ -2764,7 +2821,6 @@
                          drawWheel(getActiveWheelItems());
                     }
 
-                    // Trigger the text auto-fit script
                     setTimeout(autoFitCardText, 50);
 
                 } else {
@@ -2902,16 +2958,6 @@
             });
         }
 
-        // ==================================================================
-        // MINI-GAME PROMPT ENGINE
-        // ------------------------------------------------------------------
-        // Hot Seat, Titan Says, Hivemind, and Rapid Debate are all the same
-        // game underneath: pull a word/prompt list for the active period
-        // from the Game Vault, show one at random without repeats until
-        // reset, persisting "already played" per pack in localStorage.
-        // To add a new mini-game of this shape, add one entry below —
-        // no new functions needed.
-        // ==================================================================
         const MINI_GAME_CONFIGS = {
             hotseat: {
                 vaultType: 'hotseat',
@@ -2932,8 +2978,6 @@
                 readyText: 'AWAITING COMMAND...',
                 emptyText: 'OUT OF COMMANDS! PLEASE RESET.',
                 placeholderList: ["NO COMMANDS LOADED", "CHECK SPREADSHEET"],
-                // Titan Says has one extra quirk the others don't: a 70% chance
-                // of prefixing the command, unless the sheet already wrote it in.
                 format: (selected) => {
                     if (!selected.toUpperCase().includes("TITAN SAYS") && Math.random() < 0.7) {
                         return "TITAN SAYS:\n" + selected;
@@ -2963,10 +3007,6 @@
             }
         };
 
-        // Called from openGameModule() when one of the four mini-games above is opened.
-        // Filters the Game Vault to rows matching this game type + the active period
-        // (or "ALL" packs), splits each row's prompt column into individual items,
-        // and stores the result in miniGameLists[gameKey].
         function loadMiniGamePrompts(gameKey, currentPeriod) {
             const cfg = MINI_GAME_CONFIGS[gameKey];
             document.getElementById(cfg.containerId).style.display = 'flex';
@@ -3027,8 +3067,6 @@
             }, 150);
         }
 
-        // Thin named wrappers so the existing onclick="" handlers in the markup
-        // don't need to change — each just delegates to the shared engine above.
         function nextHotSeatWord() { nextMiniGamePrompt('hotseat'); }
         function resetHotSeat() { resetMiniGame('hotseat'); }
         function nextTitanSaysPrompt() { nextMiniGamePrompt('titansays'); }
