@@ -688,7 +688,8 @@
         /* --- ROSTER / PARTICIPATION TRACKER --- */
         #trackerContainer {
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); 
+            /* Increased minmax from 230px to 290px to give names room to breathe */
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); 
             gap: clamp(6px, 1vh, 12px); 
             max-height: 74vh; 
             overflow-y: auto; 
