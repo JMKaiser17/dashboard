@@ -1706,8 +1706,18 @@
                 let endStr = getCol(row, 'End');
 
                 let startMins = 0, endMins = 0;
-                if (startStr.includes(':')) { let p = startStr.split(':'); startMins = parseInt(p[0]) * 60 + parseInt(p[1]); }
-                if (endStr.includes(':')) { let p = endStr.split(':'); endMins = parseInt(p[0]) * 60 + parseInt(p[1]); }
+                if (startStr.includes(':')) { 
+                    let p = startStr.split(':'); 
+                    let h = parseInt(p[0]);
+                    if (h >= 1 && h <= 6) h += 12; // Convert afternoon times to 24-hour
+                    startMins = h * 60 + parseInt(p[1]); 
+                }
+                if (endStr.includes(':')) { 
+                    let p = endStr.split(':'); 
+                    let h = parseInt(p[0]);
+                    if (h >= 1 && h <= 6) h += 12; // Convert afternoon times to 24-hour
+                    endMins = h * 60 + parseInt(p[1]); 
+                }
 
                 let standardsText = getCol(row, 'Standards');
 
@@ -2792,7 +2802,7 @@
             document.getElementById('wheelModal').classList.remove('active');
             clearTimeout(spinTimeout);
             setTimeout(() => {
-                document.getElementById('wheelWinnerDisplay').innerText = isGroupWheelMode ? "SPIN THE GROUPS" : "SPIN THE WHEEL";
+                document.getElementById('wheelWinnerDisplay').innerText = isGroupWheelMode ? "SPIN THE GROUPS" : "SPIN THE GROUPS";
                 document.getElementById('wheelWinnerDisplay').style.color = '#fff';
             }, 300); 
         }
@@ -2918,9 +2928,12 @@
                 activeBlock = forcedBlock;
             } else {
                 for (let block of schedule) {
-                    if (currentMinutes >= block.start && currentMinutes < block.end) {
-                        activeBlock = block;
-                        break;
+                    if (currentMinutes <= block.end) {
+                        // Skip planning periods so we jump straight to the next active class
+                        if (!block.title.toLowerCase().includes('planning')) {
+                            activeBlock = block;
+                            break;
+                        }
                     }
                 }
             }
