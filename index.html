@@ -698,6 +698,42 @@
             border: clamp(4px, 0.5vw, 6px) solid #5A2B81; display: flex; flex-direction: column; gap: clamp(12px, 1.8vh, 20px);
             overflow-y: auto;
         }
+
+        /* Warm-Up fullscreen modal dressing — same watermark treatment as .card-agenda,
+           plus a divider under the title and a "paper panel" look for the text itself,
+           so the expanded view doesn't read as a plain white box. */
+        .warmup-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .warmup-card::before {
+            content: "";
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 55%; height: 55%;
+            background-image: url('SouthGarner_Titans_Logo1.png');
+            background-size: contain; background-position: center; background-repeat: no-repeat;
+            opacity: 0.05;
+            z-index: 0; pointer-events: none;
+        }
+        .warmup-card > * { position: relative; z-index: 1; }
+        .warmup-card h1 {
+            display: flex; align-items: center; gap: clamp(10px, 1.2vw, 18px);
+            padding-bottom: clamp(10px, 1.5vh, 18px);
+            border-bottom: 3px dashed rgba(90, 43, 129, 0.25);
+        }
+        .warmup-card h1::before {
+            content: "⚡";
+            font-size: 0.7em;
+            filter: drop-shadow(0 2px 3px rgba(90, 43, 129, 0.4));
+        }
+        .warmup-text-panel {
+            background: linear-gradient(145deg, #f8f6fb, #ecebf3);
+            border-radius: 20px;
+            border: 1px solid rgba(90, 43, 129, 0.15);
+            box-shadow: inset 0 2px 10px rgba(90, 43, 129, 0.08), inset 0 -2px 4px rgba(255, 255, 255, 0.7);
+        }
         .lb-header { font-size: clamp(1.8rem, 2.8vw, 3.5rem); margin: 0; font-weight: 900; text-transform: uppercase; text-align: center; }
         
         .lb-current-class {
@@ -887,9 +923,9 @@
     
     <!-- Warmup Expanded Overlay -->
     <div class="modal" id="warmupModal" style="background: rgba(17, 17, 17, 0.96);">
-        <div class="leaderboard-wrapper" style="width: 95%; max-width: 1750px; height: 85vh; text-align: left; padding: clamp(20px, 3vw, 50px); display: flex; flex-direction: column; justify-content: space-between;">
-            <h1 style="color: #5A2B81; font-size: clamp(2.2rem, 3.5vw, 4.5rem); margin: 0 0 15px 0; font-weight: 900; text-transform: uppercase; flex-shrink: 0;">Warm-Up Activity</h1>
-            <div id="warmupModalTextContainer" style="flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; overflow: hidden; padding: 10px 0;">
+        <div class="leaderboard-wrapper warmup-card" style="width: 95%; max-width: 1750px; height: 85vh; text-align: left; padding: clamp(20px, 3vw, 50px); display: flex; flex-direction: column; justify-content: space-between;">
+            <h1 style="color: #5A2B81; font-size: clamp(2.2rem, 3.5vw, 4.5rem); margin: 0; font-weight: 900; text-transform: uppercase; flex-shrink: 0;">Warm-Up Activity</h1>
+            <div id="warmupModalTextContainer" class="warmup-text-panel" style="flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; overflow: hidden; padding: clamp(20px, 3vw, 40px);">
                 <p id="warmupModalText" style="color: #111111; font-size: 3rem; line-height: 1.4; white-space: pre-wrap; margin: 0; font-weight: 600; text-align: center; width: 100%;">Loading...</p>
             </div>
             <button class="close-btn" onclick="toggleModal('warmupModal')" style="margin-top: 15px; align-self: center; background: #5A2B81; color: white; flex-shrink: 0;">Close Fullscreen</button>
@@ -2787,16 +2823,31 @@
                 let parentCard = el.closest('.sub-card, .card');
                 if (!parentCard) return;
 
-                let currentSize = parseFloat(window.getComputedStyle(el).fontSize);
-                while (parentCard.scrollHeight > parentCard.clientHeight && currentSize > 10) {
-                    currentSize -= 1;
-                    el.style.fontSize = currentSize + 'px';
-                }
-                
                 if (el.id === 'eqText') {
-                    let standardsEl = document.getElementById('standardsText');
-                    if (standardsEl) {
-                        standardsEl.style.fontSize = Math.max(currentSize * 0.5, 10) + 'px'; 
+                    // The Essential Question card also has a Standards line pinned to
+                    // the bottom via CSS (its own fixed, small font-size — see
+                    // .standards-text). That line should never grow or shrink with the
+                    // EQ text, so measure the EQ against only the space left over after
+                    // the heading and the Standards line, not the whole card's overflow.
+                    const heading = parentCard.querySelector('h3');
+                    const standardsEl = document.getElementById('standardsText');
+                    standardsEl && (standardsEl.style.fontSize = ''); // always defer to its own CSS clamp()
+
+                    let reserved = 0;
+                    if (heading) reserved += heading.offsetHeight;
+                    if (standardsEl) reserved += standardsEl.offsetHeight;
+                    const available = parentCard.clientHeight - reserved;
+
+                    let currentSize = parseFloat(window.getComputedStyle(el).fontSize);
+                    while (el.scrollHeight > available && currentSize > 10) {
+                        currentSize -= 1;
+                        el.style.fontSize = currentSize + 'px';
+                    }
+                } else {
+                    let currentSize = parseFloat(window.getComputedStyle(el).fontSize);
+                    while (parentCard.scrollHeight > parentCard.clientHeight && currentSize > 10) {
+                        currentSize -= 1;
+                        el.style.fontSize = currentSize + 'px';
                     }
                 }
             });
