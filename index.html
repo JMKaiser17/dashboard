@@ -109,7 +109,7 @@
         .clock-pill:hover { background: linear-gradient(145deg, #f0f0f0, #c0c2c9); }
 
         .pill-subtitle {
-            font-size: clamp(0.55rem, 0.7vw, 0.85rem);
+            font-size: clamp(0.7rem, 0.9vw, 1rem);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: #444; 
@@ -137,7 +137,7 @@
         }
 
         .widget-text { 
-            font-size: clamp(0.85rem, 1.1vw, 1.3rem); 
+            font-size: clamp(1rem, 1.3vw, 1.5rem); 
             font-weight: 700; 
             line-height: 1.1;
             white-space: nowrap; 
@@ -311,7 +311,7 @@
         }
 
         .card p, .card ul { 
-            font-size: clamp(1.2rem, 2vw, 2.8rem); 
+            font-size: clamp(1.5rem, 2.5vw, 3rem); 
             line-height: 1.5; 
             margin: 0; 
         }
@@ -392,7 +392,7 @@
            ".sub-card p" rule above (class+tag beats a lone class on specificity —
            that's what let Standards inherit the big EQ font-size before). */
         #standardsText {
-            font-size: clamp(0.6rem, 0.8vw, 1rem);
+            font-size: clamp(0.9rem, 1.1vw, 1.3rem);
         }
 
         /* Shared Timer Section */
@@ -772,8 +772,8 @@
         /* --- ROSTER / PARTICIPATION TRACKER --- */
         #trackerContainer {
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); 
-            gap: clamp(6px, 1vh, 12px); 
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+            gap: 6px; 
             max-height: 74vh; 
             overflow-y: auto; 
             padding-right: 6px; 
@@ -870,7 +870,7 @@
             box-shadow: 0 3px 6px rgba(0,0,0,0.25); 
             opacity: 0; 
             animation: groupPopIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            width: clamp(150px, 18vw, 240px); 
+            width: clamp(200px, 22vw, 300px); 
             transition: transform 0.2s, box-shadow 0.2s, border-left-color 0.2s, background-color 0.2s; 
         }
         .group-card.drag-over {
@@ -881,13 +881,13 @@
         }
         
         @keyframes groupPopIn { 0% { opacity: 0; transform: scale(0.95) translateY(10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
-        .group-card h4 { margin: 0 0 2px 0; color: #5A2B81; font-size: clamp(1rem, 1.2vw, 1.5rem); text-transform: uppercase; pointer-events: none; }
+        .group-card h4 { margin: 0 0 2px 0; color: #5A2B81; font-size: clamp(1.2rem, 1.5vw, 1.8rem); text-transform: uppercase; pointer-events: none; }
         .group-card ul { margin: 0; padding: 0; list-style-type: none; min-height: 24px; border-radius: 8px; pointer-events: none;}
         
         /* Fixed Single-line Truncation for Long Names in Groups */
         .group-card li { 
-            color: #111111; font-size: clamp(0.95rem, 1.3vw, 1.6rem); font-weight: 600; line-height: 1.2; 
-            padding: clamp(1px, 0.3vh, 4px) clamp(6px, 1vw, 10px); 
+            color: #111111; font-size: clamp(1.2rem, 1.6vw, 1.9rem); font-weight: 600; line-height: 1.2; 
+            padding: clamp(4px, 0.5vh, 8px) clamp(8px, 1.2vw, 12px); 
             margin-bottom: 2px;
             background: #fff; border-radius: 6px; border: 1px solid #c0c2c9; cursor: grab; box-shadow: 0 1.5px 4px rgba(0,0,0,0.1);
             pointer-events: auto; 
@@ -934,6 +934,17 @@
                 <p id="warmupModalText" style="color: #111111; font-size: 3rem; line-height: 1.4; white-space: pre-wrap; margin: 0; font-weight: 600; text-align: center; width: 100%;">Loading...</p>
             </div>
             <button class="close-btn" onclick="toggleModal('warmupModal')" style="margin-top: 15px; align-self: center; background: #5A2B81; color: white; flex-shrink: 0;">Close Fullscreen</button>
+        </div>
+    </div>
+    
+    <!-- Task Expanded Overlay -->
+    <div class="modal" id="taskModal" style="background: rgba(17, 17, 17, 0.96);">
+        <div class="leaderboard-wrapper warmup-card" style="width: 95%; max-width: 1750px; height: 85vh; text-align: left; padding: clamp(20px, 3vw, 50px); display: flex; flex-direction: column; justify-content: space-between;">
+            <h1 style="color: #5A2B81; font-size: clamp(2.2rem, 3.5vw, 4.5rem); margin: 0; font-weight: 900; text-transform: uppercase; flex-shrink: 0;">Current Task</h1>
+            <div class="warmup-text-panel" style="flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; overflow: hidden; padding: clamp(20px, 3vw, 40px);">
+                <div id="taskModalText" style="color: #111111; font-size: 3rem; line-height: 1.4; white-space: pre-wrap; margin: 0; font-weight: 600; text-align: center; width: 100%;"></div>
+            </div>
+            <button class="close-btn" onclick="toggleModal('taskModal')" style="margin-top: 15px; align-self: center; background: #5A2B81; color: white; flex-shrink: 0;">Close Fullscreen</button>
         </div>
     </div>
 
@@ -1153,7 +1164,7 @@
 
             <div class="card card-warmup">
                 <h2 class="expandable-title" onclick="toggleWarmupModal()" title="Expand Full Screen">
-                    Warm-Up Activity
+                    <span>Warm-Up Activity</span>
                     <span class="expand-badge">⛶ Expand</span>
                 </h2>
                 <p id="warmupText" style="white-space: pre-wrap;">Loading data...</p>
@@ -1180,7 +1191,10 @@
         <div class="bento-grid" id="focusModeBoard">
             <div class="zen-left-col">
                 <div class="zen-task-card">
-                    <h2>🎯 Current Task</h2>
+                    <h2 class="expandable-title" onclick="openTaskModal()" title="Expand Full Screen">
+                        <span>🎯 Current Task</span>
+                        <span class="expand-badge">⛶ Expand</span>
+                    </h2>
                     <div class="focus-editable" contenteditable="true">
                         <p>Click here to type the independent work instructions...</p>
                     </div>
@@ -1351,6 +1365,8 @@
                     toggleModal('trackerModal'); 
                 } else if (event.target.id === 'warmupModal') {
                     toggleModal('warmupModal');
+                } else if (event.target.id === 'taskModal') {
+                    toggleModal('taskModal');
                 } else {
                     event.target.classList.remove('active');
                 }
@@ -1362,6 +1378,12 @@
             if (document.getElementById('warmupModal').classList.contains('active')) {
                 autoFitModalText();
             }
+        }
+
+        function openTaskModal() {
+            const currentTaskHTML = document.querySelector('.zen-left-col .focus-editable').innerHTML;
+            document.getElementById('taskModalText').innerHTML = currentTaskHTML;
+            toggleModal('taskModal');
         }
 
         function autoFitModalText() {
