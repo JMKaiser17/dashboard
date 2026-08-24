@@ -386,8 +386,13 @@
             font-style: italic; 
             margin-top: auto !important; 
             padding-top: 8px;
-            font-size: clamp(0.6rem, 0.8vw, 1rem); 
             border-top: 1px dashed rgba(90, 43, 129, 0.2);
+        }
+        /* Targeted by ID, not just class, so it always wins over the more specific
+           ".sub-card p" rule above (class+tag beats a lone class on specificity —
+           that's what let Standards inherit the big EQ font-size before). */
+        #standardsText {
+            font-size: clamp(0.6rem, 0.8vw, 1rem);
         }
 
         /* Shared Timer Section */
@@ -699,25 +704,10 @@
             overflow-y: auto;
         }
 
-        /* Warm-Up fullscreen modal dressing — same watermark treatment as .card-agenda,
-           plus a divider under the title and a "paper panel" look for the text itself,
-           so the expanded view doesn't read as a plain white box. */
-        .warmup-card {
-            position: relative;
-            overflow: hidden;
-        }
-        .warmup-card::before {
-            content: "";
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 55%; height: 55%;
-            background-image: url('SouthGarner_Titans_Logo1.png');
-            background-size: contain; background-position: center; background-repeat: no-repeat;
-            opacity: 0.05;
-            z-index: 0; pointer-events: none;
-        }
-        .warmup-card > * { position: relative; z-index: 1; }
+        /* Warm-Up fullscreen modal dressing — a divider under the title, and a
+           "paper panel" look plus a faint watermark for the text itself (same
+           treatment as .card-agenda), so the expanded view doesn't read as a
+           plain white box. */
         .warmup-card h1 {
             display: flex; align-items: center; gap: clamp(10px, 1.2vw, 18px);
             padding-bottom: clamp(10px, 1.5vh, 18px);
@@ -729,11 +719,26 @@
             filter: drop-shadow(0 2px 3px rgba(90, 43, 129, 0.4));
         }
         .warmup-text-panel {
+            position: relative;
+            overflow: hidden;
             background: linear-gradient(145deg, #f8f6fb, #ecebf3);
             border-radius: 20px;
             border: 1px solid rgba(90, 43, 129, 0.15);
             box-shadow: inset 0 2px 10px rgba(90, 43, 129, 0.08), inset 0 -2px 4px rgba(255, 255, 255, 0.7);
         }
+        .warmup-text-panel::before {
+            content: "";
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 55%; height: 55%;
+            background-image: url('SouthGarner_Titans_Logo1.png');
+            background-size: contain; background-position: center; background-repeat: no-repeat;
+            opacity: 0.07;
+            z-index: 0; pointer-events: none;
+        }
+        .warmup-text-panel > * { position: relative; z-index: 1; }
+
         .lb-header { font-size: clamp(1.8rem, 2.8vw, 3.5rem); margin: 0; font-weight: 900; text-transform: uppercase; text-align: center; }
         
         .lb-current-class {
@@ -2826,22 +2831,31 @@
                 if (el.id === 'eqText') {
                     // The Essential Question card also has a Standards line pinned to
                     // the bottom via CSS (its own fixed, small font-size — see
-                    // .standards-text). That line should never grow or shrink with the
-                    // EQ text, so measure the EQ against only the space left over after
-                    // the heading and the Standards line, not the whole card's overflow.
+                    // #standardsText). That line should never grow or shrink with the
+                    // EQ text. The EQ itself should fill whatever space is left over
+                    // above it, not just shrink-on-overflow — so grow it from a small
+                    // base up until it either fills the available height or hits a
+                    // sensible ceiling, then fall back to shrinking if it overflows.
                     const heading = parentCard.querySelector('h3');
                     const standardsEl = document.getElementById('standardsText');
-                    standardsEl && (standardsEl.style.fontSize = ''); // always defer to its own CSS clamp()
+                    standardsEl && (standardsEl.style.fontSize = ''); // always defer to its own CSS rule
 
                     let reserved = 0;
                     if (heading) reserved += heading.offsetHeight;
                     if (standardsEl) reserved += standardsEl.offsetHeight;
                     const available = parentCard.clientHeight - reserved;
+                    const maxSize = 64;
 
-                    let currentSize = parseFloat(window.getComputedStyle(el).fontSize);
-                    while (el.scrollHeight > available && currentSize > 10) {
-                        currentSize -= 1;
-                        el.style.fontSize = currentSize + 'px';
+                    let size = 10;
+                    el.style.fontSize = size + 'px';
+                    while (size < maxSize) {
+                        const nextSize = size + 1;
+                        el.style.fontSize = nextSize + 'px';
+                        if (el.scrollHeight > available || el.scrollWidth > parentCard.clientWidth) {
+                            el.style.fontSize = size + 'px';
+                            break;
+                        }
+                        size = nextSize;
                     }
                 } else {
                     let currentSize = parseFloat(window.getComputedStyle(el).fontSize);
