@@ -280,6 +280,28 @@
             font-weight: 700;
             line-height: 1.1;
         }
+        
+        /* New Expandable Title Styling */
+        .expandable-title {
+            cursor: pointer; 
+            transition: opacity 0.2s; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
+        .expandable-title:hover { opacity: 0.7; }
+        .expand-badge {
+            font-size: 0.4em; 
+            color: #111; 
+            background: #e2e4e9; 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            border: 2px solid #c0c2c9;
+        }
+
         .card p, .card ul { 
             font-size: clamp(1.2rem, 2vw, 2.8rem); 
             line-height: 1.5; 
@@ -345,7 +367,15 @@
             margin: 0; 
         }
         .sub-card ul { padding-left: 1em; margin-bottom: 0; }
-        .standards-text { font-size: clamp(0.85rem, 1.1vw, 1.4rem) !important; color: #555; font-style: italic; margin-top: 8px !important; }
+        
+        /* Updated Standards Text Styling */
+        .standards-text { 
+            color: #555; 
+            font-style: italic; 
+            margin-top: auto !important; 
+            padding-top: 8px;
+            font-size: clamp(0.6rem, 0.8vw, 1rem); /* Base size, overridden by autoFit */
+        }
 
         /* Shared Timer Section */
         .timer-section { width: 100%; }
@@ -841,6 +871,17 @@
         <div id="displayGameCode" style="color: #ffffff; font-size: clamp(3.5rem, 6vw, 6.5rem); margin: 10px 0 30px 0; font-weight: 900;"></div>
         <button class="close-btn" onclick="toggleModal('gameModal')">Close Screen</button>
     </div>
+    
+    <!-- Warmup Expanded Overlay -->
+    <div class="modal" id="warmupModal" style="background: rgba(17, 17, 17, 0.98);">
+        <div class="leaderboard-wrapper" style="width: 95%; max-width: 1750px; max-height: 92vh; text-align: left; padding: clamp(20px, 3vw, 50px); display: flex; flex-direction: column; align-items: flex-start;">
+            <h1 style="color: #5A2B81; font-size: clamp(2.5rem, 4vw, 5.5rem); margin: 0 0 20px 0; font-weight: 900; text-transform: uppercase;">🔥 Warm-Up Activity</h1>
+            <div style="flex-grow: 1; overflow-y: auto; width: 100%; padding-right: 20px;">
+                <p id="warmupModalText" style="color: #111111; font-size: clamp(1.8rem, 2.5vw, 3.5rem); line-height: 1.5; white-space: pre-wrap; margin: 0; font-weight: 600;"></p>
+            </div>
+            <button class="close-btn" onclick="toggleModal('warmupModal')" style="margin-top: 30px; align-self: center; background: #5A2B81; color: white;">Close Fullscreen</button>
+        </div>
+    </div>
 
     <!-- Live Participation Tracker Overlay -->
     <div class="modal" id="trackerModal">
@@ -1057,7 +1098,10 @@
             </div>
 
             <div class="card card-warmup">
-                <h2>Warm-Up Activity</h2>
+                <h2 class="expandable-title" onclick="toggleModal('warmupModal')" title="Expand Full Screen">
+                    Warm-Up Activity
+                    <span class="expand-badge">⛶ Expand</span>
+                </h2>
                 <p id="warmupText" style="white-space: pre-wrap;">Loading data...</p>
             </div>
 
@@ -2354,6 +2398,7 @@
                 if (event.key.toLowerCase() === 'b') togglePointsModal();
                 if (event.key.toLowerCase() === 'm') toggleModal('timerModal');
                 if (event.key.toLowerCase() === 'e') toggleModal('examModal');
+                if (event.key.toLowerCase() === 'w') toggleModal('warmupModal');
                 if (event.key.toLowerCase() === 'o') {
                     document.getElementById('customSheetUrlInput').value = getActiveCsvUrl();
                     document.getElementById('gameVaultUrlInput').value = localStorage.getItem('titan_game_url') || "";
@@ -2711,6 +2756,13 @@
                     currentSize -= 1;
                     el.style.fontSize = currentSize + 'px';
                 }
+                
+                if (el.id === 'eqText') {
+                    let standardsEl = document.getElementById('standardsText');
+                    if (standardsEl) {
+                        standardsEl.style.fontSize = Math.max(currentSize * 0.5, 10) + 'px'; 
+                    }
+                }
             });
         }
 
@@ -2772,6 +2824,7 @@
                     document.getElementById('eqText').innerText = activeBlock.eq || "No EQ provided today.";
                     document.getElementById('standardsText').innerText = activeBlock.standards;
                     document.getElementById('warmupText').innerText = activeBlock.warmup || "No Warm-Up provided today.";
+                    document.getElementById('warmupModalText').innerText = activeBlock.warmup || "No Warm-Up provided today.";
                     
                     if(!isMarketTicker) {
                         document.getElementById('dailyMessage').innerText = activeBlock.message || "Welcome Titans! Let's make today a great day to learn.";
@@ -2835,6 +2888,7 @@
                     document.getElementById('eqText').innerText = "";
                     document.getElementById('standardsText').innerText = "";
                     document.getElementById('warmupText').innerText = "Have a great day!";
+                    document.getElementById('warmupModalText').innerText = "Have a great day!";
                     document.getElementById('agendaItems').innerHTML = "";
                     document.getElementById('remindersItems').innerHTML = "";
                     if(!isMarketTicker) document.getElementById('dailyMessage').innerText = "Have a wonderful evening!";
