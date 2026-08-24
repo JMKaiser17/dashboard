@@ -1533,10 +1533,15 @@
         buildDailyMarketFeed();
         setInterval(() => { if(isMarketTicker) updateTickerDisplay(); }, 4000);
 
-        const defaultCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRGRRReH45oDtxtlrczAIXVBICF9naer8L26KSg3-NKw04ERUESXzZZbGw5uUaSfMH3vBQIaVi0gmbA/pub?gid=0&single=true&output=csv";
+        const defaultCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEdY9rw8iqzh89fYe8_A3UGWlf3ZWMzXErLmsXnLs8BLDjvtT4cDB2xcIE1-xb3Uv4EKOYayrhdcVR/pub?gid=0&single=true&output=csv";
+        const defaultGameUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEdY9rw8iqzh89fYe8_A3UGWlf3ZWMzXErLmsXnLs8BLDjvtT4cDB2xcIE1-xb3Uv4EKOYayrhdcVR/pub?gid=115764450&single=true&output=csv";
 
         function getActiveCsvUrl() {
             return localStorage.getItem('titan_sheet_url') || defaultCsvUrl;
+        }
+
+        function getActiveGameUrl() {
+            return localStorage.getItem('titan_game_url') || defaultGameUrl;
         }
 
         function saveSettings() {
@@ -1638,7 +1643,7 @@
         }
 
         async function fetchGameVaultData() {
-            const gameUrl = localStorage.getItem('titan_game_url');
+            const gameUrl = getActiveGameUrl();
             if (!gameUrl) return;
 
             try {
