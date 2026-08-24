@@ -255,7 +255,7 @@
         .bento-grid {
             display: grid;
             grid-template-columns: 1fr 1.3fr; 
-            grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);      
+            grid-template-rows: minmax(0, 1.2fr) minmax(0, 0.8fr);      
             gap: clamp(10px, 1.5vw, 24px);
             flex-grow: 1;
             min-height: 0; 
@@ -345,7 +345,7 @@
         .card-warmup { grid-column: 2 / 3; grid-row: 1 / 2; }
         .card-bottom-split {
             grid-column: 2 / 3; grid-row: 2 / 3; 
-            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: clamp(10px, 1.5vw, 20px);
+            display: grid; grid-template-columns: 1fr 1fr; gap: clamp(10px, 1.5vw, 20px);
             background: none; padding: 0; border: none; box-shadow: none;
         }
         .sub-card {
@@ -418,6 +418,8 @@
         /* --- ENHANCED FOCUS / ZEN MODE STYLES --- */
         #focusModeBoard { 
             display: none; 
+            grid-template-columns: 1.2fr 1fr; 
+            grid-template-rows: 1fr 1.2fr;
             border-left: clamp(4px, 0.5vw, 8px) solid #111111; 
             border-radius: 18px; 
             overflow: hidden; 
@@ -1180,10 +1182,6 @@
                     <h3>Reminders</h3>
                     <ul id="remindersItems"><li>Loading data...</li></ul>
                 </div>
-                <div class="sub-card">
-                    <h3>🏆 Spotlight</h3>
-                    <p id="spotlightText">Loading...</p>
-                </div>
             </div>
         </div>
 
@@ -1706,18 +1704,8 @@
                 let endStr = getCol(row, 'End');
 
                 let startMins = 0, endMins = 0;
-                if (startStr.includes(':')) { 
-                    let p = startStr.split(':'); 
-                    let h = parseInt(p[0]);
-                    if (h >= 1 && h <= 6) h += 12; // Convert afternoon times to 24-hour
-                    startMins = h * 60 + parseInt(p[1]); 
-                }
-                if (endStr.includes(':')) { 
-                    let p = endStr.split(':'); 
-                    let h = parseInt(p[0]);
-                    if (h >= 1 && h <= 6) h += 12; // Convert afternoon times to 24-hour
-                    endMins = h * 60 + parseInt(p[1]); 
-                }
+                if (startStr.includes(':')) { let p = startStr.split(':'); startMins = parseInt(p[0]) * 60 + parseInt(p[1]); }
+                if (endStr.includes(':')) { let p = endStr.split(':'); endMins = parseInt(p[0]) * 60 + parseInt(p[1]); }
 
                 let standardsText = getCol(row, 'Standards');
 
@@ -2802,7 +2790,7 @@
             document.getElementById('wheelModal').classList.remove('active');
             clearTimeout(spinTimeout);
             setTimeout(() => {
-                document.getElementById('wheelWinnerDisplay').innerText = isGroupWheelMode ? "SPIN THE GROUPS" : "SPIN THE GROUPS";
+                document.getElementById('wheelWinnerDisplay').innerText = isGroupWheelMode ? "SPIN THE GROUPS" : "SPIN THE WHEEL";
                 document.getElementById('wheelWinnerDisplay').style.color = '#fff';
             }, 300); 
         }
@@ -2855,8 +2843,7 @@
             const textElements = [
                 document.getElementById('warmupText'),
                 document.getElementById('eqText'),
-                document.getElementById('remindersItems'),
-                document.getElementById('spotlightText')
+                document.getElementById('remindersItems')
             ];
 
             textElements.forEach(el => {
@@ -2928,12 +2915,9 @@
                 activeBlock = forcedBlock;
             } else {
                 for (let block of schedule) {
-                    if (currentMinutes <= block.end) {
-                        // Skip planning periods so we jump straight to the next active class
-                        if (!block.title.toLowerCase().includes('planning')) {
-                            activeBlock = block;
-                            break;
-                        }
+                    if (currentMinutes >= block.start && currentMinutes < block.end) {
+                        activeBlock = block;
+                        break;
                     }
                 }
             }
@@ -2972,7 +2956,8 @@
                     }
                     
                     let spotlightText = activeBlock.spotlight || "Remember to stay focused, ask questions, and finish strong!";
-                    document.getElementById('spotlightText').innerHTML = spotlightText;
+                    let spotlightEl = document.getElementById('spotlightText');
+                    if (spotlightEl) spotlightEl.innerHTML = spotlightText;
 
                     let listKey = 'checklist_' + activeBlock.date.getTime() + '_' + activeBlock.id;
                     let checkedItems = JSON.parse(localStorage.getItem(listKey) || '[]');
@@ -3033,7 +3018,8 @@
                     document.getElementById('agendaItems').innerHTML = "";
                     document.getElementById('remindersItems').innerHTML = "";
                     if(!isMarketTicker) document.getElementById('dailyMessage').innerText = "Have a wonderful evening!";
-                    document.getElementById('spotlightText').innerText = "See you tomorrow!";
+                    let spotlightEl = document.getElementById('spotlightText');
+                    if (spotlightEl) spotlightEl.innerText = "See you tomorrow!";
                     currentSlides = []; 
                 }
             }
