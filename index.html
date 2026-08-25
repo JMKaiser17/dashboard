@@ -1545,6 +1545,7 @@
             let watermark = localStorage.getItem('titan_setting_watermark') || 'SouthGarner_Titans_Logo1.png';
 
             let hoverColor = adjustBrightness(primary, 15);
+            let boardGradEnd = adjustBrightness(glow, -15);
 
             document.documentElement.style.setProperty('--primary-color', primary);
             document.documentElement.style.setProperty('--primary-rgb', hexToRgb(primary));
@@ -1562,7 +1563,7 @@
             document.documentElement.style.setProperty('--page-bg-base', bg);
             document.documentElement.style.setProperty('--page-bg-glow', glow);
             document.documentElement.style.setProperty('--board-grad-start', glow);
-            document.documentElement.style.setProperty('--board-grad-end', bg);
+            document.documentElement.style.setProperty('--board-grad-end', boardGradEnd);
             
             if (watermark) {
                 document.documentElement.style.setProperty('--mascot-url', `url('${watermark}')`);
