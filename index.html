@@ -1528,7 +1528,7 @@
             let mid = localStorage.getItem('titan_setting_mid') || '#c0c2c9';
             let watermark = localStorage.getItem('titan_setting_watermark') || 'SouthGarner_Titans_Logo1.png';
 
-            let hoverColor = adjustBrightness(primary, 15); // Automatically compute a lighter hover state
+            let hoverColor = adjustBrightness(primary, 15);
 
             document.documentElement.style.setProperty('--primary-color', primary);
             document.documentElement.style.setProperty('--primary-rgb', hexToRgb(primary));
@@ -1670,83 +1670,24 @@
         let gameVaultData = []; 
         let miniGameLists = { hotseat: [], titansays: [], hivemind: [], debate: [] };
 
-        const coreMarketAnchors = [
-            { name: "S&P 500", val: 5620.40, change: 0.35 },
-            { name: "NASDAQ", val: 17850.15, change: 0.62 },
-            { name: "DOW JONES", val: 40830.70, change: -0.18 }
-        ];
-
-        const rotatingStockPool = [
-            { name: "AAPL (Apple)", val: 224.50, change: 0.45 },
-            { name: "NVDA (NVIDIA)", val: 128.20, change: 1.85 },
-            { name: "TSLA (Tesla)", val: 218.90, change: -1.15 },
-            { name: "AMZN (Amazon)", val: 178.60, change: 0.75 },
-            { name: "MSFT (Microsoft)", val: 422.30, change: 0.20 },
-            { name: "NKE (Nike)", val: 83.40, change: -0.65 },
-            { name: "DIS (Disney)", val: 91.20, change: 0.40 },
-            { name: "COST (Costco)", val: 865.10, change: 0.55 },
-            { name: "SBUX (Starbucks)", val: 95.80, change: 1.10 },
-            { name: "NFLX (Netflix)", val: 685.40, change: 0.90 },
-            { name: "RBLX (Roblox)", val: 42.15, change: 2.40 },
-            { name: "SPOT (Spotify)", val: 342.60, change: 1.30 },
-            { name: "KO (Coca-Cola)", val: 69.80, change: 0.15 },
-            { name: "PEP (PepsiCo)", val: 172.50, change: -0.10 },
-            { name: "MCD (McDonald's)", val: 288.40, change: 0.30 },
-            { name: "TGT (Target)", val: 145.20, change: -0.80 },
-            { name: "SONY (Sony)", val: 94.70, change: 0.50 },
-            { name: "EA (Electronic Arts)", val: 146.30, change: 0.25 },
-            { name: "LULU (Lululemon)", val: 265.80, change: -1.40 },
-            { name: "CROX (Crocs)", val: 138.90, change: 1.70 }
-        ];
-
-        let activeDailyMarketFeed = [];
-
-        function buildDailyMarketFeed() {
-            let now = new Date();
-            let daySeed = (now.getFullYear() * 372) + ((now.getMonth() + 1) * 31) + now.getDate();
-            let poolCopy = [...rotatingStockPool];
-            let dailyPicks = [];
-            
-            for(let i = 0; i < 5; i++) {
-                let pickIndex = (daySeed + (i * 7)) % poolCopy.length;
-                dailyPicks.push(poolCopy.splice(pickIndex, 1)[0]);
-            }
-            activeDailyMarketFeed = [...coreMarketAnchors, ...dailyPicks];
-        }
-
         function toggleTickerMode() {
             isMarketTicker = !isMarketTicker;
-            if (isMarketTicker && activeDailyMarketFeed.length === 0) {
-                buildDailyMarketFeed();
-            }
             updateTickerDisplay();
         }
 
         function updateTickerDisplay() {
             const el = document.getElementById('dailyMessage');
             if (isMarketTicker) {
-                activeDailyMarketFeed.forEach(item => {
-                    let microDelta = (Math.random() - 0.5) * (item.val * 0.001);
-                    item.val = Math.max(1, item.val + microDelta);
-                    item.change += (microDelta / item.val) * 10;
-                });
-                
-                el.innerHTML = activeDailyMarketFeed.map(item => {
-                    let isPositive = item.change >= 0;
-                    let sign = isPositive ? "+" : "";
-                    let icon = isPositive ? "📈" : "📉";
-                    let color = isPositive ? "var(--bg-mid)" : "#ffffff";
-                    let formattedVal = item.val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                    let formattedChange = item.change.toFixed(2);
-                    return `${icon} ${item.name}: <span style="font-variant-numeric:tabular-nums;">${formattedVal}</span> <span style="color:${color};">(${sign}${formattedChange}%)</span>`;
-                }).join(" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ");
+                let rawTickerText = (activeBlockData && activeBlockData.ticker) ? activeBlockData.ticker : "Awaiting Market Data...";
+                let formattedTicker = rawTickerText.replace(/(\(\+[^)]+\))/g, '<span style="color: #a3e6b5;">$1</span>')
+                                                   .replace(/(\(-[^)]+\))/g, '<span style="color: #ff9999;">$1</span>');
+                el.innerHTML = formattedTicker.split('|').join(' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ');
             } else {
                 let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans';
                 el.innerText = activeBlockData ? (activeBlockData.message || `Welcome ${mascot}! Let's make today a great day to learn.`) : "Loading daily message...";
             }
         }
         
-        buildDailyMarketFeed();
         setInterval(() => { if(isMarketTicker) updateTickerDisplay(); }, 4000);
 
         function getActiveCsvUrl() {
@@ -1853,6 +1794,7 @@
                 standards: 'Standard(s): Tech.1.1',
                 warmup: 'Welcome to your new classroom dashboard! \n\nClick the "Expand" button in the top right of this card to see this text in full screen. \n\nThen, try pressing "Shift + 0" to open the settings menu and link your own Google Sheet.',
                 message: 'Welcome to your customizable classroom dashboard!',
+                ticker: '📈 AAPL: $225.00 (+1.25%) | 📉 TSLA: $210.00 (-0.50%) | 📈 S&P 500: 5600.00 (+0.80%)',
                 resources: 'Example Slide=https://docs.google.com/presentation/d/e/2PACX-1vT5K-9W8x0hA34-0QvE8vA/embed?start=false&loop=false&delayms=3000',
                 agenda: ['Take attendance with Roster', 'Review Warm-Up', 'Play a Mini-Game', 'Independent Work (Zen Mode)'],
                 reminders: ['Check out the settings menu (Shift + 0)', 'Hit Spacebar to start timer', 'Try the Random Groups maker'],
@@ -1943,7 +1885,10 @@
 
         function processCsvData(csvText) {
             let allParsedBlocks = [];
+            
+            // Using absolute MS to allow auto-rolling over to the next day's class
             let nowMs = new Date().getTime();
+            
             const rows = parseCsv(csvText);
 
             rows.forEach(row => {
@@ -1975,6 +1920,7 @@
                     standards: standardsText ? `Standard(s): ${standardsText}` : "",
                     warmup: getCol(row, 'Warmup'),
                     message: getCol(row, 'Message'),
+                    ticker: getCol(row, 'Ticker'),
                     gameCode: getCol(row, 'GameCode'),
                     resources: getCol(row, 'Resources'),
                     agenda: [],
@@ -2826,9 +2772,9 @@
                 if (event.key.toLowerCase() === 'w') toggleWarmupModal();
                 if (event.key.toLowerCase() === 'n') triggerColdCall();
                 
-                // Shift + Digit0 (Zero) for Settings
-                if (event.code === 'Digit0') {
-                    event.preventDefault();
+                // Shift + 0 (Catches top row '0', numpad '0', and the ')' character depending on layout)
+                if (event.code === 'Digit0' || event.code === 'Numpad0' || event.key === ')' || event.key === '0') {
+                    event.preventDefault(); 
                     document.getElementById('customSheetUrlInput').value = getActiveCsvUrl() === defaultCsvUrl ? "" : getActiveCsvUrl();
                     document.getElementById('gameVaultUrlInput').value = getActiveGameUrl() === defaultGameUrl ? "" : getActiveGameUrl();
                     toggleModal('settingsModal');
