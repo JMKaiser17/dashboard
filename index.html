@@ -1561,6 +1561,8 @@
             // Apply Background Colors
             document.documentElement.style.setProperty('--page-bg-base', bg);
             document.documentElement.style.setProperty('--page-bg-glow', glow);
+            document.documentElement.style.setProperty('--board-grad-start', glow);
+            document.documentElement.style.setProperty('--board-grad-end', bg);
             
             if (watermark) {
                 document.documentElement.style.setProperty('--mascot-url', `url('${watermark}')`);
