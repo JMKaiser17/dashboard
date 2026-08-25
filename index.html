@@ -236,7 +236,7 @@
             display: inline-block;
             white-space: nowrap;
             padding-left: 100%; 
-            animation: ticker 35s linear infinite; 
+            animation: ticker 30s linear infinite; 
         }
         .ticker-item {
             display: inline-block;
@@ -1303,6 +1303,10 @@
                     <div class="pill-subtitle">Selector</div>
                     <div class="widget-text">🎲 Spin</div>
                 </div>
+                <div class="pill action-pill" onclick="openSettingsModal()">
+                    <div class="pill-subtitle">Config</div>
+                    <div class="widget-text">⚙️ Settings</div>
+                </div>
                 <div class="pill clock-pill clock" id="clockDisplay" onclick="toggleModal('examModal')" title="Click for Testing Mode">08:00:00 AM</div>
             </div>
         </div>
@@ -1600,6 +1604,16 @@
                 autoFitModalText('taskModalTextContainer', 'taskModalText');
             }
         }
+        
+        function openSettingsModal() {
+            try {
+                document.getElementById('customSheetUrlInput').value = getActiveCsvUrl() === defaultCsvUrl ? "" : getActiveCsvUrl();
+                document.getElementById('gameVaultUrlInput').value = getActiveGameUrl() === defaultGameUrl ? "" : getActiveGameUrl();
+            } catch(e) {
+                console.warn("Could not pre-fill URLs", e);
+            }
+            toggleModal('settingsModal');
+        }
 
         function autoFitModalText(containerId, textId) {
             const container = document.getElementById(containerId);
@@ -1672,6 +1686,14 @@
 
         function toggleTickerMode() {
             isMarketTicker = !isMarketTicker;
+            
+            const tickerMove = document.querySelector('.ticker-move');
+            if (isMarketTicker) {
+                tickerMove.style.animationDuration = '60s'; 
+            } else {
+                tickerMove.style.animationDuration = '30s'; 
+            }
+            
             updateTickerDisplay();
         }
 
@@ -1885,10 +1907,7 @@
 
         function processCsvData(csvText) {
             let allParsedBlocks = [];
-            
-            // Using absolute MS to allow auto-rolling over to the next day's class
             let nowMs = new Date().getTime();
-            
             const rows = parseCsv(csvText);
 
             rows.forEach(row => {
@@ -2772,12 +2791,10 @@
                 if (event.key.toLowerCase() === 'w') toggleWarmupModal();
                 if (event.key.toLowerCase() === 'n') triggerColdCall();
                 
-                // Shift + 0 (Catches top row '0', numpad '0', and the ')' character depending on layout)
-                if (event.code === 'Digit0' || event.code === 'Numpad0' || event.key === ')' || event.key === '0') {
+                // Shift + 0 OR Shift + O
+                if (event.code === 'Digit0' || event.code === 'Numpad0' || event.key === ')' || event.key === '0' || event.code === 'KeyO' || event.key.toLowerCase() === 'o') {
                     event.preventDefault(); 
-                    document.getElementById('customSheetUrlInput').value = getActiveCsvUrl() === defaultCsvUrl ? "" : getActiveCsvUrl();
-                    document.getElementById('gameVaultUrlInput').value = getActiveGameUrl() === defaultGameUrl ? "" : getActiveGameUrl();
-                    toggleModal('settingsModal');
+                    openSettingsModal();
                 }
                 
                 if (event.key.toLowerCase() === 's') {
