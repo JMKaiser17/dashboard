@@ -1086,6 +1086,8 @@
                 <!-- Theme Column -->
                 <div style="background: var(--bg-light); padding: 20px; border-radius: 16px;">
                     <h3 style="color: var(--primary-color); margin: 0 0 10px 0; font-size: 1.2rem;">Theme & Terminology</h3>
+                    
+                    <!-- 4 Color Pickers -->
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                         <div>
                             <label style="font-weight:bold; color:var(--secondary-dark); font-size:0.8rem; display:block;">Primary</label>
@@ -1095,22 +1097,34 @@
                             <label style="font-weight:bold; color:var(--secondary-dark); font-size:0.8rem; display:block;">Dark Accents</label>
                             <input type="color" id="themeDark" value="#111111" style="width:100%; height:35px; border:none; cursor:pointer;">
                         </div>
+                        <div>
+                            <label style="font-weight:bold; color:var(--secondary-dark); font-size:0.8rem; display:block;">Background</label>
+                            <input type="color" id="themeBg" value="#0d0b12" style="width:100%; height:35px; border:none; cursor:pointer;">
+                        </div>
+                        <div>
+                            <label style="font-weight:bold; color:var(--secondary-dark); font-size:0.8rem; display:block;">Glow Accent</label>
+                            <input type="color" id="themeGlow" value="#3a2253" style="width:100%; height:35px; border:none; cursor:pointer;">
+                        </div>
                     </div>
                     
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                    <!-- 4 Text Inputs -->
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <div>
                             <label style="font-weight:bold; color:var(--secondary-dark); font-size:0.8rem; display:block;">Mascot/Greeting</label>
                             <input type="text" id="settingMascot" value="Titans" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--bg-mid);">
                         </div>
                         <div>
-                            <label style="font-weight:bold; color:var(--secondary-dark); font-size:0.8rem; display:block;">Leaderboard Name</label>
+                            <label style="font-weight:bold; color:var(--secondary-dark); font-size:0.8rem; display:block;">Leaderboard</label>
                             <input type="text" id="settingLeaderboard" value="Titan Cup" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--bg-mid);">
                         </div>
-                    </div>
-                    
-                    <div>
-                        <label style="font-weight:bold; color:var(--secondary-dark); font-size:0.8rem; display:block;">Watermark Image URL</label>
-                        <input type="text" id="settingWatermark" placeholder="https://..." style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--bg-mid); font-family:monospace; font-size:0.8rem;">
+                        <div>
+                            <label style="font-weight:bold; color:var(--secondary-dark); font-size:0.8rem; display:block;">Teacher Name</label>
+                            <input type="text" id="settingTeacher" placeholder="Mr. Kaiser" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--bg-mid);">
+                        </div>
+                        <div>
+                            <label style="font-weight:bold; color:var(--secondary-dark); font-size:0.8rem; display:block;">Watermark URL</label>
+                            <input type="text" id="settingWatermark" placeholder="https://..." style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--bg-mid); font-family:monospace; font-size:0.8rem;">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1302,10 +1316,6 @@
                 <div class="pill action-pill" onclick="openWheelModal()">
                     <div class="pill-subtitle">Selector</div>
                     <div class="widget-text">🎲 Spin</div>
-                </div>
-                <div class="pill action-pill" onclick="openSettingsModal()">
-                    <div class="pill-subtitle">Config</div>
-                    <div class="widget-text">⚙️ Settings</div>
                 </div>
                 <div class="pill clock-pill clock" id="clockDisplay" onclick="toggleModal('examModal')" title="Click for Testing Mode">08:00:00 AM</div>
             </div>
@@ -1530,6 +1540,8 @@
             let dark = localStorage.getItem('titan_setting_dark') || '#111111';
             let light = localStorage.getItem('titan_setting_light') || '#e2e4e9';
             let mid = localStorage.getItem('titan_setting_mid') || '#c0c2c9';
+            let bg = localStorage.getItem('titan_setting_bg') || '#0d0b12';
+            let glow = localStorage.getItem('titan_setting_glow') || '#3a2253';
             let watermark = localStorage.getItem('titan_setting_watermark') || 'SouthGarner_Titans_Logo1.png';
 
             let hoverColor = adjustBrightness(primary, 15);
@@ -1546,6 +1558,10 @@
             document.documentElement.style.setProperty('--bg-mid', mid);
             document.documentElement.style.setProperty('--bg-mid-rgb', hexToRgb(mid));
             
+            // Apply Background Colors
+            document.documentElement.style.setProperty('--page-bg-base', bg);
+            document.documentElement.style.setProperty('--page-bg-glow', glow);
+            
             if (watermark) {
                 document.documentElement.style.setProperty('--mascot-url', `url('${watermark}')`);
             }
@@ -1558,11 +1574,15 @@
             document.getElementById('dynamicAskTeacher').innerText = `Then ask ${teacher}.`;
             document.getElementById('dynamicJeopardyTitle').innerText = `${mascot} Jeopardy`;
 
+            // Fill the inputs in the modal if it's open
             if(document.getElementById('themePrimary')) {
                 document.getElementById('themePrimary').value = primary;
                 document.getElementById('themeDark').value = dark;
+                document.getElementById('themeBg').value = bg;
+                document.getElementById('themeGlow').value = glow;
                 document.getElementById('settingMascot').value = mascot;
                 document.getElementById('settingLeaderboard').value = leaderboard;
+                document.getElementById('settingTeacher').value = teacher;
                 document.getElementById('settingWatermark').value = watermark === 'SouthGarner_Titans_Logo1.png' ? '' : watermark;
             }
         }
@@ -1580,6 +1600,8 @@
                     toggleModal('warmupModal');
                 } else if (event.target.id === 'taskModal') {
                     toggleModal('taskModal');
+                } else if (event.target.id === 'cheatSheetModal') {
+                    toggleModal('cheatSheetModal');
                 } else {
                     event.target.classList.remove('active');
                     checkFloatingTimer();
@@ -1729,8 +1751,12 @@
             
             localStorage.setItem('titan_setting_primary', document.getElementById('themePrimary').value);
             localStorage.setItem('titan_setting_dark', document.getElementById('themeDark').value);
+            localStorage.setItem('titan_setting_bg', document.getElementById('themeBg').value);
+            localStorage.setItem('titan_setting_glow', document.getElementById('themeGlow').value);
+            
             localStorage.setItem('titan_setting_mascot', document.getElementById('settingMascot').value);
             localStorage.setItem('titan_setting_leaderboard', document.getElementById('settingLeaderboard').value);
+            localStorage.setItem('titan_setting_teacher', document.getElementById('settingTeacher').value);
             localStorage.setItem('titan_setting_watermark', document.getElementById('settingWatermark').value.trim() || 'SouthGarner_Titans_Logo1.png');
             
             loadThemeSettings();
