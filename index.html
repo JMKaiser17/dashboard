@@ -452,6 +452,40 @@
         .progress-bar-container { width: 100%; height: 12px; background-color: var(--bg-mid); border-radius: 10px; overflow: hidden; margin-bottom: 2px; }
         .progress-bar { width: 0%; height: 100%; background-color: var(--primary-color); transition: width 1s linear, background-color 0.3s; }
 
+        /* Floating Picture-in-Picture Timer */
+        #floatingTimer {
+            display: none; 
+            position: fixed;
+            bottom: clamp(20px, 3vh, 40px);
+            right: clamp(20px, 3vw, 40px);
+            background: var(--secondary-dark);
+            color: var(--bg-light);
+            border: clamp(2px, 0.4vw, 4px) solid var(--primary-color);
+            padding: clamp(8px, 1.5vh, 16px) clamp(16px, 2vw, 24px);
+            border-radius: 50px;
+            font-size: clamp(1.5rem, 2.5vw, 3rem);
+            font-weight: 900;
+            z-index: 9999;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            font-variant-numeric: tabular-nums;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+        #floatingTimer:hover {
+            transform: scale(1.05);
+            background: var(--primary-color);
+        }
+
+        /* --- MODE BOARD TRANSITIONS --- */
+        @keyframes boardFadeIn {
+            0% { opacity: 0; transform: scale(0.98) translateY(15px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes boardFadeOut {
+            0% { opacity: 1; transform: scale(1) translateY(0); }
+            100% { opacity: 0; transform: scale(0.98) translateY(-15px); }
+        }
+
         /* --- ENHANCED FOCUS / ZEN MODE STYLES --- */
         #focusModeBoard { 
             display: none; 
@@ -954,6 +988,9 @@
 </head>
 <body>
 
+    <!-- Floating Picture-in-Picture Timer -->
+    <div id="floatingTimer" class="sync-timer" onclick="toggleModal('timerModal')" title="Open Timer">00:00</div>
+
     <!-- Game Mode Overlay -->
     <div class="modal" id="gameModal">
         <h1 style="color: var(--primary-color) !important; font-size: clamp(3.5rem, 6vw, 6.5rem) !important; text-shadow: 4px 4px 0px #fff !important;">JOIN THE REVIEW</h1>
@@ -1109,7 +1146,10 @@
 
     <!-- Random Groups Overlay -->
     <div class="modal" id="groupModal">
-        <h1 style="color: #fff; margin-bottom: 4px; margin-top: 0;">RANDOM GROUPS</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 98%;">
+            <h1 style="color: #fff; margin-bottom: 4px; margin-top: 0;">RANDOM GROUPS</h1>
+            <button onclick="clearGroupHistory()" style="background: var(--bg-mid); color: #111; border: none; border-radius: 50px; padding: 6px 14px; font-weight: bold; font-size: 0.95rem; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">Clear History</button>
+        </div>
         <div style="display: flex; gap: 10px; margin-bottom: 6px; align-items: center; justify-content: center; flex-wrap: wrap;">
             <div class="group-controls">
                 <button onclick="changeGroupSize(-1)">-</button>
@@ -1822,6 +1862,7 @@
         function toggleModal(modalId) {
             const modal = document.getElementById(modalId);
             modal.classList.toggle('active');
+            checkFloatingTimer();
         }
 
         function toggleTrackerModal() {
@@ -2446,6 +2487,8 @@
                 newBoard.style.animation = '';
                 activeBoard = targetBoard;
                 isTransitioning = false;
+                
+                if (targetBoard === 'mainBento') setTimeout(autoFitCardText, 50);
                 return;
             }
 
@@ -2459,6 +2502,7 @@
                 activeBoard = targetBoard;
                 
                 if (targetBoard !== 'gameModeBoard') closeGameModule();
+                if (targetBoard === 'mainBento') setTimeout(autoFitCardText, 50);
 
                 isTransitioning = false;
             }, 300); 
@@ -2532,8 +2576,36 @@
             }
         }
 
+        function checkFloatingTimer() {
+            const floatingTimer = document.getElementById('floatingTimer');
+            if (!floatingTimer) return;
+
+            const hasTime = totalTimeMs > 0;
+            const activeModals = document.querySelectorAll('.modal.active');
+            let isBlockingView = false;
+            
+            if (activeModals.length > 0) {
+                isBlockingView = !document.getElementById('timerModal').classList.contains('active');
+            }
+
+            if (hasTime && isBlockingView) {
+                floatingTimer.style.display = 'block';
+            } else {
+                floatingTimer.style.display = 'none';
+            }
+        }
+
         // --- KEYBOARD SHORTCUTS ---
         document.addEventListener('keydown', function(event) {
+            const target = event.target;
+            const isTyping = target && (
+                target.tagName === 'INPUT' ||
+                target.tagName === 'TEXTAREA' ||
+                target.isContentEditable
+            );
+            
+            if (isTyping) return; 
+
             if (event.shiftKey) {
                 if (event.key.toLowerCase() === 'c') fireBigConfetti();
                 if (event.key.toLowerCase() === 't') toggleModal('tardyModal');
@@ -2557,7 +2629,6 @@
                 }
             }
             
-            // --- SOUNDBOARD SHORTCUTS ---
             if (event.altKey) {
                 if (event.code === 'Digit1') {
                     event.preventDefault();
@@ -2575,32 +2646,22 @@
                 }
                 return;
             }
-        });
 
-        document.addEventListener('keydown', function(event) {
-            if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) return;
-
-            const target = event.target;
-            const isTyping = target && (
-                target.tagName === 'INPUT' ||
-                target.tagName === 'TEXTAREA' ||
-                target.isContentEditable
-            );
-            if (isTyping) return;
-
-            if (event.code === 'Space') {
-                event.preventDefault();
-                toggleTimer();
-            } else if (event.code === 'ArrowRight') {
-                const openGameKey = Object.keys(MINI_GAME_CONFIGS).find(key =>
-                    document.getElementById(MINI_GAME_CONFIGS[key].containerId).style.display === 'flex'
-                );
-                if (openGameKey) nextMiniGamePrompt(openGameKey);
+            if (!event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
+                if (event.code === 'Space') {
+                    event.preventDefault();
+                    toggleTimer();
+                } else if (event.code === 'ArrowRight') {
+                    const openGameKey = Object.keys(MINI_GAME_CONFIGS).find(key =>
+                        document.getElementById(MINI_GAME_CONFIGS[key].containerId).style.display === 'flex'
+                    );
+                    if (openGameKey) nextMiniGamePrompt(openGameKey);
+                }
             }
         });
 
         function fireBigConfetti() {
-            confetti({ particleCount: 300, spread: 140, startVelocity: 45, origin: { y: 0.6 }, colors: ['#5A2B81', '#C0C2C9', '#FFFFFF'] });
+            confetti({ particleCount: 300, spread: 140, startVelocity: 45, origin: { y: 0.6 }, colors: ['var(--primary-color)', 'var(--bg-mid)', '#FFFFFF'] });
         }
 
         let targetGroupSize = 2;
@@ -2611,6 +2672,32 @@
             if(targetGroupSize < 2) targetGroupSize = 2;
             if(activeBlockData && targetGroupSize > activeBlockData.roster.length) targetGroupSize = activeBlockData.roster.length;
             document.getElementById('groupSizeDisplay').innerText = `Size: ${targetGroupSize}`;
+        }
+
+        function getPairKey(a, b) {
+            return [a, b].sort().join('|');
+        }
+
+        function scoreShuffle(groups, history) {
+            let score = 0;
+            groups.forEach(group => {
+                for(let i = 0; i < group.length; i++){
+                    for(let j = i + 1; j < group.length; j++){
+                        let key = getPairKey(group[i], group[j]);
+                        score += (history[key] || 0);
+                    }
+                }
+            });
+            return score;
+        }
+
+        function clearGroupHistory() {
+            if (!activeBlockData) return;
+            let historyKey = 'titan_group_history_' + activeBlockData.id;
+            if (confirm("Clear all past grouping memory for this class?")) {
+                localStorage.removeItem(historyKey);
+                alert("History cleared!");
+            }
         }
 
         function generateGroups() {
@@ -2625,26 +2712,44 @@
                 alert("Everyone is marked absent!"); return;
             }
 
-            let shuffled = [...presentRoster];
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            let historyKey = 'titan_group_history_' + activeBlockData.id;
+            let history = JSON.parse(localStorage.getItem(historyKey) || '{}');
+            let bestGroups = [];
+            let bestScore = Infinity;
+
+            for (let iter = 0; iter < 100; iter++) {
+                let shuffled = [...presentRoster].sort(() => Math.random() - 0.5);
+                let currentGroups = [];
+                for (let i = 0; i < shuffled.length; i += targetGroupSize) {
+                    currentGroups.push(shuffled.slice(i, i + targetGroupSize));
+                }
+
+                if (currentGroups.length > 1 && currentGroups[currentGroups.length - 1].length === 1) {
+                    let remainder = currentGroups.pop()[0];
+                    currentGroups[currentGroups.length - 1].push(remainder);
+                }
+
+                let score = scoreShuffle(currentGroups, history);
+                if (score < bestScore) {
+                    bestScore = score;
+                    bestGroups = currentGroups;
+                }
             }
 
-            let groups = [];
-            for (let i = 0; i < shuffled.length; i += targetGroupSize) {
-                groups.push(shuffled.slice(i, i + targetGroupSize));
-            }
-
-            if (groups.length > 1 && groups[groups.length - 1].length === 1) {
-                let remainder = groups.pop()[0];
-                groups[groups.length - 1].push(remainder);
-            }
+            bestGroups.forEach(group => {
+                for(let i = 0; i < group.length; i++){
+                    for(let j = i + 1; j < group.length; j++){
+                        let key = getPairKey(group[i], group[j]);
+                        history[key] = (history[key] || 0) + 1;
+                    }
+                }
+            });
+            localStorage.setItem(historyKey, JSON.stringify(history));
 
             const container = document.getElementById('groupsContainer');
             container.innerHTML = '';
             
-            groups.forEach((group, index) => {
+            bestGroups.forEach((group, index) => {
                 let card = document.createElement('div');
                 card.className = 'group-card';
                 card.style.animationDelay = `${index * 0.05}s`;
@@ -2838,6 +2943,7 @@
                 document.getElementById('wheelWinnerDisplay').innerText = isGroupWheelMode ? "SPIN THE GROUPS" : "SPIN THE WHEEL";
                 document.getElementById('wheelWinnerDisplay').style.color = '#fff';
             }, 300); 
+            checkFloatingTimer();
         }
 
         function executeSpin() {
@@ -2885,6 +2991,8 @@
         }
 
         function autoFitCardText() {
+            if (activeBoard !== 'mainBento') return;
+
             const textElements = [
                 document.getElementById('warmupText'),
                 document.getElementById('eqText'),
@@ -2952,7 +3060,6 @@
             if (forcedBlock) {
                 activeBlock = forcedBlock;
             } else {
-                // 1. Try to find a class we are currently inside of
                 for (let block of schedule) {
                     let startMs = block.date.getTime() + (block.start * 60000);
                     let endMs = block.date.getTime() + (block.end * 60000);
@@ -2962,7 +3069,6 @@
                     }
                 }
                 
-                // 2. If no class is currently active, grab the next upcoming one
                 if (!activeBlock) {
                     activeBlock = schedule.find(b => {
                         let endMs = b.date.getTime() + (b.end * 60000);
@@ -3139,6 +3245,7 @@
                 if (totalTimeMs > 0) bar.style.width = ((remainingMs / totalTimeMs) * 100) + "%";
                 bar.style.backgroundColor = "var(--primary-color)"; 
             });
+            checkFloatingTimer();
         }
 
         function toggleTimer() {
@@ -3154,6 +3261,7 @@
                 }
             }
             saveTimerState();
+            checkFloatingTimer();
         }
 
         function clearTimer() {
@@ -3166,6 +3274,7 @@
                 bar.style.backgroundColor = "var(--primary-color)"; bar.style.width = "0%";
             });
             saveTimerState();
+            checkFloatingTimer();
         }
 
         function updateTimerDisplay() {
@@ -3193,6 +3302,7 @@
                 else if (remainingMs <= 60000) bar.style.backgroundColor = "var(--bg-mid)"; 
                 else bar.style.backgroundColor = "var(--primary-color)"; 
             });
+            checkFloatingTimer();
         }
 
         const MINI_GAME_CONFIGS = {
