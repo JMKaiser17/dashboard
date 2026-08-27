@@ -1049,7 +1049,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bg-mid); padding-bottom: 12px; margin-bottom: 14px;">
                 <h1 class="lb-header" style="text-align: left; font-size: clamp(1.6rem, 2.2vw, 2.8rem);">📋 Class Roster</h1>
                 <div style="display:flex; gap:12px;">
-                    <button onclick="clearAbsences()" style="background:var(--secondary-dark); color:var(--bg-light); padding:10px 22px; border-radius:12px; font-weight:bold; border:2px solid var(--primary-color); cursor:pointer; font-size: 1.1rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">Clear Absences</button>
+                    <button onclick="toggleAllAbsences()" style="background:var(--secondary-dark); color:var(--bg-light); padding:10px 22px; border-radius:12px; font-weight:bold; border:2px solid var(--primary-color); cursor:pointer; font-size: 1.1rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">Toggle Absences</button>
                     <button onclick="clearPointsData()" style="background:var(--secondary-dark); color:var(--bg-light); padding:10px 22px; border-radius:12px; font-weight:bold; border:2px solid var(--primary-color); cursor:pointer; font-size: 1.1rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">Clear Points</button>
                     <button onclick="copyAbsencesData()" style="background:var(--bg-light); color:#111; padding:10px 22px; border-radius:12px; font-weight:bold; border:2px solid var(--bg-mid); cursor:pointer; font-size: 1.1rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">Copy Absences</button>
                     <button onclick="copyTrackerData()" style="background:var(--bg-light); color:#111; padding:10px 22px; border-radius:12px; font-weight:bold; border:2px solid var(--bg-mid); cursor:pointer; font-size: 1.1rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">Copy Scores</button>
@@ -2154,30 +2154,23 @@
             renderTracker(); 
         };
 
-        window.logParticipation = function(student, change, classId) {
-            let trackingData = JSON.parse(localStorage.getItem('titan_tracker_' + classId) || '{}');
-            if (trackingData[student] === undefined) trackingData[student] = 0;
+        window.toggleAllAbsences = function() {
+            if (!activeBlockData || !activeBlockData.roster) return;
+            let absentKey = 'titan_absent_' + activeBlockData.id;
+            let currentAbsences = JSON.parse(localStorage.getItem(absentKey) || '[]');
             
-            trackingData[student] += change;
-            localStorage.setItem('titan_tracker_' + classId, JSON.stringify(trackingData));
-            
-            let safeStudentId = student.replace(/['"\s]/g, '-');
-            document.getElementById(`score-display-${safeStudentId}`).innerText = trackingData[student];
-
-            pushPointsUndo(() => {
-                let td = JSON.parse(localStorage.getItem('titan_tracker_' + classId) || '{}');
-                td[student] = (td[student] || 0) - change;
-                localStorage.setItem('titan_tracker_' + classId, JSON.stringify(td));
-                const el = document.getElementById(`score-display-${safeStudentId}`);
-                if (el) el.innerText = td[student];
-            });
-        };
-
-        window.clearAbsences = function() {
-            if (!activeBlockData) return;
-            if (confirm("Are you sure you want to clear all absences for this class?")) {
-                localStorage.removeItem('titan_absent_' + activeBlockData.id);
-                renderTracker();
+            // If everyone is already marked absent, clear the list (mark all present)
+            if (currentAbsences.length >= activeBlockData.roster.length && activeBlockData.roster.length > 0) {
+                if (confirm("This will mark ALL students as PRESENT. Continue?")) {
+                    localStorage.removeItem(absentKey);
+                    renderTracker();
+                }
+            } else {
+                // Otherwise, mark everyone absent
+                if (confirm("This will mark ALL students as ABSENT. Continue?")) {
+                    localStorage.setItem(absentKey, JSON.stringify(activeBlockData.roster));
+                    renderTracker();
+                }
             }
         };
 
