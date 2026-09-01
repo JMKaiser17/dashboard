@@ -2429,38 +2429,24 @@
             updateBoardDisplays();
         }
 
-        function handlePackSelection(gameType) {
-            let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans';
-            const GAME_TITLES = {
-                jeopardy: `${mascot} Jeopardy`,
-                biddingwar: `The Bidding War`,
-                hotseat: `The Hot Seat`,
-                taboo: `Taboo`,
-                titansays: `${mascot} Says`,
-                hivemind: `Hivemind`,
-                debate: `Rapid Debate`
-            };
-            let displayTitle = GAME_TITLES[gameType] || "Mini-Game";
-
-            let currentPeriod = activeBlockData ? activeBlockData.id.toString() : "TESTING";
+        function handlePackSelection(gameType, displayTitle) {
             let matchingGames = gameVaultData.filter(g => g.type === gameType);
-            
             let uniquePacks = [];
             let seenPacks = new Set();
 
+            // Ignore the class period. If it's active in the sheet, show it here!
             matchingGames.forEach(g => {
-                let packId = g.pack.toString().toUpperCase();
-                let isMatch = (packId === currentPeriod.toUpperCase()) || (packId === 'ALL') || (currentPeriod === "TESTING");
-                
-                if (isMatch && !seenPacks.has(g.pack)) {
-                    seenPacks.add(g.pack);
+                let packId = g.pack.toString();
+                if (!seenPacks.has(packId)) {
+                    seenPacks.add(packId);
                     uniquePacks.push({
-                        packId: g.pack,
-                        title: g.title || `Pack ${g.pack}`
+                        packId: packId,
+                        title: g.title || `Pack ${packId}`
                     });
                 }
             });
 
+            // Show the sub-menu of available packs
             const menu = document.getElementById('gameHubMenu');
             menu.innerHTML = `
                 <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; grid-column: 1 / -1;">
@@ -2470,7 +2456,7 @@
             `;
 
             if (uniquePacks.length === 0) {
-                menu.innerHTML += `<h3 style="color:var(--bg-mid); text-align: center; width: 100%; grid-column: 1 / -1;">No packs found for this period.</h3>`;
+                menu.innerHTML += `<h3 style="color:var(--bg-mid); text-align: center; width: 100%; grid-column: 1 / -1;">No packs found for this game.</h3>`;
             } else {
                 uniquePacks.forEach(p => {
                     let safePackId = p.packId.toString().replace(/'/g, "\\'");
@@ -2493,23 +2479,20 @@
                 return;
             }
 
-            let currentPeriod = activeBlockData ? activeBlockData.id.toString() : "TESTING";
-            
             let hasGame = {
                 jeopardy: false, biddingwar: false, hotseat: false, 
                 taboo: false, titansays: false, hivemind: false, debate: false
             };
 
+            // If it's in the data array, it's active. Period.
             gameVaultData.forEach(row => {
-                let packId = row.pack.toString().toUpperCase();
-                let isMatch = (packId === currentPeriod.toUpperCase()) || (packId === 'ALL') || (currentPeriod === "TESTING");
-                if (isMatch && hasGame[row.type] !== undefined) {
+                if (hasGame[row.type] !== undefined) {
                     hasGame[row.type] = true;
                 }
             });
 
             if (!Object.values(hasGame).some(val => val)) {
-                menu.innerHTML = '<h3 style="color:var(--bg-mid); text-align: center; width: 100%;">No games assigned to Period ' + currentPeriod + '.</h3>';
+                menu.innerHTML = '<h3 style="color:var(--bg-mid); text-align: center; width: 100%;">No games are currently marked ACTIVE in the vault.</h3>';
                 return;
             }
 
@@ -2517,7 +2500,7 @@
 
             if (hasGame.jeopardy) {
                 menu.innerHTML += `
-                    <div class="game-cartridge" onclick="handlePackSelection('jeopardy')">
+                    <div class="game-cartridge" onclick="handlePackSelection('jeopardy', '${mascot} Jeopardy')">
                         <h3>${mascot} Jeopardy</h3>
                         <p>Select a Pack</p>
                     </div>
@@ -2525,7 +2508,7 @@
             }
             if (hasGame.biddingwar) {
                 menu.innerHTML += `
-                    <div class="game-cartridge" onclick="handlePackSelection('biddingwar')">
+                    <div class="game-cartridge" onclick="handlePackSelection('biddingwar', 'The Bidding War')">
                         <h3>The Bidding War</h3>
                         <p>Select a Pack</p>
                     </div>
@@ -2533,7 +2516,7 @@
             }
             if (hasGame.hotseat) {
                 menu.innerHTML += `
-                    <div class="game-cartridge" onclick="handlePackSelection('hotseat')">
+                    <div class="game-cartridge" onclick="handlePackSelection('hotseat', 'The Hot Seat')">
                         <h3>The Hot Seat</h3>
                         <p>Select a Pack</p>
                     </div>
@@ -2541,7 +2524,7 @@
             }
             if (hasGame.taboo) {
                 menu.innerHTML += `
-                    <div class="game-cartridge" onclick="handlePackSelection('taboo')">
+                    <div class="game-cartridge" onclick="handlePackSelection('taboo', 'Taboo')">
                         <h3>Taboo</h3>
                         <p>Select a Pack</p>
                     </div>
@@ -2549,7 +2532,7 @@
             }
             if (hasGame.titansays) {
                 menu.innerHTML += `
-                    <div class="game-cartridge" onclick="handlePackSelection('titansays')">
+                    <div class="game-cartridge" onclick="handlePackSelection('titansays', '${mascot} Says')">
                         <h3>${mascot} Says</h3>
                         <p>Select a Pack</p>
                     </div>
@@ -2557,7 +2540,7 @@
             }
             if (hasGame.hivemind) {
                 menu.innerHTML += `
-                    <div class="game-cartridge" onclick="handlePackSelection('hivemind')">
+                    <div class="game-cartridge" onclick="handlePackSelection('hivemind', 'Hivemind')">
                         <h3>Hivemind</h3>
                         <p>Select a Pack</p>
                     </div>
@@ -2565,7 +2548,7 @@
             }
             if (hasGame.debate) {
                 menu.innerHTML += `
-                    <div class="game-cartridge" onclick="handlePackSelection('debate')">
+                    <div class="game-cartridge" onclick="handlePackSelection('debate', 'Rapid Debate')">
                         <h3>Rapid Debate</h3>
                         <p>Select a Pack</p>
                     </div>
