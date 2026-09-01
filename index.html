@@ -760,6 +760,18 @@
             min-height: 0;
         }
 
+        /* Notepad Clear Button Hover */
+        .clear-notepad-btn {
+            background: var(--bg-light); color: #111; border: 2px solid var(--bg-mid);
+            border-radius: 8px; padding: clamp(6px, 1vh, 10px) clamp(12px, 1.5vw, 20px);
+            font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            font-size: clamp(0.9rem, 1.2vw, 1.1rem); transition: all 0.2s;
+        }
+        .clear-notepad-btn:hover {
+            background: #ffffff; border-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
         /* --- RESPONSIVE MODAL OVERLAYS --- */
         .modal {
             display: flex; 
@@ -1509,9 +1521,16 @@
 
         <!-- Slide / Presentation Mode Board -->
         <div id="slideModeBoard">
-            <div id="slideNoData" style="display: none; width: 100%; height: 100%; justify-content: center; align-items: center; font-size: clamp(1.8rem, 3vw, 4rem); color: var(--primary-color); font-weight: bold; background: var(--bg-light); border-radius: 18px;">
-                No sources linked for this period.
+            <!-- Universal Notepad Container -->
+            <div id="slideNotepadContainer" style="display: none; width: 100%; height: 100%; flex-direction: column; padding: clamp(15px, 2vw, 30px); position: relative;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px dashed rgba(var(--primary-rgb), 0.2); padding-bottom: 10px;">
+                    <h2 style="margin: 0; color: var(--primary-color); font-size: clamp(1.5rem, 2vw, 2.5rem); font-weight: 700;">📝 Class Notepad</h2>
+                    <button onclick="clearNotepad()" class="clear-notepad-btn">🧹 Clear Notes</button>
+                </div>
+                <div id="slideNotepad" class="focus-editable" contenteditable="true" oninput="saveNotepad()" style="flex-grow: 1; border: none; background: transparent; box-shadow: none; padding: 0;"></div>
             </div>
+
+            <!-- Slide iframe -->
             <iframe id="slideIframe" src="" style="width: 100%; height: 100%; border: none;"></iframe>
         </div>
 
@@ -1703,7 +1722,7 @@
         let needsDataRender = true; 
 
         let currentSlides = [];
-        let currentSlideIndex = 0;
+        let currentSlideIndex = -1; // -1 represents the Notepad, 0+ represent slides
         let isMarketTicker = false;
         
         let gameVaultData = []; 
@@ -2645,7 +2664,7 @@
             const newBoard = document.getElementById(targetBoard);
             const topTabs = document.getElementById('topSourceTabs');
 
-            if (targetBoard === 'slideModeBoard' && currentSlides.length > 1) {
+            if (targetBoard === 'slideModeBoard') {
                 topTabs.style.display = 'flex';
                 renderSlide();
             } else {
@@ -2680,38 +2699,85 @@
             }, 300); 
         }
 
+        function saveNotepad() {
+            if (!activeBlockData) return;
+            const content = document.getElementById('slideNotepad').innerHTML;
+            localStorage.setItem('titan_notepad_' + activeBlockData.id, content);
+        }
+
+        function loadNotepad() {
+            const notepad = document.getElementById('slideNotepad');
+            if (activeBlockData) {
+                const saved = localStorage.getItem('titan_notepad_' + activeBlockData.id);
+                notepad.innerHTML = saved !== null ? saved : '<p>Start typing notes here...</p>';
+            } else {
+                notepad.innerHTML = '<p>Start typing notes here...</p>';
+            }
+        }
+
+        function clearNotepad() {
+            if (confirm("Are you sure you want to clear these notes?")) {
+                document.getElementById('slideNotepad').innerHTML = '<p></p>';
+                saveNotepad();
+            }
+        }
+
         function renderSlide() {
             const iframe = document.getElementById('slideIframe');
-            const noData = document.getElementById('slideNoData');
+            const notepadContainer = document.getElementById('slideNotepadContainer');
             const topTabs = document.getElementById('topSourceTabs');
 
+            // Force index to Notepad if there are absolutely no slides 
+            // and we somehow attempted to view one.
             if (currentSlides.length === 0) {
-                iframe.style.display = 'none';
-                topTabs.style.display = 'none';
-                noData.style.display = 'flex';
-            } else {
-                iframe.style.display = 'block';
-                noData.style.display = 'none';
-                
-                if (iframe.src !== currentSlides[currentSlideIndex].url) {
-                    iframe.src = currentSlides[currentSlideIndex].url;
-                }
+                currentSlideIndex = -1;
+            }
 
-                if (currentSlides.length > 1 && activeBoard === 'slideModeBoard') {
-                    topTabs.style.display = 'flex';
-                    topTabs.innerHTML = currentSlides.map((slide, idx) => {
-                        let isActive = idx === currentSlideIndex;
+            if (activeBoard === 'slideModeBoard') {
+                topTabs.style.display = 'flex';
+                
+                let tabsHTML = '';
+                
+                // Always render Notepad Tab (Index -1)
+                let isNotepadActive = (currentSlideIndex === -1);
+                let nBg = isNotepadActive ? '#ffffff' : 'transparent';
+                let nColor = isNotepadActive ? 'var(--primary-color)' : 'var(--bg-light)';
+                let nBorder = isNotepadActive ? 'clamp(1.5px, 0.15vw, 2.5px) solid var(--secondary-dark)' : 'clamp(1.5px, 0.15vw, 2.5px) solid #ffffff';
+                let nOpacity = isNotepadActive ? '1' : '0.7';
+                let nTransform = isNotepadActive ? 'scale(1.1)' : 'scale(1)';
+                
+                tabsHTML += `<button onclick="goToSlide(-1)" title="Notepad" style="background: ${nBg}; color: ${nColor}; border: ${nBorder}; opacity: ${nOpacity}; width: clamp(28px, 2.2vw, 40px); height: clamp(28px, 2.2vw, 40px); border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; font-size: clamp(1rem, 1.2vw, 1.5rem); transition: all 0.2s; box-shadow: 0 3px 6px rgba(0,0,0,0.3); flex-shrink: 0; transform: ${nTransform}; margin: 0 4px;">📝</button>`;
+
+                // Render Slide Tabs (Index 0 to N)
+                if (currentSlides.length > 0) {
+                    currentSlides.forEach((slide, idx) => {
+                        let isActive = (idx === currentSlideIndex);
                         let bg = isActive ? '#ffffff' : 'transparent';
                         let color = isActive ? 'var(--primary-color)' : 'var(--bg-light)';
                         let border = isActive ? 'clamp(1.5px, 0.15vw, 2.5px) solid var(--secondary-dark)' : 'clamp(1.5px, 0.15vw, 2.5px) solid #ffffff';
                         let opacity = isActive ? '1' : '0.7';
                         let transform = isActive ? 'scale(1.1)' : 'scale(1)';
                         
-                        return `<button onclick="goToSlide(${idx})" title="${slide.name}" style="background: ${bg}; color: ${color}; border: ${border}; opacity: ${opacity}; width: clamp(22px, 1.8vw, 34px); height: clamp(22px, 1.8vw, 34px); border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: clamp(0.8rem, 1vw, 1.2rem); transition: all 0.2s; box-shadow: 0 3px 6px rgba(0,0,0,0.3); flex-shrink: 0; transform: ${transform}; margin: 0 4px;">${idx + 1}</button>`;
-                    }).join('');
-                } else {
-                    topTabs.style.display = 'none';
+                        tabsHTML += `<button onclick="goToSlide(${idx})" title="${slide.name}" style="background: ${bg}; color: ${color}; border: ${border}; opacity: ${opacity}; width: clamp(22px, 1.8vw, 34px); height: clamp(22px, 1.8vw, 34px); border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: clamp(0.8rem, 1vw, 1.2rem); transition: all 0.2s; box-shadow: 0 3px 6px rgba(0,0,0,0.3); flex-shrink: 0; transform: ${transform}; margin: 0 4px;">${idx + 1}</button>`;
+                    });
                 }
+
+                topTabs.innerHTML = tabsHTML;
+                
+                // Toggle between Notepad and iFrame based on active index
+                if (currentSlideIndex === -1) {
+                    iframe.style.display = 'none';
+                    notepadContainer.style.display = 'flex';
+                    loadNotepad();
+                } else {
+                    notepadContainer.style.display = 'none';
+                    iframe.style.display = 'block';
+                    if (iframe.src !== currentSlides[currentSlideIndex].url) {
+                        iframe.src = currentSlides[currentSlideIndex].url;
+                    }
+                }
+            } else {
+                topTabs.style.display = 'none';
             }
         }
 
@@ -3300,7 +3366,6 @@
             let currentActiveId = activeBlock ? activeBlock.id : null;
             
             if (lastActiveBlockId !== currentActiveId || needsDataRender) {
-                lastActiveBlockId = currentActiveId;
                 needsDataRender = false;
 
                 if (activeBlock) {
@@ -3367,6 +3432,11 @@
                         });
                     }
                     
+                    // Smart defaulting for presentation mode based on loaded resources
+                    if (lastActiveBlockId !== currentActiveId) {
+                        currentSlideIndex = currentSlides.length > 0 ? 0 : -1;
+                    }
+                    
                     if (!isGroupWheelMode && activeBlockData && activeBlockData.roster) {
                          drawWheel(getActiveWheelItems());
                     }
@@ -3383,7 +3453,10 @@
                     document.getElementById('remindersItems').innerHTML = "";
                     if(!isMarketTicker) document.getElementById('dailyMessage').innerText = "Have a wonderful evening!";
                     currentSlides = []; 
+                    if (lastActiveBlockId !== currentActiveId) currentSlideIndex = -1;
                 }
+                
+                lastActiveBlockId = currentActiveId;
             }
         }
 
