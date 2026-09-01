@@ -2432,38 +2432,37 @@
         function handlePackSelection(gameType, displayTitle) {
             let matchingGames = gameVaultData.filter(g => g.type === gameType);
             let uniquePacks = [];
-            let seenPacks = new Set();
+            let seenTitles = new Set();
 
-            // Ignore the class period. If it's active in the sheet, show it here!
+            // Ignore the class period AND Pack ID entirely. Just group by Title!
             matchingGames.forEach(g => {
-                let packId = g.pack.toString();
-                if (!seenPacks.has(packId)) {
-                    seenPacks.add(packId);
+                let gameTitle = g.title ? g.title.toString().trim() : "Untitled Pack";
+                if (!seenTitles.has(gameTitle)) {
+                    seenTitles.add(gameTitle);
                     uniquePacks.push({
-                        packId: packId,
-                        title: g.title || `Pack ${packId}`
+                        title: gameTitle
                     });
                 }
             });
 
-            // Show the sub-menu of available packs
+            // Show the sub-menu of available game titles
             const menu = document.getElementById('gameHubMenu');
             menu.innerHTML = `
                 <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; grid-column: 1 / -1;">
-                    <h2 style="color: #fff; margin: 0; font-size: clamp(1.4rem, 2vw, 2.2rem); text-transform: uppercase;">Select ${displayTitle} Pack</h2>
+                    <h2 style="color: #fff; margin: 0; font-size: clamp(1.4rem, 2vw, 2.2rem); text-transform: uppercase;">Select ${displayTitle} Deck</h2>
                     <button onclick="buildDynamicGameMenu()" style="background:var(--bg-light); border:none; padding:8px 20px; border-radius:20px; font-weight:bold; cursor:pointer; font-size:1rem; color: #111;">Back to Hub</button>
                 </div>
             `;
 
             if (uniquePacks.length === 0) {
-                menu.innerHTML += `<h3 style="color:var(--bg-mid); text-align: center; width: 100%; grid-column: 1 / -1;">No packs found for this game.</h3>`;
+                menu.innerHTML += `<h3 style="color:var(--bg-mid); text-align: center; width: 100%; grid-column: 1 / -1;">No decks found for this game.</h3>`;
             } else {
                 uniquePacks.forEach(p => {
-                    let safePackId = p.packId.toString().replace(/'/g, "\\'");
+                    let safeTitle = p.title.replace(/'/g, "\\'");
                     menu.innerHTML += `
-                        <div class="game-cartridge" onclick="openGameModule('${gameType}', '${safePackId}')">
+                        <div class="game-cartridge" onclick="openGameModule('${gameType}', '${safeTitle}')">
                             <h3>${p.title}</h3>
-                            <p>Pack ID: ${p.packId}</p>
+                            <p>Play Now</p>
                         </div>
                     `;
                 });
@@ -2484,7 +2483,7 @@
                 taboo: false, titansays: false, hivemind: false, debate: false
             };
 
-            // If it's in the data array, it's active. Period.
+            // If it's in the data array, it's active.
             gameVaultData.forEach(row => {
                 if (hasGame[row.type] !== undefined) {
                     hasGame[row.type] = true;
@@ -2502,7 +2501,7 @@
                 menu.innerHTML += `
                     <div class="game-cartridge" onclick="handlePackSelection('jeopardy', '${mascot} Jeopardy')">
                         <h3>${mascot} Jeopardy</h3>
-                        <p>Select a Pack</p>
+                        <p>Select a Deck</p>
                     </div>
                 `;
             }
@@ -2510,7 +2509,7 @@
                 menu.innerHTML += `
                     <div class="game-cartridge" onclick="handlePackSelection('biddingwar', 'The Bidding War')">
                         <h3>The Bidding War</h3>
-                        <p>Select a Pack</p>
+                        <p>Select a Deck</p>
                     </div>
                 `;
             }
@@ -2518,7 +2517,7 @@
                 menu.innerHTML += `
                     <div class="game-cartridge" onclick="handlePackSelection('hotseat', 'The Hot Seat')">
                         <h3>The Hot Seat</h3>
-                        <p>Select a Pack</p>
+                        <p>Select a Deck</p>
                     </div>
                 `;
             }
@@ -2526,7 +2525,7 @@
                 menu.innerHTML += `
                     <div class="game-cartridge" onclick="handlePackSelection('taboo', 'Taboo')">
                         <h3>Taboo</h3>
-                        <p>Select a Pack</p>
+                        <p>Select a Deck</p>
                     </div>
                 `;
             }
@@ -2534,7 +2533,7 @@
                 menu.innerHTML += `
                     <div class="game-cartridge" onclick="handlePackSelection('titansays', '${mascot} Says')">
                         <h3>${mascot} Says</h3>
-                        <p>Select a Pack</p>
+                        <p>Select a Deck</p>
                     </div>
                 `;
             }
@@ -2542,7 +2541,7 @@
                 menu.innerHTML += `
                     <div class="game-cartridge" onclick="handlePackSelection('hivemind', 'Hivemind')">
                         <h3>Hivemind</h3>
-                        <p>Select a Pack</p>
+                        <p>Select a Deck</p>
                     </div>
                 `;
             }
@@ -2550,16 +2549,16 @@
                 menu.innerHTML += `
                     <div class="game-cartridge" onclick="handlePackSelection('debate', 'Rapid Debate')">
                         <h3>Rapid Debate</h3>
-                        <p>Select a Pack</p>
+                        <p>Select a Deck</p>
                     </div>
                 `;
             }
         }
 
-        let currentActivePackId = '1'; 
+        let currentActiveGameTitle = ''; 
 
-        function openGameModule(gameType, packId) {
-            currentActivePackId = packId; 
+        function openGameModule(gameType, gameTitle) {
+            currentActiveGameTitle = gameTitle; 
             document.getElementById('gameHubMenu').style.display = 'none';
             document.getElementById('activeGameContainer').style.display = 'flex';
             
@@ -2577,9 +2576,9 @@
                 document.getElementById('biddingWarTimer').style.display = 'flex';
             } else if (gameType === 'jeopardy') {
                 document.getElementById('jeopardyContainer').style.display = 'flex';
-                renderJeopardyBoard(packId); 
+                renderJeopardyBoard(gameTitle); 
             } else if (MINI_GAME_CONFIGS[gameType]) {
-                loadMiniGamePrompts(gameType, packId);
+                loadMiniGamePrompts(gameType, gameTitle);
             }
         }
 
@@ -2589,27 +2588,27 @@
             buildDynamicGameMenu(); 
         }
 
-        function getPlayedJeopardyTiles(packId) {
-            return JSON.parse(localStorage.getItem(`titan_jeopardy_played_${packId}`) || '[]');
+        function getPlayedJeopardyTiles(gameTitle) {
+            return JSON.parse(localStorage.getItem(`titan_jeopardy_played_${gameTitle}`) || '[]');
         }
 
-        function markJeopardyTilePlayed(packId, cat, val) {
-            let played = getPlayedJeopardyTiles(packId);
+        function markJeopardyTilePlayed(gameTitle, cat, val) {
+            let played = getPlayedJeopardyTiles(gameTitle);
             let tileKey = `${cat}_${val}`;
             if (!played.includes(tileKey)) {
                 played.push(tileKey);
-                localStorage.setItem(`titan_jeopardy_played_${packId}`, JSON.stringify(played));
+                localStorage.setItem(`titan_jeopardy_played_${gameTitle}`, JSON.stringify(played));
             }
         }
 
         function resetJeopardyBoard() {
-            localStorage.removeItem(`titan_jeopardy_played_${currentActivePackId}`);
-            renderJeopardyBoard(currentActivePackId);
+            localStorage.removeItem(`titan_jeopardy_played_${currentActiveGameTitle}`);
+            renderJeopardyBoard(currentActiveGameTitle);
         }
 
-        function openJeopardyPrompt(cardElement, category, value, prompt, answer, packId) {
+        function openJeopardyPrompt(cardElement, category, value, prompt, answer, gameTitle) {
             cardElement.classList.add('played');
-            markJeopardyTilePlayed(packId, category, value);
+            markJeopardyTilePlayed(gameTitle, category, value);
             
             document.getElementById('jeopardyModalHeader').innerText = `${category} - ${value}`;
             document.getElementById('jeopardyModalPrompt').innerText = prompt;
@@ -2632,19 +2631,20 @@
             document.getElementById('jeopardyModal').classList.remove('active');
         }
 
-        function renderJeopardyBoard(packId) {
+        function renderJeopardyBoard(gameTitle) {
             const board = document.getElementById('jeopardyBoard');
             board.innerHTML = '';
             
-            const jeopardyQuestions = gameVaultData.filter(g => g.type === 'jeopardy' && g.pack.toString().toUpperCase() === packId.toUpperCase());
+            // Filter by TITLE instead of Pack
+            const jeopardyQuestions = gameVaultData.filter(g => g.type === 'jeopardy' && g.title.toString().trim() === gameTitle);
             
             if(jeopardyQuestions.length === 0) {
-                board.innerHTML = '<h3 style="color:white; grid-column: span 5; text-align: center;">Error loading trivia data for this pack.</h3>';
+                board.innerHTML = '<h3 style="color:white; grid-column: span 5; text-align: center;">Error loading trivia data for this deck.</h3>';
                 return;
             }
 
             const categories = [...new Set(jeopardyQuestions.map(q => q.category))].slice(0, 5);
-            let playedTiles = getPlayedJeopardyTiles(packId);
+            let playedTiles = getPlayedJeopardyTiles(gameTitle);
             
             categories.forEach(cat => {
                 board.innerHTML += `<div class="j-header">${cat}</div>`;
@@ -2662,7 +2662,7 @@
                         let isPlayed = playedTiles.includes(`${cat}_${val}`);
                         let playedClass = isPlayed ? 'played' : '';
                         
-                        board.innerHTML += `<div class="j-card ${playedClass}" onclick="if(!this.classList.contains('played')) openJeopardyPrompt(this, '${safeCat}', '${val}', '${safePrompt}', '${safeAnswer}', '${packId}')">${val}</div>`;
+                        board.innerHTML += `<div class="j-card ${playedClass}" onclick="if(!this.classList.contains('played')) openJeopardyPrompt(this, '${safeCat}', '${val}', '${safePrompt}', '${safeAnswer}', '${gameTitle.replace(/'/g, "\\'")}')">${val}</div>`;
                     } else {
                         board.innerHTML += `<div class="j-card played">-</div>`;
                     }
@@ -3695,7 +3695,7 @@
             }
         };
 
-        function loadMiniGamePrompts(gameKey, packId) {
+        function loadMiniGamePrompts(gameKey, gameTitle) {
             const cfg = MINI_GAME_CONFIGS[gameKey];
             document.getElementById(cfg.containerId).style.display = 'flex';
             
@@ -3708,7 +3708,7 @@
 
             const matchingRows = gameVaultData.filter(g =>
                 g.type === cfg.vaultType &&
-                g.pack.toString().toUpperCase() === packId.toUpperCase()
+                g.title.toString().trim() === gameTitle
             );
 
             let list = [];
@@ -3733,7 +3733,7 @@
             const list = miniGameLists[gameKey];
             if (!list || list.length === 0) return;
 
-            const playedKey = cfg.storagePrefix + currentActivePackId;
+            const playedKey = cfg.storagePrefix + currentActiveGameTitle;
             let playedItems = JSON.parse(localStorage.getItem(playedKey) || '[]');
             
             let available = list.filter(item => {
@@ -3776,7 +3776,7 @@
 
         function resetMiniGame(gameKey) {
             const cfg = MINI_GAME_CONFIGS[gameKey];
-            localStorage.removeItem(cfg.storagePrefix + currentActivePackId);
+            localStorage.removeItem(cfg.storagePrefix + currentActiveGameTitle);
 
             const display = document.getElementById(cfg.displayId);
             const extraDisplay = cfg.extraDisplayId ? document.getElementById(cfg.extraDisplayId) : null;
