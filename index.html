@@ -760,6 +760,26 @@
             min-height: 0;
         }
 
+        /* Auto-sizing 16:9 Slide Wrapper */
+        .slide-frame-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .slide-frame-container iframe {
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            height: auto;
+            max-height: 100%;
+            max-width: 100%;
+            border: none;
+            border-radius: 12px;
+        }
+
         /* Notepad Clear Button Hover */
         .clear-notepad-btn {
             background: var(--bg-light); color: #111; border: 2px solid var(--bg-mid);
@@ -1156,6 +1176,7 @@
                         <p><kbd>Shift</kbd> + <kbd>D</kbd> Eyes Up Front</p>
                         <p><kbd>Shift</kbd> + <kbd>T</kbd> Tardy Screen</p>
                         <p><kbd>Shift</kbd> + <kbd>0</kbd> Settings Menu</p>
+                        <p><kbd>ESC</kbd> Close Active Screen</p>
                     </div>
                 </div>
             </div>
@@ -1471,6 +1492,24 @@
                     </div>
                 </div>
 
+                <!-- Taboo Module -->
+                <div class="game-rules-card" id="tabooContainer" style="display: none; flex: 1 1 100%; flex-direction: column; align-items: center; justify-content: space-between; background: linear-gradient(145deg, #d32f2f, #9a0007); color: white; min-height: 50vh; border-radius: 16px; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4); border: 2px solid rgba(var(--bg-mid-rgb), 0.3); overflow: hidden;">
+                    <div style="display: flex; justify-content: space-between; width: 100%; padding: 20px; flex-shrink: 0; background: rgba(0,0,0,0.2); border-bottom: 4px solid #111;">
+                        <h2 style="color: #ffffff; margin: 0; font-size: clamp(1.5rem, 2.5vw, 3rem); font-weight: 900; text-transform: uppercase;">TABOO</h2>
+                        <button onclick="closeGameModule()" style="background:var(--secondary-dark); color:var(--bg-light); border:2px solid var(--bg-light); padding:8px 20px; border-radius:20px; font-weight:bold; cursor:pointer; font-size:1.1rem;">Back to Hub</button>
+                    </div>
+                    <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; padding: 0 20px; overflow: hidden; gap: 20px;">
+                        <h1 id="tabooWordDisplay" style="font-size: clamp(3rem, 8vw, 10rem); font-weight: 900; text-transform: uppercase; text-shadow: 4px 4px 0px #111; margin: 0; text-align: center; transition: opacity 0.15s; line-height: 1.1; word-wrap: break-word; max-width: 100%;">READY?</h1>
+                        <div id="tabooForbiddenDisplay" style="display: flex; flex-direction: column; gap: 10px; font-size: clamp(1.5rem, 3vw, 4rem); font-weight: 700; color: #ffcccc; text-transform: uppercase; text-align: center; transition: opacity 0.15s;">
+                            <!-- Forbidden words go here -->
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 20px; margin-bottom: 30px; padding-top: 10px; flex-shrink: 0; align-items: center;">
+                        <button onclick="resetTaboo()" style="background: var(--bg-light); color: #111; border: none; padding: 12px 25px; font-size: clamp(1.1rem, 1.5vw, 1.8rem); border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); transition: transform 0.1s;">Reset Game</button>
+                        <button onclick="nextTabooWord()" style="background: #ffffff; color: #d32f2f; border: 2px solid #ffffff; padding: 15px 40px; font-size: clamp(1.5rem, 2vw, 2.5rem); border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 6px 12px rgba(0,0,0,0.6); transition: transform 0.1s;">Next Word</button>
+                    </div>
+                </div>
+
                 <!-- Mascot Says Module -->
                 <div class="game-rules-card" id="titanSaysContainer" style="display: none; flex: 1 1 100%; flex-direction: column; align-items: center; justify-content: space-between; background: linear-gradient(145deg, var(--secondary-dark), #1a1a1a); color: white; min-height: 50vh; border-radius: 16px; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4); border: 2px solid rgba(var(--bg-mid-rgb), 0.3); overflow: hidden;">
                     <div style="display: flex; justify-content: space-between; width: 100%; padding: 20px; flex-shrink: 0; background: var(--primary-color); border-bottom: 4px solid #111;">
@@ -1530,8 +1569,10 @@
                 <div id="slideNotepad" class="focus-editable" contenteditable="true" oninput="saveNotepad()" style="flex-grow: 1; border: none; background: transparent; box-shadow: none; padding: 0;"></div>
             </div>
 
-            <!-- Slide iframe -->
-            <iframe id="slideIframe" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+            <!-- Auto-sizing 16:9 Slide Frame Container -->
+            <div class="slide-frame-container" id="slideFrameContainer">
+                <iframe id="slideIframe" src=""></iframe>
+            </div>
         </div>
 
     </div>
@@ -1726,7 +1767,7 @@
         let isMarketTicker = false;
         
         let gameVaultData = []; 
-        let miniGameLists = { hotseat: [], titansays: [], hivemind: [], debate: [] };
+        let miniGameLists = { hotseat: [], titansays: [], hivemind: [], debate: [], taboo: [] };
 
         function toggleTickerMode() {
             isMarketTicker = !isMarketTicker;
@@ -1875,7 +1916,8 @@
                 { id: '1', type: 'jeopardy', title: 'Demo Trivia', pack: '1', category: 'Dashboard 101', prompt: 'This hotkey instantly triggers a confetti celebration.', answer: 'Shift + C', value: '100' },
                 { id: '2', type: 'jeopardy', title: 'Demo Trivia', pack: '1', category: 'Dashboard 101', prompt: 'Pressing this key starts or pauses the class timer.', answer: 'Spacebar', value: '200' },
                 { id: '3', type: 'hotseat', title: 'Demo Vocab', pack: '1', prompt: 'Gamification, Efficiency, Organization, Technology', category: '', answer: '', value: '' },
-                { id: '4', type: 'titansays', title: 'Demo Simon', pack: '1', prompt: 'Touch your nose., Stand on one foot., High-five your neighbor.', category: '', answer: '', value: '' }
+                { id: '4', type: 'titansays', title: 'Demo Simon', pack: '1', prompt: 'Touch your nose., Stand on one foot., High-five your neighbor.', category: '', answer: '', value: '' },
+                { id: '5', type: 'taboo', title: 'Demo Taboo', pack: '1', category: '', prompt: 'Dashboard', answer: 'Screen, Class, Board', value: '' }
             ];
             
             needsDataRender = true;
@@ -2387,121 +2429,14 @@
             updateBoardDisplays();
         }
 
-        function buildDynamicGameMenu() {
-            const menu = document.getElementById('gameHubMenu');
-            menu.innerHTML = '';
-            
-            if (gameVaultData.length === 0) {
-                menu.innerHTML = '<h3 style="color:var(--bg-mid); text-align: center; width: 100%;">No active games found. Mark rows as "ACTIVE" in your Game Vault sheet!</h3>';
-                return;
-            }
-
+        function handlePackSelection(gameType, displayTitle) {
             let currentPeriod = activeBlockData ? activeBlockData.id.toString() : "TESTING";
-            let availableJeopardyPacks = [];
-            let hasBiddingWar = false;
-            let hasHotSeat = false;
-            let hasTitanSays = false;
-            let hasHivemind = false;
-            let hasDebate = false;
-            let seenJeopardyPacks = new Set();
-
-            gameVaultData.forEach(row => {
-                let packId = row.pack.toString().toUpperCase();
-                let isMatch = (packId === currentPeriod.toUpperCase()) || (packId === 'ALL') || (currentPeriod === "TESTING");
-                
-                if (isMatch) {
-                    if (row.type === 'jeopardy') {
-                        if (!seenJeopardyPacks.has(row.pack)) {
-                            seenJeopardyPacks.add(row.pack);
-                            availableJeopardyPacks.push({
-                                packId: row.pack,
-                                title: row.title || `Jeopardy Pack ${row.pack}`
-                            });
-                        }
-                    } else if (row.type === 'biddingwar') {
-                        hasBiddingWar = true;
-                    } else if (row.type === 'hotseat') {
-                        hasHotSeat = true;
-                    } else if (row.type === 'titansays') {
-                        hasTitanSays = true;
-                    } else if (row.type === 'hivemind') {
-                        hasHivemind = true;
-                    } else if (row.type === 'debate') {
-                        hasDebate = true;
-                    }
-                }
-            });
-
-            if (availableJeopardyPacks.length === 0 && !hasBiddingWar && !hasHotSeat && !hasTitanSays && !hasHivemind && !hasDebate) {
-                menu.innerHTML = '<h3 style="color:var(--bg-mid); text-align: center; width: 100%;">No games assigned to Period ' + currentPeriod + '.</h3>';
-                return;
-            }
-
-            let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans';
-
-            if (availableJeopardyPacks.length > 0) {
-                menu.innerHTML += `
-                    <div class="game-cartridge" onclick="handleJeopardyCartridgeClick()">
-                        <h3>${mascot} Jeopardy</h3>
-                        <p>${availableJeopardyPacks.length > 1 ? availableJeopardyPacks.length + ' Packs Available' : '5x5 Trivia Board'}</p>
-                    </div>
-                `;
-            }
-
-            if (hasBiddingWar) {
-                menu.innerHTML += `
-                    <div class="game-cartridge" onclick="openGameModule('biddingwar', '1')">
-                        <h3>The Bidding War</h3>
-                        <p>Team Wager Competition</p>
-                    </div>
-                `;
-            }
-            
-            if (hasHotSeat) {
-                menu.innerHTML += `
-                    <div class="game-cartridge" onclick="openGameModule('hotseat', '1')">
-                        <h3>The Hot Seat</h3>
-                        <p>Team Vocabulary Challenge</p>
-                    </div>
-                `;
-            }
-
-            if (hasTitanSays) {
-                menu.innerHTML += `
-                    <div class="game-cartridge" onclick="openGameModule('titansays', '1')">
-                        <h3>${mascot} Says</h3>
-                        <p>Instructions Challenge</p>
-                    </div>
-                `;
-            }
-
-            if (hasHivemind) {
-                menu.innerHTML += `
-                    <div class="game-cartridge" onclick="openGameModule('hivemind', '1')">
-                        <h3>Hivemind</h3>
-                        <p>Majority Rules Game</p>
-                    </div>
-                `;
-            }
-
-            if (hasDebate) {
-                menu.innerHTML += `
-                    <div class="game-cartridge" onclick="openGameModule('debate', '1')">
-                        <h3>Rapid Debate</h3>
-                        <p>The Spectrum Game</p>
-                    </div>
-                `;
-            }
-        }
-
-        function handleJeopardyCartridgeClick() {
-            let currentPeriod = activeBlockData ? activeBlockData.id.toString() : "TESTING";
-            let matchingJeopardy = gameVaultData.filter(g => g.type === 'jeopardy');
+            let matchingGames = gameVaultData.filter(g => g.type === gameType);
             
             let uniquePacks = [];
             let seenPacks = new Set();
 
-            matchingJeopardy.forEach(g => {
+            matchingGames.forEach(g => {
                 let packId = g.pack.toString().toUpperCase();
                 let isMatch = (packId === currentPeriod.toUpperCase()) || (packId === 'ALL') || (currentPeriod === "TESTING");
                 
@@ -2514,26 +2449,121 @@
                 }
             });
 
-            // Always show the sub-menu, even if there's only one pack
+            // If there's only one valid pack, skip the menu and launch the game directly!
+            if (uniquePacks.length === 1) {
+                openGameModule(gameType, uniquePacks[0].packId);
+                return;
+            }
+
+            // Otherwise, show the sub-menu of available packs
             const menu = document.getElementById('gameHubMenu');
             menu.innerHTML = `
-                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h2 style="color: #fff; margin: 0; font-size: clamp(1.4rem, 2vw, 2.2rem); text-transform: uppercase;">Select Jeopardy Pack</h2>
+                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; grid-column: 1 / -1;">
+                    <h2 style="color: #fff; margin: 0; font-size: clamp(1.4rem, 2vw, 2.2rem); text-transform: uppercase;">Select ${displayTitle} Pack</h2>
                     <button onclick="buildDynamicGameMenu()" style="background:var(--bg-light); border:none; padding:8px 20px; border-radius:20px; font-weight:bold; cursor:pointer; font-size:1rem; color: #111;">Back to Hub</button>
                 </div>
             `;
 
             if (uniquePacks.length === 0) {
-                menu.innerHTML += `<h3 style="color:var(--bg-mid); text-align: center; width: 100%;">No Jeopardy packs found for this period.</h3>`;
+                menu.innerHTML += `<h3 style="color:var(--bg-mid); text-align: center; width: 100%; grid-column: 1 / -1;">No packs found for this period.</h3>`;
             } else {
                 uniquePacks.forEach(p => {
                     menu.innerHTML += `
-                        <div class="game-cartridge" onclick="openGameModule('jeopardy', '${p.packId}')">
+                        <div class="game-cartridge" onclick="openGameModule('${gameType}', '${p.packId.replace(/'/g, "\\'")}')">
                             <h3>${p.title}</h3>
                             <p>Pack ID: ${p.packId}</p>
                         </div>
                     `;
                 });
+            }
+        }
+
+        function buildDynamicGameMenu() {
+            const menu = document.getElementById('gameHubMenu');
+            menu.innerHTML = '';
+            
+            if (gameVaultData.length === 0) {
+                menu.innerHTML = '<h3 style="color:var(--bg-mid); text-align: center; width: 100%;">No active games found. Mark rows as "ACTIVE" in your Game Vault sheet!</h3>';
+                return;
+            }
+
+            let currentPeriod = activeBlockData ? activeBlockData.id.toString() : "TESTING";
+            
+            let hasGame = {
+                jeopardy: false, biddingwar: false, hotseat: false, 
+                taboo: false, titansays: false, hivemind: false, debate: false
+            };
+
+            gameVaultData.forEach(row => {
+                let packId = row.pack.toString().toUpperCase();
+                let isMatch = (packId === currentPeriod.toUpperCase()) || (packId === 'ALL') || (currentPeriod === "TESTING");
+                if (isMatch && hasGame[row.type] !== undefined) {
+                    hasGame[row.type] = true;
+                }
+            });
+
+            if (!Object.values(hasGame).some(val => val)) {
+                menu.innerHTML = '<h3 style="color:var(--bg-mid); text-align: center; width: 100%;">No games assigned to Period ' + currentPeriod + '.</h3>';
+                return;
+            }
+
+            let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans';
+
+            if (hasGame.jeopardy) {
+                menu.innerHTML += `
+                    <div class="game-cartridge" onclick="handlePackSelection('jeopardy', '${mascot} Jeopardy')">
+                        <h3>${mascot} Jeopardy</h3>
+                        <p>Select a Pack</p>
+                    </div>
+                `;
+            }
+            if (hasGame.biddingwar) {
+                menu.innerHTML += `
+                    <div class="game-cartridge" onclick="handlePackSelection('biddingwar', 'The Bidding War')">
+                        <h3>The Bidding War</h3>
+                        <p>Select a Pack</p>
+                    </div>
+                `;
+            }
+            if (hasGame.hotseat) {
+                menu.innerHTML += `
+                    <div class="game-cartridge" onclick="handlePackSelection('hotseat', 'The Hot Seat')">
+                        <h3>The Hot Seat</h3>
+                        <p>Select a Pack</p>
+                    </div>
+                `;
+            }
+            if (hasGame.taboo) {
+                menu.innerHTML += `
+                    <div class="game-cartridge" onclick="handlePackSelection('taboo', 'Taboo')">
+                        <h3>Taboo</h3>
+                        <p>Select a Pack</p>
+                    </div>
+                `;
+            }
+            if (hasGame.titansays) {
+                menu.innerHTML += `
+                    <div class="game-cartridge" onclick="handlePackSelection('titansays', '${mascot} Says')">
+                        <h3>${mascot} Says</h3>
+                        <p>Select a Pack</p>
+                    </div>
+                `;
+            }
+            if (hasGame.hivemind) {
+                menu.innerHTML += `
+                    <div class="game-cartridge" onclick="handlePackSelection('hivemind', 'Hivemind')">
+                        <h3>Hivemind</h3>
+                        <p>Select a Pack</p>
+                    </div>
+                `;
+            }
+            if (hasGame.debate) {
+                menu.innerHTML += `
+                    <div class="game-cartridge" onclick="handlePackSelection('debate', 'Rapid Debate')">
+                        <h3>Rapid Debate</h3>
+                        <p>Select a Pack</p>
+                    </div>
+                `;
             }
         }
 
@@ -2548,11 +2578,10 @@
             document.getElementById('biddingWarTimer').style.display = 'none';
             document.getElementById('jeopardyContainer').style.display = 'none';
             document.getElementById('hotSeatContainer').style.display = 'none'; 
+            document.getElementById('tabooContainer').style.display = 'none'; 
             document.getElementById('titanSaysContainer').style.display = 'none';
             document.getElementById('hivemindContainer').style.display = 'none';
             document.getElementById('debateContainer').style.display = 'none';
-
-            let currentPeriod = activeBlockData ? activeBlockData.id.toString() : "TESTING";
 
             if (gameType === 'biddingwar') {
                 document.getElementById('biddingWarRules').style.display = 'flex';
@@ -2561,7 +2590,7 @@
                 document.getElementById('jeopardyContainer').style.display = 'flex';
                 renderJeopardyBoard(packId); 
             } else if (MINI_GAME_CONFIGS[gameType]) {
-                loadMiniGamePrompts(gameType, currentPeriod);
+                loadMiniGamePrompts(gameType, packId); // Fixed: Now correctly uses the selected Pack ID
             }
         }
 
@@ -2725,10 +2754,10 @@
         function renderSlide() {
             const iframe = document.getElementById('slideIframe');
             const notepadContainer = document.getElementById('slideNotepadContainer');
+            const frameContainer = document.getElementById('slideFrameContainer');
             const topTabs = document.getElementById('topSourceTabs');
 
             // Force index to Notepad if there are absolutely no slides 
-            // and we somehow attempted to view one.
             if (currentSlides.length === 0) {
                 currentSlideIndex = -1;
             }
@@ -2764,14 +2793,14 @@
 
                 topTabs.innerHTML = tabsHTML;
                 
-                // Toggle between Notepad and iFrame based on active index
+                // Toggle between Notepad and Auto-scaling iFrame Frame
                 if (currentSlideIndex === -1) {
-                    iframe.style.display = 'none';
+                    frameContainer.style.display = 'none';
                     notepadContainer.style.display = 'flex';
                     loadNotepad();
                 } else {
                     notepadContainer.style.display = 'none';
-                    iframe.style.display = 'block';
+                    frameContainer.style.display = 'flex';
                     if (iframe.src !== currentSlides[currentSlideIndex].url) {
                         iframe.src = currentSlides[currentSlideIndex].url;
                     }
@@ -2866,6 +2895,20 @@
             
             if (isTyping) return; 
 
+            // --- ESCAPE KEY LOGIC ---
+            if (event.key === 'Escape') {
+                const activeModals = document.querySelectorAll('.modal.active');
+                activeModals.forEach(modal => {
+                    if (modal.id === 'wheelModal') {
+                        closeWheelModal(); 
+                    } else {
+                        modal.classList.remove('active');
+                    }
+                });
+                checkFloatingTimer();
+                return; 
+            }
+
             if (event.shiftKey) {
                 if (event.key.toLowerCase() === 'c') fireBigConfetti();
                 if (event.key.toLowerCase() === 't') toggleModal('tardyModal');
@@ -2931,7 +2974,24 @@
         function fireBigConfetti() {
             let pColor = localStorage.getItem('titan_setting_primary') || '#5A2B81';
             let mColor = localStorage.getItem('titan_setting_mid') || '#c0c2c9';
-            confetti({ particleCount: 300, spread: 140, startVelocity: 45, origin: { y: 0.6 }, colors: [pColor, mColor, '#FFFFFF'] });
+            
+            // Left cannon
+            confetti({ 
+                particleCount: 150, 
+                angle: 60, 
+                spread: 80, 
+                origin: { x: 0, y: 0.7 }, 
+                colors: [pColor, mColor, '#FFFFFF'] 
+            });
+            
+            // Right cannon
+            confetti({ 
+                particleCount: 150, 
+                angle: 120, 
+                spread: 80, 
+                origin: { x: 1, y: 0.7 }, 
+                colors: [pColor, mColor, '#FFFFFF'] 
+            });
         }
 
         let targetGroupSize = 2;
@@ -3596,6 +3656,16 @@
                 emptyText: 'OUT OF WORDS! PLEASE RESET.',
                 placeholderList: ["NO WORDS LOADED", "CHECK SPREADSHEET", "COLUMN F"]
             },
+            taboo: {
+                vaultType: 'taboo',
+                containerId: 'tabooContainer',
+                displayId: 'tabooWordDisplay',
+                extraDisplayId: 'tabooForbiddenDisplay',
+                storagePrefix: 'titan_taboo_played_',
+                readyText: 'READY?',
+                emptyText: 'OUT OF WORDS! PLEASE RESET.',
+                placeholderList: [{target: "NO WORDS LOADED", forbidden: "CHECK SPREADSHEET"}]
+            },
             titansays: {
                 vaultType: 'titansays',
                 containerId: 'titanSaysContainer',
@@ -3636,19 +3706,29 @@
             }
         };
 
-        function loadMiniGamePrompts(gameKey, currentPeriod) {
+        function loadMiniGamePrompts(gameKey, packId) {
             const cfg = MINI_GAME_CONFIGS[gameKey];
             document.getElementById(cfg.containerId).style.display = 'flex';
-            document.getElementById(cfg.displayId).innerText = cfg.readyText;
+            
+            if (gameKey === 'taboo') {
+                document.getElementById(cfg.displayId).innerText = cfg.readyText;
+                document.getElementById(cfg.extraDisplayId).innerHTML = '';
+            } else {
+                document.getElementById(cfg.displayId).innerText = cfg.readyText;
+            }
 
             const matchingRows = gameVaultData.filter(g =>
                 g.type === cfg.vaultType &&
-                (g.pack.toString().toUpperCase() === currentPeriod.toUpperCase() || g.pack.toString().toUpperCase() === 'ALL' || currentPeriod === "TESTING")
+                g.pack.toString().toUpperCase() === packId.toUpperCase()
             );
 
             let list = [];
             matchingRows.forEach(row => {
-                if (row.prompt) {
+                if (gameKey === 'taboo') {
+                    if (row.prompt) {
+                        list.push({ target: row.prompt.trim(), forbidden: row.answer ? row.answer.trim() : '' });
+                    }
+                } else if (row.prompt) {
                     row.prompt.split(cfg.splitRegex).forEach(p => {
                         const clean = p.trim();
                         if (clean) list.push(clean);
@@ -3666,21 +3746,42 @@
 
             const playedKey = cfg.storagePrefix + currentActivePackId;
             let playedItems = JSON.parse(localStorage.getItem(playedKey) || '[]');
-            let available = list.filter(item => !playedItems.includes(item));
+            
+            let available = list.filter(item => {
+                let id = gameKey === 'taboo' ? item.target : item;
+                return !playedItems.includes(id);
+            });
 
             const display = document.getElementById(cfg.displayId);
+            const extraDisplay = cfg.extraDisplayId ? document.getElementById(cfg.extraDisplayId) : null;
+
             display.style.opacity = 0;
+            if(extraDisplay) extraDisplay.style.opacity = 0;
 
             setTimeout(() => {
                 if (available.length === 0) {
                     display.innerText = cfg.emptyText;
+                    if(extraDisplay) extraDisplay.innerHTML = '';
                 } else {
                     const selected = available[Math.floor(Math.random() * available.length)];
-                    playedItems.push(selected);
+                    let id = gameKey === 'taboo' ? selected.target : selected;
+                    
+                    playedItems.push(id);
                     localStorage.setItem(playedKey, JSON.stringify(playedItems));
-                    display.innerText = cfg.format ? cfg.format(selected) : selected;
+                    
+                    if (gameKey === 'taboo') {
+                        display.innerText = selected.target;
+                        if(selected.forbidden) {
+                            extraDisplay.innerHTML = selected.forbidden.split(',').map(w => `<div>🚫 ${w.trim()}</div>`).join('');
+                        } else {
+                            extraDisplay.innerHTML = '';
+                        }
+                    } else {
+                        display.innerText = cfg.format ? cfg.format(selected) : selected;
+                    }
                 }
                 display.style.opacity = 1;
+                if(extraDisplay) extraDisplay.style.opacity = 1;
             }, 150);
         }
 
@@ -3689,15 +3790,24 @@
             localStorage.removeItem(cfg.storagePrefix + currentActivePackId);
 
             const display = document.getElementById(cfg.displayId);
+            const extraDisplay = cfg.extraDisplayId ? document.getElementById(cfg.extraDisplayId) : null;
+            
             display.style.opacity = 0;
+            if (extraDisplay) extraDisplay.style.opacity = 0;
+            
             setTimeout(() => {
                 display.innerText = cfg.readyText;
+                if (extraDisplay) extraDisplay.innerHTML = '';
+                
                 display.style.opacity = 1;
+                if (extraDisplay) extraDisplay.style.opacity = 1;
             }, 150);
         }
 
         function nextHotSeatWord() { nextMiniGamePrompt('hotseat'); }
         function resetHotSeat() { resetMiniGame('hotseat'); }
+        function nextTabooWord() { nextMiniGamePrompt('taboo'); }
+        function resetTaboo() { resetMiniGame('taboo'); }
         function nextTitanSaysPrompt() { nextMiniGamePrompt('titansays'); }
         function resetTitanSays() { resetMiniGame('titansays'); }
         function nextHivemindPrompt() { nextMiniGamePrompt('hivemind'); }
