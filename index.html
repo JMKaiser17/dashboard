@@ -769,7 +769,7 @@
         function nextGauntletTier() { gauntletIndex++; if (gauntletIndex < gauntletTiers.length) { document.getElementById('gauntletDisplay').innerText = gauntletTiers[gauntletIndex].prompt; document.getElementById('gauntletDisplay').style.color = '#fff'; renderGauntletLadder(); } else { document.getElementById('gauntletDisplay').innerText = "GAUNTLET CONQUERED!"; document.getElementById('gauntletDisplay').style.color = '#f9a826'; } }
 
         let vaultCurrentClues = [];
-        function loadVaultModule(gameTitle) { document.getElementById('vaultContainer').style.display = 'flex'; let items = gameVaultData.filter(g => g.type === 'vault' && g.title.toString().trim() === gameTitle); miniGameLists['vault'] = items.length > 0 ? items : [{prompt:"NO CLUES LOADED", answer:""}]; resetMiniGame('vault'); }
+        function loadVaultModule(gameTitle) { document.getElementById('vaultContainer').style.display = 'flex'; let items = gameVaultData.filter(g => g.type === 'vault' && g.title.toString().trim() === gameTitle); miniGameLists['vault'] = items.length > 0 ? items : [{prompt:"NO CLUES LOADED", answer:""}]; resetVault(); }
         function nextVaultClue() {
             let display = document.getElementById('vaultInner'); let playedKey = 'titan_vault_played_' + currentActiveGameTitle; let played = JSON.parse(localStorage.getItem(playedKey) || '[]');
             let available = miniGameLists['vault'].map((item, idx) => idx).filter(idx => !played.includes(idx));
@@ -1231,6 +1231,18 @@
             if (gameKey === 'factorfiction') { display.style.color = currentMiniGameAnswer.toUpperCase() === 'FACT' ? '#69f0ae' : '#ff5252'; }
             else { display.style.color = '#f9a826'; }
             currentMiniGameAnswer = ""; autoFitGameText(gameKey);
+        }
+
+        function resetMiniGame(gameKey) {
+            const cfg = MINI_GAME_CONFIGS[gameKey];
+            localStorage.removeItem(cfg.storagePrefix + currentActiveGameTitle);
+            const display = document.getElementById(cfg.displayId);
+            const extraDisplay = cfg.extraDisplayId ? document.getElementById(cfg.extraDisplayId) : null;
+            display.style.opacity = 0; if (extraDisplay) extraDisplay.style.opacity = 0;
+            setTimeout(() => {
+                display.innerText = cfg.readyText; if (extraDisplay) extraDisplay.innerHTML = '';
+                display.style.opacity = 1; if (extraDisplay) extraDisplay.style.opacity = 1; autoFitGameText(gameKey);
+            }, 150);
         }
 
         loadTimerState();
