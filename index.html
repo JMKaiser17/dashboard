@@ -54,7 +54,7 @@
         /* Game Mechanics CSS */
         .bull-tile { background:#388e3c; color:white; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:clamp(1.2rem,2vw,2.5rem); font-weight:bold; cursor:pointer; border:4px solid #1b5e20; transition:transform 0.2s,background 0.3s; text-align:center; padding:10px; } .bull-tile:hover { transform:scale(0.97); } .bull-tile.revealed { background:#fff; color:#111; pointer-events:none; border-color:#69f0ae; } .bull-tile.crash { background:#d32f2f !important; color:white !important; border-color:#b71c1c !important; }
         .gridlock-cell { background:#222; border:3px solid #444; border-radius:8px; cursor:pointer; transition:background 0.2s,opacity 0.2s; display:flex; align-items:center; justify-content:center; text-align:center; padding:8px; color:white; font-weight:bold; font-size:1.5rem; overflow-y:auto; line-height:1.2; word-break:break-word; } .gridlock-cell:hover { opacity:0.8; } .gridlock-cell.team1 { background:#5A2B81; border-color:#3a1c53; } .gridlock-cell.team2 { background:#111111; border-color:#333333; }
-        .survey-card { background:#ff9800; color:#ff9800; border:2px solid #fff; border-radius:8px; width:100%; padding:clamp(5px,1vh,12px) clamp(10px,1.5vw,20px); font-size:clamp(1rem,1.5vw,2rem); font-weight:bold; cursor:pointer; user-select:none; transition:all 0.3s; display:flex; justify-content:space-between; align-items:center; min-height:clamp(40px,5vh,60px); } .survey-card.revealed { background:#fff; color:#111; }
+        .survey-card { background:#ff9800; color:#3e1600; border:2px solid #fff; border-radius:8px; width:100%; padding:clamp(5px,1vh,12px) clamp(10px,1.5vw,20px); font-size:clamp(1rem,1.5vw,2rem); font-weight:bold; cursor:pointer; user-select:none; transition:all 0.3s; display:flex; justify-content:space-between; align-items:center; min-height:clamp(40px,5vh,60px); } .survey-card.revealed { background:#fff; color:#111; }
         .gauntlet-tier { background:rgba(255,255,255,0.05); padding:10px 20px; border-radius:8px; color:#666; font-weight:bold; text-align:right; transition:all 0.3s; font-size:clamp(1.2rem,1.8vw,2.2rem); display:flex; justify-content:space-between; align-items:center; border-left:4px solid transparent; } .gauntlet-tier.active { background:#d7ccc8; color:#111; box-shadow:0 0 15px rgba(215,204,200,0.4); border-left:8px solid #8d6e63; transform:scale(1.02); z-index:2; font-size:clamp(1.4rem,2vw,2.6rem); } .lifeline-btn { background:#555; color:white; border:none; padding:10px 15px; border-radius:8px; font-weight:bold; cursor:pointer; transition:0.2s; } .lifeline-btn:hover { background:#777; } .lifeline-btn.used { text-decoration:line-through; opacity:0.4; pointer-events:none; }
         
         #jeopardyContainer { display:none; flex-direction:column; width:100%; height:100%; flex:1 1 0; min-height:0; gap:clamp(10px,1.5vw,20px); } .jeopardy-grid { display:grid; grid-template-columns:repeat(5,1fr); grid-template-rows:auto repeat(5,1fr); gap:clamp(6px,0.8vw,12px); flex-grow:1; min-height:0; overflow-y:auto; padding-right:5px; } .j-header { background:var(--secondary-dark); color:var(--bg-light); font-weight:900; font-size:clamp(0.9rem,1.2vw,1.6rem); text-align:center; padding:clamp(8px,1vh,12px); border-radius:8px; border-bottom:4px solid var(--primary-color); text-transform:uppercase; display:flex; align-items:center; justify-content:center; } .j-card { background:linear-gradient(145deg,var(--primary-color),var(--jeopardy-grad-end)); color:#ffffff; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:clamp(1.5rem,2.5vw,3.5rem); font-weight:900; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.3); transition:transform 0.1s,background 0.3s; border:2px solid var(--secondary-dark); } .j-card:hover { transform:scale(0.97); } .j-card.played { background:var(--bg-mid); color:var(--secondary-dark); opacity:0.3; cursor:default; box-shadow:none; }
@@ -278,7 +278,7 @@
                         AWAITING MARKET DATA...
                     </div>
                     <div style="flex-grow:1;display:flex;align-items:center;justify-content:center;padding:10px;width:100%;height:100%;min-height:0;">
-                        <div id="bullMarketGrid" style="display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:15px;width:100%;height:100%;max-width:60vh;max-height:60vh;aspect-ratio:1 / 1;margin:0 auto;">
+                        <div id="bullMarketGrid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:15px;width:100%;height:100%;max-width:60vh;max-height:60vh;aspect-ratio:1 / 1;margin:0 auto;">
                             <!-- JS generates randomized tiles here -->
                         </div>
                     </div>
@@ -319,7 +319,7 @@
                         </div>
                     </div>
                     <div style="flex-grow:1;display:flex;align-items:center;justify-content:center;padding:10px;width:100%;height:100%;min-height:0;">
-                        <div id="gridlockGrid" style="display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr);gap:clamp(5px,1vh,12px);width:100%;height:100%;max-width:1400px;margin:0 auto;">
+                        <div id="gridlockGrid" style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));gap:clamp(5px,1vh,12px);width:100%;height:100%;max-width:1400px;margin:0 auto;">
                             <!-- JS generates tiles -->
                         </div>
                     </div>
@@ -361,7 +361,7 @@
                         <div id="gauntletDisplay" onclick="revealGauntlet()" style="flex:2;display:flex;align-items:center;justify-content:center;font-size:clamp(2rem,3.5vw,5rem);font-weight:bold;text-align:center;cursor:pointer;word-wrap:break-word;max-width:100%;line-height:1.2;">
                             AWAITING CHALLENGER...
                         </div>
-                        <div id="gauntletLadder" style="flex:1;display:flex;flex-direction:column-reverse;gap:5px;border-left:2px solid #555;padding-left:15px;overflow-y:auto;justify-content:center;">
+                        <div id="gauntletLadder" style="flex:1;display:flex;flex-direction:column-reverse;gap:5px;border-left:2px solid #555;padding-left:15px;overflow-y:auto;justify-content:safe center;">
                             <!-- JS populates tiers -->
                         </div>
                     </div>
