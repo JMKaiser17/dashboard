@@ -184,7 +184,7 @@
 
         <div class="bento-grid" id="focusModeBoard">
             <div class="zen-left-col">
-                <div class="zen-task-card"><h2 class="expandable-title" onclick="openTaskModal()"><span>🎯 Current Task</span><span class="expand-badge">⛶ Expand</span></h2><div class="focus-editable" contenteditable="true"><p>Click here to type the independent work instructions...</p></div></div>
+                <div class="zen-task-card"><h2 class="expandable-title" onclick="openTaskModal()"><span>🎯 Current Task</span><span class="expand-badge">⛶ Expand</span></h2><div id="currentTaskEditable" class="focus-editable" contenteditable="true" oninput="saveTaskNote()"><p>Click here to type the independent work instructions...</p></div></div>
                 <div class="zen-task-card"><h2>🚀 If You Finish Early</h2><div class="focus-editable" contenteditable="true"><p>1. Check for missing assignments.</p><p>2. Read silently.</p></div></div>
             </div>
             <div id="noiseLevelWidget" onclick="cycleNoiseLevel()"><div class="noise-icon-wrapper" id="noiseIcon">🤫</div><div class="noise-text" id="noiseText">Level 0: Silent</div></div>
@@ -425,7 +425,7 @@
 
         function toggleWarmupModal() { toggleModal('warmupModal'); if (document.getElementById('warmupModal').classList.contains('active')) autoFitModalText('warmupModalTextContainer', 'warmupModalText'); }
         function openTaskModal() { const currentTaskHTML = document.querySelector('.zen-left-col .focus-editable').innerHTML; document.getElementById('taskModalText').innerHTML = '<style>#taskModalText * { font-size:inherit; line-height:inherit; margin-bottom:10px; }</style>' + currentTaskHTML; toggleModal('taskModal'); if (document.getElementById('taskModal').classList.contains('active')) autoFitModalText('taskModalTextContainer', 'taskModalText'); }
-        function openSettingsModal() { try { document.getElementById('customSheetUrlInput').value = getActiveCsvUrl() === defaultCsvUrl ? "" : getActiveCsvUrl(); document.getElementById('gameVaultUrlInput').value = getActiveGameUrl() === defaultGameUrl ? "" : getActiveGameUrl(); } catch(e) {} toggleModal('settingsModal'); }
+        function openSettingsModal() { try { document.getElementById('customSheetUrlInput').value = getActiveCsvUrl(); document.getElementById('gameVaultUrlInput').value = getActiveGameUrl(); } catch(e) {} toggleModal('settingsModal'); }
         function autoFitModalText(containerId, textId) { const container = document.getElementById(containerId); const el = document.getElementById(textId); if (!container || !el) return; el.style.fontSize = '4rem'; let currentSize = 64; while ((el.scrollHeight > container.clientHeight || el.scrollWidth > container.clientWidth) && currentSize > 18) { currentSize -= 2; el.style.fontSize = currentSize + 'px'; } }
 
         let audioCtx;
@@ -445,7 +445,7 @@
         function toggleTickerMode() { isMarketTicker = !isMarketTicker; document.querySelector('.ticker-move').style.animationDuration = isMarketTicker ? '60s' : '30s'; updateTickerDisplay(); }
         function updateTickerDisplay() {
             const el = document.getElementById('dailyMessage');
-            if (isMarketTicker) { let rawTickerText = (activeBlockData && activeBlockData.ticker) ? activeBlockData.ticker : "Awaiting Market Data..."; let formattedTicker = rawTickerText.replace(/(\(\+[^)]+\))/g, '<span style="color:#a3e6b5;">$1</span>').replace(/(\(-[^)]+\))/g, '<span style="color:#ff9999;">$1</span>'); el.innerHTML = formattedTicker.split('|').join(' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '); } 
+            if (isMarketTicker) { let rawTickerText = (activeBlockData && activeBlockData.ticker) ? activeBlockData.ticker : "Awaiting Market Data..."; let formattedTicker = escapeHtml(rawTickerText).replace(/(\(\+[^)]+\))/g, '<span style="color:#a3e6b5;">$1</span>').replace(/(\(-[^)]+\))/g, '<span style="color:#ff9999;">$1</span>'); el.innerHTML = formattedTicker.split('|').join(' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '); } 
             else { let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans'; el.innerText = activeBlockData ? (activeBlockData.message || `Welcome ${mascot}! Let's make today a great day to learn.`) : "Loading daily message..."; }
         }
         setInterval(() => { if(isMarketTicker) updateTickerDisplay(); }, 4000);
@@ -515,6 +515,17 @@
 
         function getCol(row, name) { const target = name.toLowerCase().replace(/[\s_]+/g, ''); const key = Object.keys(row).find(k => k.toLowerCase().replace(/[\s_]+/g, '') === target); return key && row[key] != null ? row[key].toString().trim() : ''; }
         function parseCsv(csvText) { return Papa.parse(csvText, { header: true, skipEmptyLines: true }).data; }
+        function escapeHtml(str) { return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+        function parseSheetDate(rawDateStr) {
+            let clean = rawDateStr.replace(/\*/g, '').trim();
+            let parts = clean.split(/[\/\-.]/).map(p => parseInt(p, 10));
+            if (parts.length === 3 && parts.every(n => !isNaN(n))) {
+                let [a, b, c] = parts;
+                if (a > 31) return new Date(a, b - 1, c);   // YYYY-MM-DD
+                return new Date(c, a - 1, b);                // MM/DD/YYYY
+            }
+            let d = new Date(clean); return isNaN(d.getTime()) ? null : d;
+        }
 
         function parseGameVault(csvText) {
             gameVaultData = [];
@@ -529,7 +540,7 @@
             let allParsedBlocks = []; let nowMs = new Date().getTime();
             parseCsv(csvText).forEach(row => {
                 const rawDateStr = getCol(row, 'Date'); if (!rawDateStr) return;
-                let isForced = rawDateStr.includes('*'); let cleanDateStr = rawDateStr.replace(/\*/g, '').trim().replace(/-/g, '\/'); let rowDate = new Date(cleanDateStr); rowDate.setHours(0, 0, 0, 0);
+                let isForced = rawDateStr.includes('*'); let rowDate = parseSheetDate(rawDateStr); if (!rowDate) return; rowDate.setHours(0, 0, 0, 0);
                 let startStr = getCol(row, 'Start'); let endStr = getCol(row, 'End'); let startMins = 0, endMins = 0;
                 if (startStr.includes(':')) { let p = startStr.split(':'); startMins = parseInt(p[0]) * 60 + parseInt(p[1]); }
                 if (endStr.includes(':')) { let p = endStr.split(':'); endMins = parseInt(p[0]) * 60 + parseInt(p[1]); }
@@ -540,6 +551,7 @@
                 allParsedBlocks.push(block);
             });
             if (allParsedBlocks.length === 0) return;
+            allParsedBlocks.sort((a, b) => (a.date.getTime() - b.date.getTime()) || (a.start - b.start));
             let upcomingBlocks = allParsedBlocks.filter(b => b.date.getTime() + (b.end * 60000) > nowMs);
             let targetBlocks = []; let forcedRows = allParsedBlocks.filter(b => b.forced);
             if (forcedRows.length > 0) targetBlocks = allParsedBlocks.filter(b => b.date.getTime() === forcedRows[0].date.getTime());
@@ -568,7 +580,7 @@
                 let safeStudentJS = student.replace(/'/g, "\\'").replace(/"/g, "&quot;"); let safeStudentId = student.replace(/['"\s]/g, '-');
                 let hpButtonStyle = isOut ? 'active' : ''; let hpTimerDisplay = isOut ? `<div class="hp-timer" id="hp-timer-${safeStudentId}">⏱️ Out...</div>` : `<div class="hp-timer" id="hp-timer-${safeStudentId}" style="display:none;"></div>`;
                 let row = document.createElement('div'); row.className = 'tracker-row'; if (isOut) row.id = `tracker-row-${safeStudentId}`;
-                row.innerHTML = `<div style="display:flex; align-items:center; gap:10px; flex-grow:1; min-width:0;"><button class="t-hp-btn ${hpButtonStyle}" onclick="toggleHallPass('${safeStudentJS}', '${classId}')" title="Hall Pass">🚪</button><div class="tracker-name-wrap"><div class="tracker-name" style="${nameStyle}" onclick="toggleAbsent('${safeStudentJS}', '${classId}')">${student}</div>${hpTimerDisplay}</div></div><div class="tracker-score-display" id="score-display-${safeStudentId}">${score}</div><div class="tracker-actions"><button class="t-btn t-minus" onclick="logParticipation('${safeStudentJS}', -1, '${classId}')">-</button><button class="t-btn t-plus" onclick="logParticipation('${safeStudentJS}', 1, '${classId}')">+</button></div>`;
+                row.innerHTML = `<div style="display:flex; align-items:center; gap:10px; flex-grow:1; min-width:0;"><button class="t-hp-btn ${hpButtonStyle}" onclick="toggleHallPass('${safeStudentJS}', '${classId}')" title="Hall Pass">🚪</button><div class="tracker-name-wrap"><div class="tracker-name" style="${nameStyle}" onclick="toggleAbsent('${safeStudentJS}', '${classId}')">${escapeHtml(student)}</div>${hpTimerDisplay}</div></div><div class="tracker-score-display" id="score-display-${safeStudentId}">${score}</div><div class="tracker-actions"><button class="t-btn t-minus" onclick="logParticipation('${safeStudentJS}', -1, '${classId}')">-</button><button class="t-btn t-plus" onclick="logParticipation('${safeStudentJS}', 1, '${classId}')">+</button></div>`;
                 container.appendChild(row);
             });
             updateHallPassIndicators();
@@ -759,9 +771,9 @@
         function loadVaultModule(gameTitle) { document.getElementById('vaultContainer').style.display = 'flex'; let items = gameVaultData.filter(g => g.type === 'vault' && g.title.toString().trim() === gameTitle); miniGameLists['vault'] = items.length > 0 ? items : [{prompt:"NO CLUES LOADED", answer:""}]; resetMiniGame('vault'); }
         function nextVaultClue() {
             let display = document.getElementById('vaultInner'); let playedKey = 'titan_vault_played_' + currentActiveGameTitle; let played = JSON.parse(localStorage.getItem(playedKey) || '[]');
-            let available = miniGameLists['vault'].filter(i => !played.includes(i.answer));
+            let available = miniGameLists['vault'].map((item, idx) => idx).filter(idx => !played.includes(idx));
             if (available.length === 0) { display.innerText = "VAULT DEPLETED."; return; }
-            let selected = available[Math.floor(Math.random() * available.length)]; played.push(selected.answer); localStorage.setItem(playedKey, JSON.stringify(played));
+            let selectedIdx = available[Math.floor(Math.random() * available.length)]; let selected = miniGameLists['vault'][selectedIdx]; played.push(selectedIdx); localStorage.setItem(playedKey, JSON.stringify(played));
             vaultCurrentClues = selected.prompt.split('|').map(c => c.trim()); vaultCurrentClues.answer = selected.answer;
             let cluesHTML = vaultCurrentClues.map(c => `<div style="background:rgba(255,255,255,0.1); padding:15px 30px; border-radius:12px; margin:10px; border-left:5px solid #f9a826; width:calc(50% - 40px); display:inline-block; box-sizing:border-box;">${c}</div>`).join('');
             display.innerHTML = `<div style="display:flex; flex-wrap:wrap; justify-content:center; font-size:0.7em; text-align:left; color:#eee; width:100%; max-width:1000px;">${cluesHTML}</div>`;
@@ -787,7 +799,7 @@
         function guessFactFiction(guess) {
             if(!isFFRunning || !currentMiniGameAnswer) return;
             if(guess.toUpperCase() === currentMiniGameAnswer.toUpperCase()) { ffStreak++; document.getElementById('ffStreakDisplay').innerText = `Streak: ${ffStreak}`; playTone(880, 0, 0.1, 0.1); nextMiniGamePrompt('factorfiction'); } 
-            else { ffTimeLeft -= 3; if(ffTimeLeft < 0) ffTimeLeft = 0; document.getElementById('ffTimerDisplay').innerText = ffTimeLeft; document.getElementById('factFictionDisplay').innerText = "INCORRECT (-3s)"; document.getElementById('factFictionDisplay').style.color = '#ff5252'; playTone(150, 0, 0.4, 0.2, 'sawtooth'); currentMiniGameAnswer = ""; setTimeout(() => { if(isFFRunning) nextMiniGamePrompt('factorfiction'); }, 800); }
+            else { ffTimeLeft -= 3; if(ffTimeLeft <= 0) { ffTimeLeft = 0; document.getElementById('ffTimerDisplay').innerText = ffTimeLeft; playTone(150, 0, 0.4, 0.2, 'sawtooth'); endGameFF(); return; } document.getElementById('ffTimerDisplay').innerText = ffTimeLeft; document.getElementById('factFictionDisplay').innerText = "INCORRECT (-3s)"; document.getElementById('factFictionDisplay').style.color = '#ff5252'; playTone(150, 0, 0.4, 0.2, 'sawtooth'); currentMiniGameAnswer = ""; setTimeout(() => { if(isFFRunning) nextMiniGamePrompt('factorfiction'); }, 800); }
         }
         function resetFactFiction() {
             isFFRunning = false; clearInterval(ffTimerInterval); ffTimeLeft = 60; ffStreak = 0;
@@ -851,6 +863,8 @@
 
         function saveNotepad() { if (!activeBlockData) return; localStorage.setItem('titan_notepad_' + activeBlockData.id, document.getElementById('slideNotepad').innerHTML); }
         function loadNotepad() { const notepad = document.getElementById('slideNotepad'); if (activeBlockData) { const saved = localStorage.getItem('titan_notepad_' + activeBlockData.id); notepad.innerHTML = saved !== null ? saved : '<p>Start typing notes here...</p>'; } else { notepad.innerHTML = '<p>Start typing notes here...</p>'; } }
+        function saveTaskNote() { if (!activeBlockData) return; localStorage.setItem('titan_task_' + activeBlockData.id, document.getElementById('currentTaskEditable').innerHTML); }
+        function loadTaskNote() { const el = document.getElementById('currentTaskEditable'); if (!el) return; if (activeBlockData) { const saved = localStorage.getItem('titan_task_' + activeBlockData.id); if (saved !== null) el.innerHTML = saved; } }
         function clearNotepad() { if (confirm("Are you sure you want to clear these notes?")) { document.getElementById('slideNotepad').innerHTML = '<p></p>'; saveNotepad(); } }
 
         function renderSlide() {
@@ -1062,9 +1076,9 @@
                     if(!isMarketTicker) { let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans'; document.getElementById('dailyMessage').innerText = activeBlock.message || `Welcome ${mascot}! Let's make today a great day to learn.`; }
                     
                     let listKey = 'checklist_' + activeBlock.date.getTime() + '_' + activeBlock.id; let checkedItems = JSON.parse(localStorage.getItem(listKey) || '[]'); let agendaHTML = '';
-                    for (let item of activeBlock.agenda) { let isChecked = checkedItems.includes(item) ? 'completed' : ''; let safeItem = item.replace(/'/g, "\\'").replace(/"/g, '&quot;'); agendaHTML += `<li class="${isChecked}" onclick="toggleChecklist(this, '${listKey}', '${safeItem}')">${item}</li>`; }
+                    for (let item of activeBlock.agenda) { let isChecked = checkedItems.includes(item) ? 'completed' : ''; let safeItem = item.replace(/'/g, "\\'").replace(/"/g, '&quot;'); agendaHTML += `<li class="${isChecked}" onclick="toggleChecklist(this, '${listKey}', '${safeItem}')">${escapeHtml(item)}</li>`; }
                     document.getElementById('agendaItems').innerHTML = agendaHTML || "<li>No activities listed.</li>";
-                    let remindersHTML = ''; for (let item of activeBlock.reminders) { remindersHTML += `<li>${item}</li>`; }
+                    let remindersHTML = ''; for (let item of activeBlock.reminders) { remindersHTML += `<li>${escapeHtml(item)}</li>`; }
                     document.getElementById('remindersItems').innerHTML = remindersHTML || "<li>No reminders today!</li>";
 
                     currentSlides = [];
@@ -1076,7 +1090,7 @@
                             if (url !== "") { if (!url.startsWith("http")) url = "https://" + url; if (url.includes("docs.google.com/presentation")) { if (url.includes("?")) url = url.split("?")[0]; if (url.includes("/pub")) url = url.replace("/pub", "/embed"); else if (url.includes("/edit")) url = url.substring(0, url.indexOf('/edit')) + "/embed"; url += "?rm=minimal"; } currentSlides.push({name, url}); }
                         });
                     }
-                    if (lastActiveBlockId !== currentActiveId) { currentSlideIndex = currentSlides.length > 0 ? 0 : -1; }
+                    if (lastActiveBlockId !== currentActiveId) { currentSlideIndex = currentSlides.length > 0 ? 0 : -1; loadTaskNote(); }
                     if (!isGroupWheelMode && activeBlockData && activeBlockData.roster) { drawWheel(getActiveWheelItems()); }
                     setTimeout(autoFitCardText, 50);
                 } else {
@@ -1185,7 +1199,7 @@
             const cfg = MINI_GAME_CONFIGS[gameKey]; const list = miniGameLists[gameKey]; if (!list || list.length === 0) return;
             const playedKey = cfg.storagePrefix + currentActiveGameTitle; let playedItems = JSON.parse(localStorage.getItem(playedKey) || '[]');
             
-            let available = list.filter(item => { let id = gameKey === 'taboo' ? item.target : ((gameKey === 'factorfiction' || gameKey === 'bullmarket') ? item.prompt : item); return !playedItems.includes(id); });
+            let available = list.map((item, idx) => idx).filter(idx => !playedItems.includes(idx));
 
             const display = document.getElementById(cfg.displayId); const extraDisplay = cfg.extraDisplayId ? document.getElementById(cfg.extraDisplayId) : null;
             display.style.opacity = 0; if(extraDisplay) extraDisplay.style.opacity = 0;
@@ -1193,9 +1207,9 @@
             setTimeout(() => {
                 if (available.length === 0) { display.innerText = cfg.emptyText; if(extraDisplay) extraDisplay.innerHTML = ''; } 
                 else {
-                    const selected = available[Math.floor(Math.random() * available.length)];
-                    let id = gameKey === 'taboo' ? selected.target : ((gameKey === 'factorfiction' || gameKey === 'bullmarket') ? selected.prompt : selected);
-                    playedItems.push(id); localStorage.setItem(playedKey, JSON.stringify(playedItems));
+                    const selectedIdx = available[Math.floor(Math.random() * available.length)];
+                    const selected = list[selectedIdx];
+                    playedItems.push(selectedIdx); localStorage.setItem(playedKey, JSON.stringify(playedItems));
                     
                     if (gameKey === 'taboo') {
                         display.innerText = selected.target;
