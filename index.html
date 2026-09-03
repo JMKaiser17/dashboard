@@ -759,7 +759,7 @@ License: MIT
                     <button onclick="toggleAllAbsences()" style="background:var(--secondary-dark);color:var(--bg-light);padding:10px 22px;border-radius:12px;font-weight:bold;border:2px solid var(--primary-color);cursor:pointer;font-size:1.1rem;box-shadow:0 3px 6px rgba(0,0,0,0.2);">Toggle Absences</button>
                     <button onclick="clearPointsData()" style="background:var(--secondary-dark);color:var(--bg-light);padding:10px 22px;border-radius:12px;font-weight:bold;border:2px solid var(--primary-color);cursor:pointer;font-size:1.1rem;box-shadow:0 3px 6px rgba(0,0,0,0.2);">Clear Points</button>
                     <button onclick="copyAbsencesData()" style="background:var(--bg-light);color:#111;padding:10px 22px;border-radius:12px;font-weight:bold;border:2px solid var(--bg-mid);cursor:pointer;font-size:1.1rem;box-shadow:0 3px 6px rgba(0,0,0,0.2);">Copy Absences</button>
-                    <button onclick="copyTrackerData()" style="background:var(--bg-light);color:#111;padding:10px 22px;border-radius:12px;font-weight:bold;border:2px solid var(--bg-mid);cursor:pointer;font-size:1.1rem;box-shadow:0 3px 6px rgba(0,0,0,0.2);">Copy Scores</button>
+                    <button onclick="exportScoresCSV()" style="background:var(--primary-color);color:#fff;padding:10px 22px;border-radius:12px;font-weight:bold;border:2px solid var(--primary-color);cursor:pointer;font-size:1.1rem;box-shadow:0 3px 6px rgba(0,0,0,0.2);">⬇️ Export Scores</button>
                     <button id="trackerUndoBtn" onclick="undoLastPointsChange()" style="display:none;background:var(--bg-light);color:var(--primary-color);padding:10px 22px;border-radius:12px;font-weight:bold;border:2px solid var(--primary-color);cursor:pointer;font-size:1.1rem;box-shadow:0 3px 6px rgba(0,0,0,0.2);">↩️ Undo</button>
                 </div>
             </div>
@@ -802,6 +802,15 @@ License: MIT
                         <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Teacher Name</label><input type="text" id="settingTeacher" placeholder="Mr. Kaiser" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--bg-mid);"></div>
                         <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Watermark URL</label><input type="text" id="settingWatermark" placeholder="https://..." style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--bg-mid);font-family:monospace;font-size:0.8rem;"></div>
                     </div>
+                </div>
+            </div>
+            <div style="background:var(--bg-light);padding:20px;border-radius:16px;margin-top:15px;">
+                <h3 style="color:var(--primary-color);margin:0 0 10px 0;font-size:1.2rem;">🎮 Game Settings</h3>
+                <label style="display:flex;align-items:center;gap:10px;font-weight:bold;color:var(--secondary-dark);font-size:0.95rem;cursor:pointer;margin-bottom:15px;"><input type="checkbox" id="settingMuteSounds" style="width:20px;height:20px;cursor:pointer;"> 🔇 Mute all game sounds (buzzers, dings, timers, etc.)</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px;">
+                    <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Hot Seat Round (sec)</label><input type="number" id="settingHotSeatTime" min="10" max="300" value="45" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--bg-mid);text-align:center;"></div>
+                    <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Fact or Fiction (sec)</label><input type="number" id="settingFFTime" min="10" max="300" value="60" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--bg-mid);text-align:center;"></div>
+                    <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Debate Timer (sec/side)</label><input type="number" id="settingDebateTime" min="10" max="300" value="60" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--bg-mid);text-align:center;"></div>
                 </div>
             </div>
             <div style="background:var(--bg-light);padding:20px;border-radius:16px;margin-top:15px;">
@@ -870,7 +879,7 @@ License: MIT
     <div class="modal" id="timerModal"><div class="leaderboard-wrapper" style="max-width:650px;text-align:center;"><h1 class="lb-header">⏱️ Class Timer</h1><div class="timer-display sync-timer" style="font-size:clamp(4.5rem,8vw,8.5rem);margin:20px 0;color:var(--secondary-dark);">00:00</div><div class="progress-bar-container" style="height:20px;margin-bottom:25px;background-color:var(--bg-mid);"><div class="progress-bar sync-progress" style="background-color:var(--primary-color);"></div></div><div class="timer-controls" style="display:flex;gap:12px;margin-bottom:10px;width:100%;"><button onclick="addTime(0.5)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:12px;">+30s</button><button onclick="addTime(1)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:12px;">+1m</button><button onclick="addTime(5)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:12px;">+5m</button><button onclick="toggleTimer()" class="action-btn sync-btn-start" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:12px;">Start</button><button onclick="clearTimer()" class="stop-btn" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:12px;">Clear</button></div><button class="close-btn" onclick="toggleModal('timerModal')" style="margin-top:15px;">Run in Background</button></div></div>
     <div class="modal" id="pointsModal"><div class="leaderboard-wrapper"><h1 class="lb-header" id="dynamicLeaderboardTitle">🏆 Titan Cup Leaderboard</h1><div class="lb-current-class" id="pointsControlSection"><div class="lb-current-info" style="min-width:0;flex:1;"><h2>Active Period</h2><h3 id="currentClassPointsTitle">Loading...</h3></div><div style="display:flex;align-items:center;gap:12px;flex-shrink:0;"><div class="lb-score-display" id="classPointsDisplay">0</div><div class="lb-controls"><button class="btn-sub" onclick="updatePoints(-1)">-</button><button class="btn-add" onclick="updatePoints(1)">+</button></div></div></div><div class="lb-chart" id="leaderboardContainer"></div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;"><div style="display:flex;gap:10px;"><button onclick="resetAllPoints()" style="background:transparent;color:var(--secondary-dark);border:2px solid var(--secondary-dark);padding:8px 20px;font-size:1.1rem;border-radius:20px;font-weight:bold;cursor:pointer;">Reset Scores</button><button id="pointsUndoBtn" onclick="undoLastPointsChange()" style="display:none;background:transparent;color:var(--primary-color);border:2px solid var(--primary-color);padding:8px 20px;font-size:1.1rem;border-radius:20px;font-weight:bold;cursor:pointer;">↩️ Undo</button></div><button class="close-btn" onclick="togglePointsModal()" style="margin:0;padding:10px 25px;font-size:1.2rem;">Close</button></div></div></div>
     <div class="modal" id="wheelModal"><h1 id="wheelWinnerDisplay" style="font-size:clamp(2.5rem,4vw,4.5rem);margin:0 0 20px 0;text-align:center;width:100%;">SPIN THE WHEEL</h1><div class="wheel-container" onclick="executeSpin()"><div class="wheel-pointer">▼</div><div class="wheel" id="spinningWheel"></div></div><div style="display:flex;gap:15px;margin-top:clamp(15px,2vh,25px);justify-content:center;flex-wrap:wrap;"><button id="wheelToggleBtn" onclick="toggleWheelMode()" style="background:var(--primary-color);color:#ffffff;border:2px solid #ffffff;padding:clamp(10px,1.5vh,16px) clamp(24px,2.5vw,40px);font-size:clamp(1.1rem,1.5vw,1.8rem);border-radius:50px;font-weight:bold;cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,0.3);">Mode: Students</button><button onclick="resetWheelPicks()" style="background:var(--secondary-dark);color:var(--bg-light);border:2px solid var(--primary-color);padding:clamp(10px,1.5vh,16px) clamp(24px,2.5vw,40px);font-size:clamp(1.1rem,1.5vw,1.8rem);border-radius:50px;font-weight:bold;cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,0.3);">Reset Picks</button><button class="close-btn" onclick="closeWheelModal()" style="margin-top:0;">Close</button></div></div>
-    <div class="modal" id="groupModal"><button id="clearHistoryBtn" onclick="clearGroupHistory()" style="display:none;position:absolute;top:clamp(20px,3vh,40px);right:clamp(20px,3vw,40px);background:var(--bg-mid);color:#111;border:none;border-radius:50px;padding:8px 16px;font-weight:bold;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.3);z-index:10;">Clear History</button><h1 style="color:#fff;margin-bottom:4px;margin-top:0;">RANDOM GROUPS</h1><div style="display:flex;gap:10px;margin-bottom:6px;align-items:center;justify-content:center;flex-wrap:wrap;"><div class="group-controls"><button onclick="changeGroupSize(-1)">-</button><span id="groupSizeDisplay">Size: 2</span><button onclick="changeGroupSize(1)">+</button></div><button class="btn-generate" onclick="generateGroups()">Shuffle & Generate</button></div><div class="groups-grid" id="groupsContainer"></div><button class="close-btn" onclick="toggleModal('groupModal')" style="margin-top:6px;">Close</button></div>
+    <div class="modal" id="groupModal"><button id="clearHistoryBtn" onclick="clearGroupHistory()" style="display:none;position:absolute;top:clamp(20px,3vh,40px);right:clamp(20px,3vw,40px);background:var(--bg-mid);color:#111;border:none;border-radius:50px;padding:8px 16px;font-weight:bold;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.3);z-index:10;">Clear History</button><h1 style="color:#fff;margin-bottom:4px;margin-top:0;">RANDOM GROUPS</h1><div style="display:flex;gap:10px;margin-bottom:6px;align-items:center;justify-content:center;flex-wrap:wrap;"><div class="group-controls"><button onclick="changeGroupSize(-1)">-</button><span id="groupSizeDisplay">Size: 2</span><button onclick="changeGroupSize(1)">+</button></div><button class="btn-generate" onclick="generateGroups()">Shuffle & Generate</button></div><div class="groups-grid" id="groupsContainer"></div><div id="groupAwardRow" style="display:none;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:2px dashed rgba(255,255,255,0.2);"><label style="color:#fff;font-weight:bold;font-size:0.95rem;">🏆 Award</label><select id="awardGroupSelect" style="padding:10px;border-radius:8px;border:2px solid var(--primary-color);font-size:1rem;font-weight:bold;"></select><input type="number" id="awardGroupPoints" value="1" style="width:65px;padding:10px;border-radius:8px;border:2px solid var(--primary-color);text-align:center;font-size:1rem;font-weight:bold;"><label style="color:#fff;font-weight:bold;font-size:0.95rem;">points to their scores</label><button onclick="awardPointsToGroup()" style="background:var(--primary-color);color:#fff;border:none;padding:10px 22px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;">Award</button><span id="groupAwardConfirm" style="color:#69f0ae;font-weight:bold;font-size:0.95rem;min-width:140px;"></span></div><button class="close-btn" onclick="toggleModal('groupModal')" style="margin-top:6px;">Close</button></div>
     <div class="modal alert-screen" id="tardyModal"><h1>CLASS HAS STARTED</h1><p>If you are standing, you are tardy.<br>Please be seated and begin your Warm-Up activity immediately.</p><button class="close-btn" onclick="toggleModal('tardyModal')">Dismiss</button></div>
     <div class="modal blackout-screen" id="eyesUpModal"><h1>👀 EYES UP FRONT</h1><p style="color:var(--bg-mid);">Voices off, please.</p><button class="close-btn" onclick="toggleModal('eyesUpModal')" style="margin-top:50px;">Resume</button></div>
     <div class="modal exam-screen" id="examModal"><h1 id="examClockDisplay">10:00:00 AM</h1><p>Exam in Progress • Voices Off</p><button class="close-btn" onclick="toggleModal('examModal')" style="background:#222;color:#888;margin-top:5vh;border:2px solid #444;">Resume Class</button></div>
@@ -1201,7 +1210,7 @@ License: MIT
             if (watermark) document.documentElement.style.setProperty('--mascot-url', `url('${watermark}')`);
             let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans'; let leaderboard = localStorage.getItem('titan_setting_leaderboard') || 'Titan Cup'; let teacher = localStorage.getItem('titan_setting_teacher') || 'the teacher';
             document.getElementById('dynamicLeaderboardTitle').innerText = `🏆 ${leaderboard} Leaderboard`; document.getElementById('dynamicAskTeacher').innerText = `Then ask ${teacher}.`; document.getElementById('dynamicJeopardyTitle').innerText = `${mascot} Jeopardy`;
-            if(document.getElementById('themePrimary')) { document.getElementById('themePrimary').value = primary; document.getElementById('themeDark').value = dark; document.getElementById('themeLight').value = light; document.getElementById('themeMid').value = mid; document.getElementById('themeBg').value = bg; document.getElementById('themeGlow').value = glow; document.getElementById('settingMascot').value = mascot; document.getElementById('settingLeaderboard').value = leaderboard; document.getElementById('settingTeacher').value = teacher; document.getElementById('settingWatermark').value = watermark === 'SouthGarner_Titans_Logo1.png' ? '' : watermark; }
+            if(document.getElementById('themePrimary')) { document.getElementById('themePrimary').value = primary; document.getElementById('themeDark').value = dark; document.getElementById('themeLight').value = light; document.getElementById('themeMid').value = mid; document.getElementById('themeBg').value = bg; document.getElementById('themeGlow').value = glow; document.getElementById('settingMascot').value = mascot; document.getElementById('settingLeaderboard').value = leaderboard; document.getElementById('settingTeacher').value = teacher; document.getElementById('settingWatermark').value = watermark === 'SouthGarner_Titans_Logo1.png' ? '' : watermark; document.getElementById('settingMuteSounds').checked = isSoundMuted(); document.getElementById('settingHotSeatTime').value = getGameTimerSetting('hotseat_time', 45); document.getElementById('settingFFTime').value = getGameTimerSetting('ff_time', 60); document.getElementById('settingDebateTime').value = getGameTimerSetting('debate_time', 60); }
         }
         loadThemeSettings();
         ensureFirstUseTimestamp(); updateBackupReminderUI(); checkFirstRun();
@@ -1222,7 +1231,10 @@ License: MIT
 
         let audioCtx;
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
+        function isSoundMuted() { return localStorage.getItem('titan_setting_muted') === 'true'; }
+        function getGameTimerSetting(key, defaultVal) { let v = parseInt(localStorage.getItem('titan_setting_' + key), 10); return (!isNaN(v) && v > 0) ? v : defaultVal; }
         function playTone(freq, startTimeOffset, duration, vol, type='sine') {
+            if (isSoundMuted()) return;
             initAudio(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.type = type; osc.frequency.value = freq;
             let startTime = audioCtx.currentTime + startTimeOffset; gain.gain.setValueAtTime(0, startTime); gain.gain.linearRampToValueAtTime(vol, startTime + 0.05); gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
             osc.start(startTime); osc.stop(startTime + duration);
@@ -1256,6 +1268,10 @@ License: MIT
             localStorage.setItem('titan_setting_bg', document.getElementById('themeBg').value); localStorage.setItem('titan_setting_glow', document.getElementById('themeGlow').value);
             localStorage.setItem('titan_setting_mascot', document.getElementById('settingMascot').value); localStorage.setItem('titan_setting_leaderboard', document.getElementById('settingLeaderboard').value);
             localStorage.setItem('titan_setting_teacher', document.getElementById('settingTeacher').value); localStorage.setItem('titan_setting_watermark', document.getElementById('settingWatermark').value.trim() || 'SouthGarner_Titans_Logo1.png');
+            localStorage.setItem('titan_setting_muted', document.getElementById('settingMuteSounds').checked ? 'true' : 'false');
+            localStorage.setItem('titan_setting_hotseat_time', parseInt(document.getElementById('settingHotSeatTime').value, 10) || 45);
+            localStorage.setItem('titan_setting_ff_time', parseInt(document.getElementById('settingFFTime').value, 10) || 60);
+            localStorage.setItem('titan_setting_debate_time', parseInt(document.getElementById('settingDebateTime').value, 10) || 60);
             loadThemeSettings(); alert("Settings saved successfully! Refreshing data..."); toggleModal('settingsModal'); fetchAgendaData(); fetchGameVaultData();
         }
 
@@ -1489,7 +1505,29 @@ License: MIT
         };
         window.clearPointsData = function() { if (!activeBlockData) return; if (confirm("Clear ALL participation data for this class?")) { localStorage.removeItem('titan_tracker_' + activeBlockData.id); renderTracker(); } };
         window.copyAbsencesData = function() { if (!activeBlockData) return; let absentList = JSON.parse(localStorage.getItem('titan_absent_' + activeBlockData.id) || '[]'); if (absentList.length === 0) { alert("No absences."); return; } navigator.clipboard.writeText("Absent:\n" + absentList.join('\n')).then(() => alert("Copied!")).catch(e => alert("Failed.")); };
-        window.copyTrackerData = function() { if (!activeBlockData) return; let trackingData = JSON.parse(localStorage.getItem('titan_tracker_' + activeBlockData.id) || '{}'); if (Object.keys(trackingData).length === 0) { alert("No data!"); return; } let text = "Student\tScore\n"; activeBlockData.roster.forEach(student => { text += `${student}\t${trackingData[student] || 0}\n`; }); navigator.clipboard.writeText(text).then(() => alert("Copied!")).catch(e => alert("Failed.")); };
+        function csvEscape(field) { let s = String(field); return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+        function exportScoresCSV() {
+            let rows = [['Period', 'Student', 'Score']]; let seenIds = new Set(); let foundAny = false;
+            if (typeof schedule !== 'undefined' && schedule.length > 0) {
+                schedule.forEach(block => {
+                    if (!block.id || seenIds.has(block.id)) return; seenIds.add(block.id);
+                    let trackingData = JSON.parse(localStorage.getItem('titan_tracker_' + block.id) || '{}');
+                    let studentNames = Object.keys(trackingData); if (studentNames.length === 0) return;
+                    foundAny = true; studentNames.forEach(name => rows.push([block.title || block.id, name, trackingData[name]]));
+                });
+            }
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i); if (!key || !key.startsWith('titan_tracker_')) continue;
+                let id = key.substring('titan_tracker_'.length); if (seenIds.has(id)) continue; seenIds.add(id);
+                let trackingData = JSON.parse(localStorage.getItem(key) || '{}');
+                let studentNames = Object.keys(trackingData); if (studentNames.length === 0) continue;
+                foundAny = true; studentNames.forEach(name => rows.push([id, name, trackingData[name]]));
+            }
+            if (!foundAny) { alert('No participation scores found yet.'); return; }
+            let csvContent = rows.map(r => r.map(csvEscape).join(',')).join('\r\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a');
+            a.href = url; a.download = `participation-scores-${new Date().toISOString().slice(0, 10)}.csv`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
 
         window.logParticipation = function(student, change, classId) {
             let trackingData = JSON.parse(localStorage.getItem('titan_tracker_' + classId) || '{}'); trackingData[student] = (trackingData[student] || 0) + change; localStorage.setItem('titan_tracker_' + classId, JSON.stringify(trackingData));
@@ -1814,7 +1852,7 @@ License: MIT
         }
 
         function startFactFiction() {
-            ffTimeLeft = 60; ffStreak = 0; isFFRunning = true;
+            ffTimeLeft = getGameTimerSetting('ff_time', 60); ffStreak = 0; isFFRunning = true;
             document.getElementById('ffTimerDisplay').innerText = ffTimeLeft; document.getElementById('ffStreakDisplay').innerText = `Streak: ${ffStreak}`;
             document.getElementById('ffStartBtn').style.display = 'none'; document.getElementById('ffResetBtn').style.display = 'block'; document.getElementById('ffFactBtn').style.display = 'block'; document.getElementById('ffFictionBtn').style.display = 'block';
             clearInterval(ffTimerInterval); ffTimerInterval = setInterval(() => { ffTimeLeft--; if(ffTimeLeft <= 0) { ffTimeLeft = 0; endGameFF(); } const timerEl = document.getElementById('ffTimerDisplay'); timerEl.innerText = ffTimeLeft; if (ffTimeLeft <= 10 && ffTimeLeft > 0) timerEl.classList.add('ff-urgent'); else timerEl.classList.remove('ff-urgent'); }, 1000);
@@ -1826,7 +1864,7 @@ License: MIT
             else { ffStreak = 0; document.getElementById('ffStreakDisplay').innerText = `Streak: ${ffStreak}`; ffTimeLeft -= 3; if(ffTimeLeft <= 0) { ffTimeLeft = 0; document.getElementById('ffTimerDisplay').innerText = ffTimeLeft; playTone(150, 0, 0.4, 0.2, 'sawtooth'); endGameFF(); return; } const timerEl = document.getElementById('ffTimerDisplay'); timerEl.innerText = ffTimeLeft; if (ffTimeLeft <= 10) timerEl.classList.add('ff-urgent'); else timerEl.classList.remove('ff-urgent'); document.getElementById('factFictionDisplay').innerText = "INCORRECT (-3s)"; document.getElementById('factFictionDisplay').style.color = '#ff5252'; playTone(150, 0, 0.4, 0.2, 'sawtooth'); currentMiniGameAnswer = ""; setTimeout(() => { if(isFFRunning) nextMiniGamePrompt('factorfiction'); }, 800); }
         }
         function resetFactFiction() {
-            isFFRunning = false; clearInterval(ffTimerInterval); ffTimeLeft = 60; ffStreak = 0;
+            isFFRunning = false; clearInterval(ffTimerInterval); ffTimeLeft = getGameTimerSetting('ff_time', 60); ffStreak = 0;
             document.getElementById('ffTimerDisplay').innerText = ffTimeLeft; document.getElementById('ffTimerDisplay').classList.remove('ff-urgent'); document.getElementById('ffStreakDisplay').innerText = `Streak: ${ffStreak}`;
             document.getElementById('factFictionDisplay').innerText = "PREPARE FOR SPEED RUN..."; document.getElementById('factFictionDisplay').style.color = '#fff';
             document.getElementById('ffFactBtn').style.display = 'none'; document.getElementById('ffFictionBtn').style.display = 'none'; document.getElementById('ffResetBtn').style.display = 'none'; document.getElementById('ffStartBtn').style.display = 'block'; document.getElementById('ffStartBtn').innerText = "Start Speed Run"; currentMiniGameAnswer = "";
@@ -1996,7 +2034,7 @@ License: MIT
             confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 }, colors: [pColor, mColor, '#FFFFFF'] });
         }
 
-        let targetGroupSize = 2; let draggedStudent = null;
+        let targetGroupSize = 2; let draggedStudent = null; let currentGroups = [];
         function changeGroupSize(change) { targetGroupSize += change; if(targetGroupSize < 2) targetGroupSize = 2; if(activeBlockData && targetGroupSize > activeBlockData.roster.length) targetGroupSize = activeBlockData.roster.length; document.getElementById('groupSizeDisplay').innerText = `Size: ${targetGroupSize}`; }
         function getPairKey(a, b) { return [a, b].sort().join('|'); }
         function scoreShuffle(groups, history) { let score = 0; groups.forEach(group => { for(let i = 0; i < group.length; i++){ for(let j = i + 1; j < group.length; j++){ let key = getPairKey(group[i], group[j]); score += (history[key] || 0); } } }); return score; }
@@ -2025,13 +2063,37 @@ License: MIT
             });
             if (isGroupWheelMode) drawWheel(getActiveWheelItems());
             document.getElementById('clearHistoryBtn').style.display = 'block';
+            syncGroupsFromDOM();
+        }
+        function syncGroupsFromDOM() {
+            const cards = Array.from(document.querySelectorAll('#groupsContainer .group-card'));
+            currentGroups = cards.map(card => Array.from(card.querySelectorAll('li')).map(li => li.textContent.trim()));
+            if (activeBlockData && activeBlockData.id) localStorage.setItem('titan_current_groups_' + activeBlockData.id, JSON.stringify(currentGroups));
+            const awardRow = document.getElementById('groupAwardRow'); if (awardRow) awardRow.style.display = currentGroups.length > 0 ? 'flex' : 'none';
+            const sel = document.getElementById('awardGroupSelect');
+            if (sel) sel.innerHTML = currentGroups.map((g, i) => `<option value="${i}">Group ${i + 1} (${g.length} student${g.length === 1 ? '' : 's'})</option>`).join('');
+            const confirmEl = document.getElementById('groupAwardConfirm'); if (confirmEl) confirmEl.innerText = '';
+        }
+        function awardPointsToGroup() {
+            const sel = document.getElementById('awardGroupSelect'); const idx = parseInt(sel.value, 10);
+            const ptsInput = document.getElementById('awardGroupPoints'); const pts = parseInt(ptsInput.value, 10);
+            const confirmEl = document.getElementById('groupAwardConfirm');
+            if (isNaN(idx) || !currentGroups[idx] || currentGroups[idx].length === 0) return;
+            if (isNaN(pts) || pts === 0) { if (confirmEl) confirmEl.innerText = 'Enter a point value first.'; return; }
+            const classId = activeBlockData ? activeBlockData.id : null;
+            if (!classId) { if (confirmEl) confirmEl.innerText = 'No active class period.'; return; }
+            currentGroups[idx].forEach(student => window.logParticipation(student, pts, classId));
+            const cards = document.querySelectorAll('#groupsContainer .group-card'); const card = cards[idx];
+            if (card) { card.classList.remove('reveal-anim'); void card.offsetWidth; card.classList.add('reveal-anim'); }
+            if (confirmEl) confirmEl.innerText = `+${pts} to ${currentGroups[idx].length} student${currentGroups[idx].length === 1 ? '' : 's'}!`;
+            playTone(880, 0, 0.15, 0.12); playTone(1046, 0.12, 0.2, 0.15);
         }
 
         function dragStudent(ev) { draggedStudent = ev.target; ev.dataTransfer.effectAllowed = 'move'; setTimeout(() => ev.target.style.opacity = '0.4', 10); }
         function dragEndStudent(ev) { if (draggedStudent) draggedStudent.style.opacity = '1'; draggedStudent = null; }
         function allowDrop(ev) { ev.preventDefault(); let card = ev.target.closest('.group-card'); if (card) card.classList.add('drag-over'); }
         function dragLeave(ev) { let card = ev.target.closest('.group-card'); if (card) card.classList.remove('drag-over'); }
-        function dropStudent(ev) { ev.preventDefault(); let card = ev.target.closest('.group-card'); if (card && draggedStudent) { card.classList.remove('drag-over'); let targetUl = card.querySelector('ul'); if (ev.target.tagName === 'LI') targetUl.insertBefore(draggedStudent, ev.target.nextSibling); else targetUl.appendChild(draggedStudent); } }
+        function dropStudent(ev) { ev.preventDefault(); let card = ev.target.closest('.group-card'); if (card && draggedStudent) { card.classList.remove('drag-over'); let targetUl = card.querySelector('ul'); if (ev.target.tagName === 'LI') targetUl.insertBefore(draggedStudent, ev.target.nextSibling); else targetUl.appendChild(draggedStudent); syncGroupsFromDOM(); } }
 
         let currentRotation = 0; let spinTimeout = null; let isGroupWheelMode = false;
         function getWheelStorageKey() { let periodId = activeBlockData ? activeBlockData.id.toString() : "TESTING"; let mode = isGroupWheelMode ? 'groups' : 'students'; return `titan_wheel_played_${mode}_${periodId}`; }
@@ -2256,7 +2318,7 @@ License: MIT
             if (gameKey === 'taboo') { document.getElementById(cfg.displayId).innerText = cfg.readyText; document.getElementById(cfg.extraDisplayId).innerHTML = ''; tabooBuzzCount = 0; const counterEl = document.getElementById('tabooBuzzCount'); if (counterEl) counterEl.innerText = '🚨 x0'; } else { document.getElementById(cfg.displayId).innerText = cfg.readyText; }
             if (gameKey === 'titansays') { const indicator = document.getElementById('titanSaysTrapIndicator'); if (indicator) indicator.style.background = 'transparent'; document.getElementById(cfg.displayId).classList.remove('pressure-pulse'); }
             if (gameKey === 'hivemind') { hivemindRoundResults = []; const historyEl = document.getElementById('hivemindHistory'); if (historyEl) historyEl.innerText = ''; const input = document.getElementById('hivemindMatchInput'); if (input) input.value = ''; }
-            if (gameKey === 'hotseat') { clearInterval(hotSeatInterval); hotSeatInterval = null; hotSeatRunning = false; hotSeatCorrectCount = 0; hotSeatBestRound = parseInt(localStorage.getItem('titan_hotseat_best_' + gameTitle) || '0', 10); updateHotSeatStreakDisplay(); hotSeatTimeLeft = 45; updateHotSeatTimerDisplay(); const startBtn = document.getElementById('hotSeatStartBtn'); if (startBtn) { startBtn.style.display = 'inline-block'; startBtn.innerText = '▶ Start Round'; } const skipBtn = document.getElementById('hotSeatSkipBtn'); if (skipBtn) skipBtn.style.display = 'none'; const gotItBtn = document.getElementById('hotSeatGotItBtn'); if (gotItBtn) gotItBtn.style.display = 'none'; }
+            if (gameKey === 'hotseat') { clearInterval(hotSeatInterval); hotSeatInterval = null; hotSeatRunning = false; hotSeatCorrectCount = 0; hotSeatBestRound = parseInt(localStorage.getItem('titan_hotseat_best_' + gameTitle) || '0', 10); updateHotSeatStreakDisplay(); hotSeatTimeLeft = getGameTimerSetting('hotseat_time', 45); updateHotSeatTimerDisplay(); const startBtn = document.getElementById('hotSeatStartBtn'); if (startBtn) { startBtn.style.display = 'inline-block'; startBtn.innerText = '▶ Start Round'; } const skipBtn = document.getElementById('hotSeatSkipBtn'); if (skipBtn) skipBtn.style.display = 'none'; const gotItBtn = document.getElementById('hotSeatGotItBtn'); if (gotItBtn) gotItBtn.style.display = 'none'; }
             if (cfg.hasClickReveal) document.getElementById(cfg.displayId).style.color = 'inherit';
             autoFitGameText(gameKey);
             const matchingRows = gameVaultData.filter(g => g.type === cfg.vaultType && g.title.toString().trim() === gameTitle);
@@ -2340,7 +2402,7 @@ License: MIT
             document.querySelectorAll('.bid-reveal-value').forEach(el => el.innerText = '');
             const winnerEl = document.getElementById('biddingWarWinner'); if (winnerEl) winnerEl.innerText = '';
         }
-        let debateTimers = { A: { seconds: 60, interval: null, running: false }, B: { seconds: 60, interval: null, running: false } };
+        let debateTimers = { A: { seconds: getGameTimerSetting('debate_time', 60), interval: null, running: false }, B: { seconds: getGameTimerSetting('debate_time', 60), interval: null, running: false } };
         function formatDebateTime(s) { let m = Math.floor(s / 60); let sec = s % 60; return `${m}:${sec.toString().padStart(2, '0')}`; }
         function toggleDebateTimer(side) {
             const t = debateTimers[side]; const displayEl = document.getElementById('debateTimer' + side);
@@ -2355,7 +2417,7 @@ License: MIT
             }, 1000);
         }
         function resetDebateTimer(side) {
-            const t = debateTimers[side]; clearInterval(t.interval); t.interval = null; t.running = false; t.seconds = 60;
+            const t = debateTimers[side]; clearInterval(t.interval); t.interval = null; t.running = false; t.seconds = getGameTimerSetting('debate_time', 60);
             const displayEl = document.getElementById('debateTimer' + side); displayEl.innerText = formatDebateTime(60); displayEl.style.color = 'var(--bg-light)';
         }
         function flipDebateCoin() {
@@ -2369,10 +2431,10 @@ License: MIT
                 playTone(880, 0, 0.2, 0.15);
             }, 1200);
         }
-        let hotSeatTimeLeft = 45; let hotSeatInterval = null; let hotSeatRunning = false; let hotSeatCorrectCount = 0; let hotSeatBestRound = 0;
+        let hotSeatTimeLeft = getGameTimerSetting('hotseat_time', 45); let hotSeatInterval = null; let hotSeatRunning = false; let hotSeatCorrectCount = 0; let hotSeatBestRound = 0;
         function startHotSeatRound() {
             if (hotSeatRunning) return;
-            hotSeatRunning = true; hotSeatCorrectCount = 0; hotSeatTimeLeft = 45;
+            hotSeatRunning = true; hotSeatCorrectCount = 0; hotSeatTimeLeft = getGameTimerSetting('hotseat_time', 45);
             updateHotSeatStreakDisplay(); updateHotSeatTimerDisplay();
             document.getElementById('hotSeatStartBtn').style.display = 'none';
             document.getElementById('hotSeatSkipBtn').style.display = 'inline-block';
@@ -2438,7 +2500,7 @@ License: MIT
             if (gameKey === 'titansays') { const indicator = document.getElementById('titanSaysTrapIndicator'); if (indicator) indicator.style.background = 'transparent'; display.classList.remove('pressure-pulse'); }
             if (gameKey === 'hivemind') { hivemindRoundResults = []; const historyEl = document.getElementById('hivemindHistory'); if (historyEl) historyEl.innerText = ''; const input = document.getElementById('hivemindMatchInput'); if (input) input.value = ''; }
             if (gameKey === 'debate') { resetDebateTimer('A'); resetDebateTimer('B'); clearInterval(window._debateFlipInterval); const coinEl = document.getElementById('debateCoinResult'); if (coinEl) coinEl.innerText = ''; }
-            if (gameKey === 'hotseat') { clearInterval(hotSeatInterval); hotSeatInterval = null; hotSeatRunning = false; hotSeatCorrectCount = 0; hotSeatTimeLeft = 45; updateHotSeatStreakDisplay(); updateHotSeatTimerDisplay(); const startBtn = document.getElementById('hotSeatStartBtn'); if (startBtn) { startBtn.style.display = 'inline-block'; startBtn.innerText = '▶ Start Round'; } const skipBtn = document.getElementById('hotSeatSkipBtn'); if (skipBtn) skipBtn.style.display = 'none'; const gotItBtn = document.getElementById('hotSeatGotItBtn'); if (gotItBtn) gotItBtn.style.display = 'none'; }
+            if (gameKey === 'hotseat') { clearInterval(hotSeatInterval); hotSeatInterval = null; hotSeatRunning = false; hotSeatCorrectCount = 0; hotSeatTimeLeft = getGameTimerSetting('hotseat_time', 45); updateHotSeatStreakDisplay(); updateHotSeatTimerDisplay(); const startBtn = document.getElementById('hotSeatStartBtn'); if (startBtn) { startBtn.style.display = 'inline-block'; startBtn.innerText = '▶ Start Round'; } const skipBtn = document.getElementById('hotSeatSkipBtn'); if (skipBtn) skipBtn.style.display = 'none'; const gotItBtn = document.getElementById('hotSeatGotItBtn'); if (gotItBtn) gotItBtn.style.display = 'none'; }
             display.style.opacity = 0; if (extraDisplay) extraDisplay.style.opacity = 0;
             setTimeout(() => {
                 display.innerText = cfg.readyText; if (extraDisplay) extraDisplay.innerHTML = '';
