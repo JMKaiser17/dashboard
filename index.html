@@ -2705,6 +2705,12 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             toggleModal('recapPromptModal');
         }
         function dismissRecapPrompt() { toggleModal('recapPromptModal'); recapPendingBlock = null; }
+        function looksLikeMarketTickerData(text) {
+            // Detects the "TICKER: $123.45 (+/-1.23%)" pattern used by Market Ticker Mode, regardless of
+            // whether that mode happens to be toggled on in the current session - isMarketTicker is an
+            // in-memory-only flag that resets on every page load, so it can't be trusted for this check.
+            return /\$\d+(\.\d+)?\s*\([+-]\d+(\.\d+)?%\)/.test(text || '');
+        }
         function parseResourceLinks(resourcesStr) {
             let out = [];
             if (!resourcesStr) return out;
@@ -2782,7 +2788,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             if (block.eq) { heading('Essential Question'); bodyText(block.eq); }
             if (block.standards) { heading('Standards'); bodyText(block.standards); }
             if (block.reminders && block.reminders.length > 0) { heading('Reminders'); block.reminders.forEach(item => bodyText('•  ' + item)); }
-            if (block.ticker && !isMarketTicker) { heading('Note'); bodyText(block.ticker); }
+            if (block.ticker && !looksLikeMarketTickerData(block.ticker)) { heading('Note'); bodyText(block.ticker); }
 
             const links = parseResourceLinks(block.resources);
             if (links.length > 0) {
