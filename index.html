@@ -2750,8 +2750,12 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             const logoImg = await loadImageElement(watermark);
             if (logoImg) {
                 try {
-                    const logoSize = 46;
-                    doc.addImage(logoImg, pageWidth - marginX - logoSize, (headerHeight - logoSize) / 2, logoSize, logoSize);
+                    const maxLogoSize = 46;
+                    const naturalW = logoImg.naturalWidth || logoImg.width || 1;
+                    const naturalH = logoImg.naturalHeight || logoImg.height || 1;
+                    const scale = Math.min(maxLogoSize / naturalW, maxLogoSize / naturalH);
+                    const logoW = naturalW * scale; const logoH = naturalH * scale;
+                    doc.addImage(logoImg, pageWidth - marginX - logoW, (headerHeight - logoH) / 2, logoW, logoH);
                 } catch (e) { /* some logo sources (e.g. cross-origin images without permissive CORS headers) can't be embedded - skip quietly, the rest of the PDF still generates fine */ }
             }
 
