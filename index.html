@@ -2782,7 +2782,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             if (block.eq) { heading('Essential Question'); bodyText(block.eq); }
             if (block.standards) { heading('Standards'); bodyText(block.standards); }
             if (block.reminders && block.reminders.length > 0) { heading('Reminders'); block.reminders.forEach(item => bodyText('•  ' + item)); }
-            if (block.ticker) { heading('Note'); bodyText(block.ticker); }
+            if (block.ticker && !isMarketTicker) { heading('Note'); bodyText(block.ticker); }
 
             const links = parseResourceLinks(block.resources);
             if (links.length > 0) {
