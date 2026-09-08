@@ -1191,7 +1191,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <p style="color:#666;font-size:0.75rem;margin:4px 0 15px 0;">Expects columns: Date, ID, Title, Start, End, EQ, Standards, Warmup, Message, Ticker, Resources, Agenda, Reminders, Roster.</p>
                     <label style="font-weight:bold;color:var(--secondary-dark);font-size:0.9rem;">Game Vault CSV Link</label>
                     <input type="text" id="gameVaultUrlInput" placeholder="https://docs.google.com/spreadsheets/.../pub?output=csv" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--bg-mid);font-family:monospace;font-size:0.9rem;">
-                    <p style="color:#666;font-size:0.75rem;margin:4px 0 0 0;">Expects columns: Status (ACTIVE to show everyone, TEACHER_ONLY to hide just from Student Mode links while keeping it on your own dashboard), ID, Type, Title, Category, Prompt, Answer, Value.</p>
+                    <p style="color:#666;font-size:0.75rem;margin:4px 0 0 0;">Expects columns: Status (ACTIVE to show everyone, TEACHER_ONLY to hide just from Student Mode links while keeping it on your own dashboard), ID, Type, Title, Category, Prompt, Answer, Value. For the Reinforcement Lab (Type=reinforcement), Prompt holds the schedule (FR-5, VR-5, FI-8, VI-8, or RANDOM) and Value holds the round length in seconds.</p>
                 </div>
                 <div style="background:var(--bg-light);padding:20px;border-radius:16px;">
                     <h3 style="color:var(--primary-color);margin:0 0 10px 0;font-size:1.2rem;">Theme & Terminology</h3>
@@ -1637,8 +1637,68 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                         <button onclick="nextGauntletTier()" style="background:var(--primary-color);color:#fff;padding:15px 40px;border-radius:50px;font-weight:bold;font-size:1.4rem;cursor:pointer;border:none;">Risk It (Next Tier)</button>
                     </div>
                 </div>
+                <div class="game-rules-card game-shell-dark" id="reinforcementContainer" style="display:none;flex-direction:column;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:20px;flex-shrink:0;background:#000;border-bottom:4px solid var(--primary-color);gap:15px;">
+                        <h2 style="color:var(--bg-light);margin:0;font-size:clamp(1.4rem,2.2vw,2.6rem);font-weight:900;text-transform:uppercase;white-space:nowrap;">🐭 The Reinforcement Lab</h2>
+                        <div style="display:flex;gap:10px;">
+                            <button id="reinforcementScoreboardBtn" onclick="openReinforcementScoreboard()" style="display:none;background:var(--bg-light);color:#111;border:none;padding:8px 18px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;">📊 Scoreboard</button>
+                            <button onclick="closeGameModule()" style="background:var(--bg-light);border:none;padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1.1rem;color:#111;">Back to Hub</button>
+                        </div>
+                    </div>
+                    <div style="flex-grow:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;padding:20px;overflow:hidden;min-height:0;color:var(--bg-light);">
+
+                        <div id="reinforcementLabelPhase" style="display:none;flex-direction:column;align-items:center;gap:18px;text-align:center;">
+                            <h3 style="margin:0;">What's your group's name?</h3>
+                            <p style="opacity:0.8;max-width:450px;margin:0;">This is just so your scores show up under a name your teacher recognizes - no personal info needed.</p>
+                            <input type="text" id="reinforcementLabelInput" placeholder="e.g. The Pigeons" style="padding:14px 20px;border-radius:12px;border:none;font-size:1.2rem;text-align:center;min-width:250px;">
+                            <button onclick="saveReinforcementLabel()" style="background:#fff;color:var(--primary-color);border:none;padding:14px 34px;border-radius:50px;font-weight:900;font-size:1.2rem;cursor:pointer;">Let's Go!</button>
+                        </div>
+
+                        <div id="reinforcementIntroPhase" style="display:none;flex-direction:column;align-items:center;gap:16px;text-align:center;max-width:520px;">
+                            <p id="reinforcementGroupWelcome" style="font-size:1rem;opacity:0.85;margin:0;"></p>
+                            <h3 style="margin:0;">Ready?</h3>
+                            <p style="margin:0;">Click the target as many times as you can before time runs out. Sometimes you'll be rewarded, sometimes you won't - see if you can spot the pattern.</p>
+                            <button onclick="startReinforcementRound()" style="background:#fff;color:var(--primary-color);border:none;padding:16px 38px;border-radius:50px;font-weight:900;font-size:1.3rem;cursor:pointer;">▶ Start Round</button>
+                        </div>
+
+                        <div id="reinforcementPlayPhase" style="display:none;flex-direction:column;width:100%;height:100%;min-height:0;">
+                            <div style="display:flex;justify-content:space-around;gap:20px;padding:6px 0 14px;font-weight:900;font-size:clamp(0.9rem,1.3vw,1.3rem);flex-shrink:0;">
+                                <div>⏱️ <span id="reinforcementTimeLeft">60</span>s</div>
+                                <div>👆 Responses: <span id="reinforcementResponseCount">0</span></div>
+                                <div>🎉 Rewards: <span id="reinforcementRewardCount">0</span></div>
+                            </div>
+                            <div id="reinforcementPlayArea" style="position:relative;flex-grow:1;min-height:0;background:rgba(0,0,0,0.25);border-radius:16px;margin-bottom:12px;overflow:hidden;">
+                                <button id="reinforcementTarget" onclick="hitReinforcementTarget()" style="position:absolute;top:20px;left:20px;width:clamp(50px,7vw,70px);height:clamp(50px,7vw,70px);border-radius:50%;background:var(--primary-color);border:3px solid #fff;cursor:pointer;font-size:clamp(1.3rem,2vw,1.8rem);box-shadow:0 4px 10px rgba(0,0,0,0.5);">🎯</button>
+                                <div id="reinforcementRewardFlash" style="position:absolute;inset:0;background:rgba(255,255,255,0.45);opacity:0;pointer-events:none;transition:opacity 0.15s;"></div>
+                            </div>
+                            <canvas id="reinforcementGraph" style="width:100%;height:110px;flex-shrink:0;background:rgba(0,0,0,0.2);border-radius:10px;"></canvas>
+                        </div>
+
+                        <div id="reinforcementQuizPhase" style="display:none;flex-direction:column;align-items:center;gap:14px;text-align:center;max-width:560px;">
+                            <h3 style="margin:0;">Round over! You earned <span id="reinforcementFinalRewards"></span> rewards from <span id="reinforcementFinalResponses"></span> responses.</h3>
+                            <canvas id="reinforcementQuizGraph" style="width:100%;max-width:480px;height:130px;background:rgba(0,0,0,0.2);border-radius:10px;"></canvas>
+                            <p style="font-weight:bold;margin:8px 0 0 0;">Based on the pattern above, which reinforcement schedule do you think you were on?</p>
+                            <div id="reinforcementQuizOptions" style="display:flex;flex-direction:column;gap:10px;width:100%;"></div>
+                        </div>
+
+                        <div id="reinforcementRevealPhase" style="display:none;flex-direction:column;align-items:center;gap:14px;text-align:center;max-width:560px;">
+                            <h2 id="reinforcementRevealTitle" style="margin:0;"></h2>
+                            <p id="reinforcementRevealExplain" style="font-size:1.05rem;margin:0;"></p>
+                            <p id="reinforcementFinalScoreText" style="font-size:1.3rem;font-weight:900;margin:6px 0 0 0;"></p>
+                            <button onclick="resetReinforcementLab()" style="background:#fff;color:var(--primary-color);border:none;padding:14px 30px;border-radius:50px;font-weight:900;cursor:pointer;font-size:1.1rem;margin-top:8px;">🔄 Play Again</button>
+                        </div>
+                    </div>
+                </div>
 
             </div>
+    <div class="modal" id="reinforcementScoreboardModal"><div class="leaderboard-wrapper" style="max-width:600px;">
+        <h1 style="color:var(--primary-color);margin:0 0 15px 0;">📊 Reinforcement Lab Scoreboard</h1>
+        <div id="reinforcementScoreboardList" style="max-height:400px;overflow-y:auto;text-align:left;padding:6px;display:flex;flex-direction:column;gap:6px;"></div>
+        <div style="display:flex;gap:15px;justify-content:center;margin-top:15px;">
+            <button onclick="refreshReinforcementScoreboard()" style="background:var(--bg-light);color:#111;border:2px solid var(--bg-mid);padding:10px 24px;border-radius:20px;font-weight:bold;cursor:pointer;">🔄 Refresh</button>
+            <button class="close-btn" onclick="toggleModal('reinforcementScoreboardModal')" style="margin-top:0;">Close</button>
+        </div>
+    </div></div>
 
     <script>
         // Must be declared first - referenced very early in the init sequence below.
@@ -1870,7 +1930,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 { id: '2', type: 'taboo', title: 'Demo Taboo', prompt: 'Dashboard', answer: 'Screen, Class, Board', value: '' },
                 { id: '3', type: 'vault', title: 'Demo Vault', prompt: 'Syllabus | Seating Chart | Hall Pass | Fire Drill', answer: 'First Week Rituals', value: '' },
                 { id: '4', type: 'factorfiction', title: 'Demo F/F', prompt: 'High school drama in movies is 100% accurate.', answer: 'FICTION', value: '' },
-                { id: '5', type: 'survey', title: 'Demo Survey', prompt: 'Name a place students avoid', answer: 'Main office:42 | The stairwells:24 | The bathrooms:19', value: '' }
+                { id: '5', type: 'survey', title: 'Demo Survey', prompt: 'Name a place students avoid', answer: 'Main office:42 | The stairwells:24 | The bathrooms:19', value: '' },
+                { id: '6', type: 'reinforcement', title: 'Demo Reinforcement Lab', prompt: 'RANDOM', answer: '', value: '45' }
             ];
             needsDataRender = true; updateDashboard(); buildDynamicGameMenu();
         }
@@ -2099,8 +2160,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             document.getElementById('studentNotesView').style.display = 'flex';
         }
 
-        const GAME_ACCENT_COLORS = { jeopardy: 'var(--primary-color)', biddingwar: 'var(--primary-color)', hotseat: 'var(--primary-color)', taboo: 'var(--primary-color)', titansays: 'var(--primary-color)', hivemind: 'var(--primary-color)', debate: 'var(--primary-color)', vault: 'var(--primary-color)', factorfiction: 'var(--primary-color)', bullmarket: 'var(--primary-color)', gridlock: 'var(--primary-color)', survey: 'var(--primary-color)', gauntlet: 'var(--primary-color)' };
-        const GAME_ICONS = { jeopardy: '❓', biddingwar: '🔨', hotseat: '🔥', taboo: '🚫', titansays: '🗣️', hivemind: '🐝', debate: '⚖️', vault: '🔒', factorfiction: '🕵️', bullmarket: '📈', gridlock: '🔲', survey: '🗳️', gauntlet: '🪜' };
+        const GAME_ACCENT_COLORS = { jeopardy: 'var(--primary-color)', biddingwar: 'var(--primary-color)', hotseat: 'var(--primary-color)', taboo: 'var(--primary-color)', titansays: 'var(--primary-color)', hivemind: 'var(--primary-color)', debate: 'var(--primary-color)', vault: 'var(--primary-color)', factorfiction: 'var(--primary-color)', bullmarket: 'var(--primary-color)', gridlock: 'var(--primary-color)', survey: 'var(--primary-color)', gauntlet: 'var(--primary-color)', reinforcement: 'var(--primary-color)' };
+        const GAME_ICONS = { jeopardy: '❓', biddingwar: '🔨', hotseat: '🔥', taboo: '🚫', titansays: '🗣️', hivemind: '🐝', debate: '⚖️', vault: '🔒', factorfiction: '🕵️', bullmarket: '📈', gridlock: '🔲', survey: '🗳️', gauntlet: '🪜', reinforcement: '🐭' };
         // ==================== GAME HUB & DECK SELECTION ====================
         function gameCartridgeHTML(gameType, onclickJs, title, subtitle, showIcon = true) {
             const accent = GAME_ACCENT_COLORS[gameType] || 'var(--primary-color)';
@@ -2120,7 +2181,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function buildDynamicGameMenu() {
             const menu = document.getElementById('gameHubMenu'); menu.innerHTML = '';
             if (gameVaultData.length === 0) { menu.innerHTML = '<h3 style="color:var(--bg-mid); text-align:center; width:100%;">No active games found.</h3>'; return; }
-            let hasGame = { jeopardy: false, biddingwar: false, hotseat: false, taboo: false, titansays: false, hivemind: false, debate: false, vault: false, factorfiction: false, survey: false, gridlock: false, bullmarket: false, gauntlet: false };
+            let hasGame = { jeopardy: false, biddingwar: false, hotseat: false, taboo: false, titansays: false, hivemind: false, debate: false, vault: false, factorfiction: false, survey: false, gridlock: false, bullmarket: false, gauntlet: false, reinforcement: false };
             gameVaultData.forEach(row => { if (hasGame[row.type] !== undefined) hasGame[row.type] = true; });
             if (!Object.values(hasGame).some(val => val)) { menu.innerHTML = '<h3 style="color:var(--bg-mid); text-align:center; width:100%;">No games are marked ACTIVE.</h3>'; return; }
             let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans';
@@ -2146,7 +2207,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             currentActiveGameTitle = gameTitle; 
             document.getElementById('gameHubMenu').style.display = 'none'; document.getElementById('activeGameContainer').style.display = 'flex';
             
-            const containers = ['biddingWarRules', 'biddingWarTimer', 'jeopardyContainer', 'hotSeatContainer', 'tabooContainer', 'titanSaysContainer', 'hivemindContainer', 'debateContainer', 'vaultContainer', 'bullMarketContainer', 'factFictionContainer', 'gridlockContainer', 'surveyContainer', 'gauntletContainer'];
+            const containers = ['biddingWarRules', 'biddingWarTimer', 'jeopardyContainer', 'hotSeatContainer', 'tabooContainer', 'titanSaysContainer', 'hivemindContainer', 'debateContainer', 'vaultContainer', 'bullMarketContainer', 'factFictionContainer', 'gridlockContainer', 'surveyContainer', 'gauntletContainer', 'reinforcementContainer'];
             containers.forEach(id => { let el = document.getElementById(id); if (el) el.style.display = 'none'; });
 
             if (gameType === 'biddingwar') { document.getElementById('biddingWarRules').style.display = 'flex'; document.getElementById('biddingWarTimer').style.display = 'flex'; } 
@@ -2156,6 +2217,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             else if (gameType === 'survey') { loadSurveyModule(gameTitle); }
             else if (gameType === 'gauntlet') { loadGauntletModule(gameTitle); }
             else if (gameType === 'vault') { loadVaultModule(gameTitle); }
+            else if (gameType === 'reinforcement') { loadReinforcementModule(gameTitle); }
             else if (MINI_GAME_CONFIGS[gameType]) { loadMiniGamePrompts(gameType, gameTitle); }
         }
 
@@ -2164,6 +2226,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             document.getElementById('gameHubMenu').style.display = 'grid'; 
             buildDynamicGameMenu(); 
             if (typeof ffTimerInterval !== 'undefined') clearInterval(ffTimerInterval); 
+            if (reinforcementTimerInterval) { clearInterval(reinforcementTimerInterval); reinforcementTimerInterval = null; }
         }
 
         let gridlockWinAnnounced = false;
@@ -3182,6 +3245,181 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             currentMiniGameAnswer = ""; autoFitGameText(gameKey);
         }
 
+        // ==================== GAME: THE REINFORCEMENT LAB ====================
+        let reinforcementSchedule = null; // { type: 'FR'|'VR'|'FI'|'VI', param: number }
+        let reinforcementState = null;
+        let reinforcementResponses = 0;
+        let reinforcementRewards = 0;
+        let reinforcementRoundDuration = 60;
+        let reinforcementTimeLeft = 60;
+        let reinforcementTimerInterval = null;
+        let reinforcementHistory = [];
+        let reinforcementCorrectGuess = false;
+        const REINFORCEMENT_EXPLANATIONS = {
+            FR: { name: 'Fixed Ratio', explain: 'You were rewarded after an exact number of clicks, every time. This usually produces a burst-pause-burst pattern: a flurry of fast responses, a short break right after the reward, then another burst.' },
+            VR: { name: 'Variable Ratio', explain: "You were rewarded after an unpredictable number of clicks. This is the schedule behind slot machines - it produces the highest, steadiest response rate of all four, and is the hardest to break since you never know how close the next reward is." },
+            FI: { name: 'Fixed Interval', explain: 'You were rewarded for the first click after a set amount of time passed, no matter how many times you clicked in between. This usually produces a "scalloped" pattern: few responses right after a reward, then a rush of clicking as the next reward gets close.' },
+            VI: { name: 'Variable Interval', explain: 'You were rewarded for the first click after an unpredictable amount of time. This produces a slow, steady response rate, like checking your phone for a text - you never know exactly when, so you check every so often.' },
+        };
+        function loadReinforcementModule(gameTitle) {
+            document.getElementById('reinforcementContainer').style.display = 'flex';
+            currentActiveGameTitle = gameTitle;
+            let rows = gameVaultData.filter(g => g.type === 'reinforcement' && g.title.toString().trim() === gameTitle);
+            let specRow = rows.length > 0 ? rows[Math.floor(Math.random() * rows.length)] : null;
+            let spec = (specRow && specRow.prompt) ? specRow.prompt.trim().toUpperCase() : 'RANDOM';
+            reinforcementRoundDuration = (specRow && specRow.value && parseInt(specRow.value, 10) > 0) ? parseInt(specRow.value, 10) : 60;
+            reinforcementSchedule = parseReinforcementSpec(spec);
+
+            document.getElementById('reinforcementScoreboardBtn').style.display = (!isStudentMode && getLiveSyncUrl() && getLiveSyncToken()) ? 'inline-block' : 'none';
+
+            const savedLabel = localStorage.getItem('titan_reinforcement_group_label');
+            if (savedLabel) { document.getElementById('reinforcementGroupWelcome').innerText = `Playing as: ${savedLabel}`; showReinforcementPhase('intro'); }
+            else { showReinforcementPhase('label'); }
+        }
+        function parseReinforcementSpec(spec) {
+            const types = ['FR', 'VR', 'FI', 'VI'];
+            const m = spec.match(/^(FR|VR|FI|VI)-?(\d+)$/);
+            if (m) return { type: m[1], param: parseInt(m[2], 10) };
+            const type = types[Math.floor(Math.random() * types.length)];
+            const param = (type === 'FR' || type === 'VR') ? [3, 5, 8][Math.floor(Math.random() * 3)] : [4, 6, 8][Math.floor(Math.random() * 3)];
+            return { type, param };
+        }
+        function showReinforcementPhase(phase) {
+            ['Label', 'Intro', 'Play', 'Quiz', 'Reveal'].forEach(p => {
+                const el = document.getElementById('reinforcement' + p + 'Phase'); if (el) el.style.display = (p.toLowerCase() === phase) ? 'flex' : 'none';
+            });
+        }
+        function saveReinforcementLabel() {
+            const val = document.getElementById('reinforcementLabelInput').value.trim(); if (!val) return;
+            localStorage.setItem('titan_reinforcement_group_label', val);
+            document.getElementById('reinforcementGroupWelcome').innerText = `Playing as: ${val}`;
+            showReinforcementPhase('intro');
+        }
+        function computeReinforcementRatioThreshold(type, param) {
+            if (type === 'FR') return param;
+            const min = Math.max(1, param - Math.floor(param / 2)); const max = param + Math.floor(param / 2);
+            return min + Math.floor(Math.random() * (max - min + 1));
+        }
+        function computeReinforcementIntervalMs(type, param) {
+            if (type === 'FI') return param * 1000;
+            const min = Math.max(1, param - Math.floor(param / 2)) * 1000; const max = (param + Math.floor(param / 2)) * 1000;
+            return min + Math.random() * (max - min);
+        }
+        function startReinforcementRound() {
+            reinforcementResponses = 0; reinforcementRewards = 0; reinforcementHistory = []; reinforcementCorrectGuess = false;
+            reinforcementTimeLeft = reinforcementRoundDuration;
+            reinforcementState = {
+                type: reinforcementSchedule.type, param: reinforcementSchedule.param, responseCount: 0,
+                nextRatioThreshold: computeReinforcementRatioThreshold(reinforcementSchedule.type, reinforcementSchedule.param),
+                lastRewardTime: Date.now(), nextIntervalThreshold: computeReinforcementIntervalMs(reinforcementSchedule.type, reinforcementSchedule.param),
+                roundStart: Date.now(),
+            };
+            document.getElementById('reinforcementResponseCount').innerText = '0';
+            document.getElementById('reinforcementRewardCount').innerText = '0';
+            document.getElementById('reinforcementTimeLeft').innerText = reinforcementTimeLeft;
+            showReinforcementPhase('play');
+            setTimeout(() => { moveReinforcementTarget(); drawReinforcementGraph('reinforcementGraph', reinforcementHistory, reinforcementRoundDuration); }, 10);
+            clearInterval(reinforcementTimerInterval);
+            reinforcementTimerInterval = setInterval(() => {
+                reinforcementTimeLeft--; document.getElementById('reinforcementTimeLeft').innerText = reinforcementTimeLeft;
+                if (reinforcementTimeLeft <= 0) endReinforcementRound();
+            }, 1000);
+        }
+        function moveReinforcementTarget() {
+            const area = document.getElementById('reinforcementPlayArea'); const target = document.getElementById('reinforcementTarget');
+            if (!area || !target) return;
+            const maxX = Math.max(0, area.clientWidth - target.offsetWidth - 10); const maxY = Math.max(0, area.clientHeight - target.offsetHeight - 10);
+            target.style.left = (5 + Math.random() * maxX) + 'px'; target.style.top = (5 + Math.random() * maxY) + 'px';
+        }
+        function hitReinforcementTarget() {
+            if (!reinforcementState) return;
+            reinforcementResponses++; document.getElementById('reinforcementResponseCount').innerText = reinforcementResponses;
+            let rewarded = false; const s = reinforcementState;
+            if (s.type === 'FR' || s.type === 'VR') {
+                s.responseCount++;
+                if (s.responseCount >= s.nextRatioThreshold) { rewarded = true; s.responseCount = 0; s.nextRatioThreshold = computeReinforcementRatioThreshold(s.type, s.param); }
+            } else {
+                const elapsed = Date.now() - s.lastRewardTime;
+                if (elapsed >= s.nextIntervalThreshold) { rewarded = true; s.lastRewardTime = Date.now(); s.nextIntervalThreshold = computeReinforcementIntervalMs(s.type, s.param); }
+            }
+            if (rewarded) {
+                reinforcementRewards++; document.getElementById('reinforcementRewardCount').innerText = reinforcementRewards;
+                const flash = document.getElementById('reinforcementRewardFlash'); flash.style.opacity = '1'; setTimeout(() => { flash.style.opacity = '0'; }, 150);
+                playTone(880, 0, 0.12, 0.12);
+            } else { playTone(300, 0, 0.05, 0.05); }
+            reinforcementHistory.push({ t: (Date.now() - s.roundStart) / 1000, cumulative: reinforcementResponses, rewarded: rewarded });
+            drawReinforcementGraph('reinforcementGraph', reinforcementHistory, reinforcementRoundDuration);
+            moveReinforcementTarget();
+        }
+        function drawReinforcementGraph(canvasId, history, maxSeconds) {
+            const canvas = document.getElementById(canvasId); if (!canvas) return;
+            const ctx = canvas.getContext('2d'); const w = canvas.clientWidth || 300; const h = canvas.clientHeight || 100;
+            const dpr = window.devicePixelRatio || 1; canvas.width = w * dpr; canvas.height = h * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+            const maxCumulative = history.length > 0 ? history[history.length - 1].cumulative : 1;
+            const padding = 10; const xScale = (w - padding * 2) / Math.max(maxSeconds, 1); const yScale = (h - padding * 2) / Math.max(maxCumulative, 1);
+            ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(padding, h - padding);
+            history.forEach(pt => { ctx.lineTo(padding + pt.t * xScale, h - padding - pt.cumulative * yScale); });
+            ctx.stroke();
+            history.forEach(pt => {
+                if (pt.rewarded) { ctx.fillStyle = '#ffd54f'; ctx.beginPath(); ctx.arc(padding + pt.t * xScale, h - padding - pt.cumulative * yScale, 4, 0, Math.PI * 2); ctx.fill(); }
+            });
+        }
+        function endReinforcementRound() {
+            clearInterval(reinforcementTimerInterval); reinforcementTimerInterval = null;
+            document.getElementById('reinforcementFinalRewards').innerText = reinforcementRewards;
+            document.getElementById('reinforcementFinalResponses').innerText = reinforcementResponses;
+            showReinforcementPhase('quiz');
+            setTimeout(() => drawReinforcementGraph('reinforcementQuizGraph', reinforcementHistory, reinforcementRoundDuration), 10);
+            renderReinforcementQuizOptions();
+        }
+        function renderReinforcementQuizOptions() {
+            const options = [
+                { key: 'FR', label: 'Fixed Ratio - reward after an exact number of responses' },
+                { key: 'VR', label: 'Variable Ratio - reward after a random number of responses' },
+                { key: 'FI', label: 'Fixed Interval - reward for the first response after a set amount of time' },
+                { key: 'VI', label: 'Variable Interval - reward for the first response after a random amount of time' },
+            ];
+            const container = document.getElementById('reinforcementQuizOptions'); container.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.style.cssText = 'background:rgba(255,255,255,0.15);color:#fff;border:2px solid rgba(255,255,255,0.4);padding:14px 18px;border-radius:12px;font-size:1rem;cursor:pointer;text-align:left;';
+                btn.innerText = opt.label;
+                btn.onclick = () => selectReinforcementGuess(opt.key);
+                container.appendChild(btn);
+            });
+        }
+        function selectReinforcementGuess(guessKey) {
+            reinforcementCorrectGuess = (guessKey === reinforcementSchedule.type);
+            const info = REINFORCEMENT_EXPLANATIONS[reinforcementSchedule.type];
+            document.getElementById('reinforcementRevealTitle').innerText = reinforcementCorrectGuess ? `Correct! You were on ${info.name} (${reinforcementSchedule.type}-${reinforcementSchedule.param})` : `Not quite - you were actually on ${info.name} (${reinforcementSchedule.type}-${reinforcementSchedule.param})`;
+            document.getElementById('reinforcementRevealExplain').innerText = info.explain;
+            const bonus = reinforcementCorrectGuess ? 5 : 0; const finalScore = reinforcementRewards + bonus;
+            document.getElementById('reinforcementFinalScoreText').innerText = `Final Score: ${finalScore} (${reinforcementRewards} reward${reinforcementRewards === 1 ? '' : 's'}${bonus ? ' + 5 bonus for the correct guess' : ''})`;
+            showReinforcementPhase('reveal');
+            submitReinforcementScore(finalScore);
+        }
+        function submitReinforcementScore(finalScore) {
+            const label = localStorage.getItem('titan_reinforcement_group_label'); if (!label) return;
+            const url = getLiveSyncUrl(); const token = getLiveSyncToken(); if (!url || !token) return;
+            const payload = JSON.stringify({ token: token, action: 'submitScore', data: { game: 'reinforcement', label: label, score: finalScore, schedule: reinforcementSchedule.type + '-' + reinforcementSchedule.param, guessedCorrectly: reinforcementCorrectGuess } });
+            fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }).catch(() => { /* silent - same reasoning as the other live-sync pushes */ });
+        }
+        function resetReinforcementLab() { showReinforcementPhase('intro'); }
+        async function openReinforcementScoreboard() { toggleModal('reinforcementScoreboardModal'); await refreshReinforcementScoreboard(); }
+        async function refreshReinforcementScoreboard() {
+            const url = getLiveSyncUrl(); const token = getLiveSyncToken();
+            const listEl = document.getElementById('reinforcementScoreboardList');
+            if (!url || !token) { listEl.innerHTML = '<p>Live sync isn\'t configured in Settings.</p>'; return; }
+            listEl.innerHTML = '<p>Loading...</p>';
+            try {
+                const sep = url.includes('?') ? '&' : '?';
+                const resp = await fetch(url + sep + 'token=' + encodeURIComponent(token) + '&action=scores&game=reinforcement');
+                const json = await resp.json();
+                if (!json.ok || !json.data || json.data.length === 0) { listEl.innerHTML = '<p>No scores submitted yet.</p>'; return; }
+                listEl.innerHTML = json.data.map((row, i) => `<div style="display:flex;justify-content:space-between;padding:8px 12px;background:${i % 2 === 0 ? 'rgba(0,0,0,0.05)' : 'transparent'};border-radius:8px;"><span>${i + 1}. ${escapeHtml(row.label)}</span><span>${row.score} pts (${escapeHtml(row.schedule)}${row.guessedCorrectly ? ' ✓' : ''})</span></div>`).join('');
+            } catch (e) { listEl.innerHTML = '<p>Couldn\'t reach the scoreboard right now.</p>'; }
+        }
         // ==================== GAME: THE BIDDING WAR ====================
         function revealBids() {
             const inputs = Array.from(document.querySelectorAll('.bid-input'));
