@@ -1229,7 +1229,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             </div>
             <div style="background:var(--bg-light);padding:20px;border-radius:16px;margin-top:15px;">
                 <h3 style="color:var(--primary-color);margin:0 0 10px 0;font-size:1.2rem;">☁️ Auto Backup (optional)</h3>
-                <p style="color:#666;font-size:0.8rem;margin:0 0 12px 0;">Connects to a small script on your own spreadsheet that silently saves a snapshot every ~15 minutes. Leave blank to keep using manual backups only.</p>
+                <p style="color:#666;font-size:0.8rem;margin:0 0 12px 0;">Connects to a small script on your own spreadsheet that silently saves your theme, settings, and sheet URLs about once a day. Doesn't include attendance, scores, or notes - use the manual backup below or the Class Recap PDF for those. Leave blank to keep using manual backups only.</p>
                 <div style="display:grid;grid-template-columns:2fr 1fr;gap:15px;">
                     <div>
                         <label style="font-weight:bold;color:var(--secondary-dark);font-size:0.9rem;">Backup Web App URL</label>
@@ -1352,9 +1352,21 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         <div class="top-bar" id="studentTopBar" style="display:none;">
             <div class="pill class-pill"><div class="pill-subtitle">Today's Schedule</div><div class="current-class" id="studentClassTitle">Loading...</div></div>
             <div class="right-pills">
+                <div id="studentTimerBadge" style="display:none;background:var(--secondary-dark);color:var(--bg-light);border:2px solid var(--primary-color);padding:8px 16px;border-radius:20px;font-weight:900;font-variant-numeric:tabular-nums;font-size:1.1rem;align-items:center;">⏱️&nbsp;<span id="studentTimerText">0:00</span></div>
+                <div id="studentStatusBadge" style="display:none;background:var(--secondary-dark);border:2px solid #e53935;padding:6px 14px;border-radius:20px;align-items:center;gap:6px;">
+                    <div id="studentStatusDot" style="width:10px;height:10px;border-radius:50%;background:#e53935;flex-shrink:0;"></div>
+                    <span id="studentStatusText" style="color:var(--bg-light);font-weight:bold;font-size:0.85rem;white-space:nowrap;">Phones Away</span>
+                </div>
                 <button onclick="showStudentAgenda()" style="background:var(--bg-light);color:#111;border:2px solid var(--primary-color);padding:10px 22px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;">📋 Today's Plan</button>
                 <button onclick="showStudentGames()" style="background:var(--primary-color);color:#fff;border:2px solid var(--primary-color);padding:10px 22px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;">🎮 Games</button>
+                <button onclick="showStudentNotes()" style="background:var(--bg-light);color:#111;border:2px solid var(--bg-mid);padding:10px 22px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;">📝 Notes</button>
                 <div class="pill clock-pill clock" id="studentClockDisplay">08:00:00 AM</div>
+            </div>
+        </div>
+        <div id="studentNotesView" style="display:none;flex-direction:column;flex-grow:1;min-height:0;padding:20px;">
+            <div class="card" style="height:100%;min-height:0;display:flex;flex-direction:column;">
+                <h2 style="margin:0 0 12px 0;">📝 Class Notes</h2>
+                <p id="studentNotesText" style="font-size:clamp(1rem,1.6vw,1.6rem);line-height:1.5;white-space:pre-wrap;overflow-y:auto;color:var(--secondary-dark);">No notes shared yet.</p>
             </div>
         </div>
         
@@ -1630,6 +1642,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     <script>
         // Must be declared first - referenced very early in the init sequence below.
         const isStudentMode = new URLSearchParams(window.location.search).get('mode') === 'student';
+        let liveStatePollTimer = null; // declared here (not near its usage below) - referenced by code that runs immediately during init
         // Global Game Timer declarations to prevent scope errors
         let ffTimerInterval; 
         let ffTimeLeft = 60; 
@@ -1667,7 +1680,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             if(document.getElementById('themePrimary')) { document.getElementById('themePrimary').value = primary; document.getElementById('themeDark').value = dark; document.getElementById('themeLight').value = light; document.getElementById('themeMid').value = mid; document.getElementById('themeBg').value = bg; document.getElementById('themeGlow').value = glow; document.getElementById('settingMascot').value = mascot; document.getElementById('settingLeaderboard').value = leaderboard; document.getElementById('settingTeacher').value = teacher; document.getElementById('settingWatermark').value = watermark === 'SouthGarner_Titans_Logo1.png' ? '' : watermark; document.getElementById('settingMuteSounds').checked = isSoundMuted(); document.getElementById('settingHotSeatTime').value = getGameTimerSetting('hotseat_time', 45); document.getElementById('settingFFTime').value = getGameTimerSetting('ff_time', 60); document.getElementById('settingDebateTime').value = getGameTimerSetting('debate_time', 60); }
         }
         loadThemeSettings();
-        if (isStudentMode) { document.getElementById('teacherTopBar').style.display = 'none'; document.getElementById('studentTopBar').style.display = 'flex'; document.body.classList.add('student-mode'); }
+        if (isStudentMode) { document.getElementById('teacherTopBar').style.display = 'none'; document.getElementById('studentTopBar').style.display = 'flex'; document.body.classList.add('student-mode'); startLiveStatePolling(); }
         ensureFirstUseTimestamp(); updateBackupReminderUI(); checkFirstRun();
         setTimeout(sendAutoBackup, 30000); // attempts shortly after load (safe - sendAutoBackup no-ops if not due yet), then re-checked every 15 min via setInterval above
 
@@ -1716,8 +1729,25 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         // ==================== SETTINGS PERSISTENCE (theme, sheet URLs, terminology) ====================
         function getActiveCsvUrl() { const urlParam = new URLSearchParams(window.location.search).get('sheet'); if (urlParam) return urlParam; return localStorage.getItem('titan_sheet_url') || ""; }
         function getActiveGameUrl() { const urlParam = new URLSearchParams(window.location.search).get('games'); if (urlParam) return urlParam; return localStorage.getItem('titan_game_url') || ""; }
+        function getLiveSyncUrl() { const urlParam = new URLSearchParams(window.location.search).get('live'); if (urlParam) return urlParam; return getAutoBackupUrl(); }
+        function getLiveSyncToken() { const urlParam = new URLSearchParams(window.location.search).get('liveToken'); if (urlParam) return urlParam; return getAutoBackupToken(); }
         function getAutoBackupUrl() { return localStorage.getItem('titan_autobackup_url') || ""; }
         function getAutoBackupToken() { return localStorage.getItem('titan_autobackup_token') || ""; }
+        function pushLiveState() {
+            const url = getAutoBackupUrl(); const token = getAutoBackupToken();
+            if (!url || !token) return; // live sync isn't configured - silently does nothing, same spirit as auto-backup
+            const badge = document.getElementById('statusLightBadge');
+            const lightActive = !!(badge && badge.style.display === 'flex');
+            const timerActive = isRunning || remainingMs > 0;
+            const notepad = document.getElementById('slideNotepad');
+            const state = {
+                statusLight: { active: lightActive, state: lightActive ? statusLightState : null },
+                timer: { active: timerActive, running: isRunning, endTime: isRunning ? endTime : null, remainingMs: remainingMs },
+                notes: notepad ? stripHtmlToText(notepad.innerHTML) : '',
+            };
+            const payload = JSON.stringify({ token: token, action: 'liveState', data: state });
+            fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }).catch(() => { /* silent - same reasoning as auto-backup's fetch */ });
+        }
         function saveSettings() {
             let inputUrl = document.getElementById('customSheetUrlInput').value.trim(); let gameUrl = document.getElementById('gameVaultUrlInput').value.trim();
             if(inputUrl) localStorage.setItem('titan_sheet_url', inputUrl); if(gameUrl) localStorage.setItem('titan_game_url', gameUrl);
@@ -1736,10 +1766,18 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         }
 
         const DASHBOARD_STORAGE_PREFIXES = ['titan_', 'classPoints_', 'checklist_'];
+        const LIGHT_BACKUP_KEYS = [
+            'titan_setting_primary', 'titan_setting_dark', 'titan_setting_light', 'titan_setting_mid', 'titan_setting_bg', 'titan_setting_glow',
+            'titan_setting_mascot', 'titan_setting_watermark', 'titan_setting_teacher', 'titan_setting_leaderboard',
+            'titan_setting_muted', 'titan_setting_hotseat_time', 'titan_setting_ff_time', 'titan_setting_debate_time',
+            'titan_sheet_url', 'titan_game_url', 'titan_autobackup_url', 'titan_autobackup_token',
+        ];
         // ==================== BACKUP & RESTORE (manual download + Apps Script auto-backup) ====================
         function isDashboardStorageKey(key) { return DASHBOARD_STORAGE_PREFIXES.some(prefix => key.startsWith(prefix)); }
         function collectDashboardBackupData_() {
-            const data = {}; for (let i = 0; i < localStorage.length; i++) { const key = localStorage.key(i); if (isDashboardStorageKey(key)) data[key] = localStorage.getItem(key); } return data;
+            // Deliberately narrow: theme/settings/config only. Restore (below) stays broad and can still
+            // fully restore an older, fuller backup file - this scope only affects what NEW backups collect.
+            const data = {}; LIGHT_BACKUP_KEYS.forEach(key => { const v = localStorage.getItem(key); if (v !== null) data[key] = v; }); return data;
         }
         function downloadBackup() {
             const payload = { source: 'Classroom Dashboard Backup', exportedAt: new Date().toISOString(), data: collectDashboardBackupData_() };
@@ -1784,7 +1822,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function sendAutoBackup() {
             const url = getAutoBackupUrl(); if (!url) return; // not configured - manual backups remain the only path, by design
             const lastBackup = parseInt(localStorage.getItem('titan_last_backup_at') || '0', 10);
-            const backupIntervalMs = 2 * 60 * 60 * 1000; // 2 hours
+            const backupIntervalMs = 24 * 60 * 60 * 1000; // once a day - settings/theme data rarely changes
             if (Date.now() - lastBackup < backupIntervalMs) return; // not due yet - keeps a page reload from re-sending early
             const payload = JSON.stringify({ token: getAutoBackupToken(), data: collectDashboardBackupData_() });
             // Apps Script Web Apps don't support CORS preflight for POST, so this must be a
@@ -2030,8 +2068,33 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function toggleFocusMode() { if (isTransitioning) return; isFocusMode = !isFocusMode; isSlideMode = false; isGameStage = false; document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active'); updateBoardDisplays(); }
         function toggleSlideMode() { if (isTransitioning) return; isSlideMode = !isSlideMode; isFocusMode = false; isGameStage = false; if (isSlideMode) document.body.classList.add('slide-mode-active'); else document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active'); updateBoardDisplays(); if (isSlideMode) renderSlide(); }
         function toggleGameStage() { if (isTransitioning) return; isGameStage = !isGameStage; isSlideMode = false; isFocusMode = false; if (isGameStage) { document.body.classList.add('game-mode-active'); buildDynamicGameMenu(); } else { document.body.classList.remove('game-mode-active'); } document.body.classList.remove('slide-mode-active'); updateBoardDisplays(); }
-        function showStudentGames() { if (isTransitioning || isGameStage) return; isGameStage = true; isSlideMode = false; isFocusMode = false; document.body.classList.add('game-mode-active'); document.body.classList.remove('slide-mode-active'); buildDynamicGameMenu(); updateBoardDisplays(); }
-        function showStudentAgenda() { if (isTransitioning || !isGameStage) return; isGameStage = false; isSlideMode = false; isFocusMode = false; document.body.classList.remove('game-mode-active'); document.body.classList.remove('slide-mode-active'); updateBoardDisplays(); }
+        function showStudentGames() {
+            if (isTransitioning) return;
+            document.getElementById('studentNotesView').style.display = 'none';
+            if (!isGameStage) {
+                isGameStage = true; isSlideMode = false; isFocusMode = false;
+                document.body.classList.add('game-mode-active'); document.body.classList.remove('slide-mode-active');
+                buildDynamicGameMenu(); updateBoardDisplays();
+            } else {
+                document.getElementById('gameModeBoard').style.display = 'flex'; // was hidden by Notes view - just re-show it
+            }
+        }
+        function showStudentAgenda() {
+            if (isTransitioning) return;
+            document.getElementById('studentNotesView').style.display = 'none';
+            if (isGameStage) {
+                isGameStage = false; isSlideMode = false; isFocusMode = false;
+                document.body.classList.remove('game-mode-active'); document.body.classList.remove('slide-mode-active');
+                updateBoardDisplays();
+            } else {
+                document.getElementById('mainBento').style.display = 'grid'; // was hidden by Notes view - just re-show it
+            }
+        }
+        function showStudentNotes() {
+            if (isTransitioning) return;
+            const current = document.getElementById(activeBoard); if (current) current.style.display = 'none';
+            document.getElementById('studentNotesView').style.display = 'flex';
+        }
 
         const GAME_ACCENT_COLORS = { jeopardy: 'var(--primary-color)', biddingwar: 'var(--primary-color)', hotseat: 'var(--primary-color)', taboo: 'var(--primary-color)', titansays: 'var(--primary-color)', hivemind: 'var(--primary-color)', debate: 'var(--primary-color)', vault: 'var(--primary-color)', factorfiction: 'var(--primary-color)', bullmarket: 'var(--primary-color)', gridlock: 'var(--primary-color)', survey: 'var(--primary-color)', gauntlet: 'var(--primary-color)' };
         const GAME_ICONS = { jeopardy: '❓', biddingwar: '🔨', hotseat: '🔥', taboo: '🚫', titansays: '🗣️', hivemind: '🐝', debate: '⚖️', vault: '🔒', factorfiction: '🕵️', bullmarket: '📈', gridlock: '🔲', survey: '🗳️', gauntlet: '🪜' };
@@ -2427,7 +2490,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             setTimeout(() => { oldBoard.style.display = 'none'; oldBoard.style.animation = ''; newBoard.style.display = (targetBoard === 'gameModeBoard') ? 'flex' : 'grid'; newBoard.style.animation = 'boardFadeIn 0.5s ease forwards'; activeBoard = targetBoard; if (targetBoard !== 'gameModeBoard') closeGameModule(); if (targetBoard === 'mainBento') setTimeout(autoFitCardText, 50); isTransitioning = false; }, 300); 
         }
 
-        function saveNotepad() { if (!activeBlockData) return; localStorage.setItem('titan_notepad_' + activeBlockData.id, document.getElementById('slideNotepad').innerHTML); }
+        let notesPushDebounceTimer = null;
+        function saveNotepad() { if (!activeBlockData) return; localStorage.setItem('titan_notepad_' + activeBlockData.id, document.getElementById('slideNotepad').innerHTML); clearTimeout(notesPushDebounceTimer); notesPushDebounceTimer = setTimeout(pushLiveState, 3000); }
         function loadNotepad() { const notepad = document.getElementById('slideNotepad'); if (activeBlockData) { const saved = localStorage.getItem('titan_notepad_' + activeBlockData.id); notepad.innerHTML = saved !== null ? saved : '<p>Start typing notes here...</p>'; } else { notepad.innerHTML = '<p>Start typing notes here...</p>'; } }
         function saveTaskNote() { if (!activeBlockData) return; localStorage.setItem('titan_task_' + activeBlockData.id, document.getElementById('currentTaskEditable').innerHTML); }
         function loadTaskNote() { const el = document.getElementById('currentTaskEditable'); if (!el) return; if (activeBlockData) { const saved = localStorage.getItem('titan_task_' + activeBlockData.id); if (saved !== null) el.innerHTML = saved; } }
@@ -2460,6 +2524,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function toggleStatusLight() {
             const badge = document.getElementById('statusLightBadge');
             if (badge.style.display === 'flex') { badge.style.display = 'none'; } else { badge.style.display = 'flex'; renderStatusLight(); }
+            pushLiveState();
         }
         function renderStatusLight() {
             const state = STATUS_LIGHT_STATES[statusLightState];
@@ -2470,6 +2535,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function cycleStatusLightState() {
             statusLightState = (statusLightState + 1) % STATUS_LIGHT_STATES.length;
             renderStatusLight(); playTone(500 + statusLightState * 150, 0, 0.1, 0.1);
+            pushLiveState();
         }
         function cycleNoiseLevel() {
             noiseState = (noiseState + 1) % 3; const widget = document.getElementById('noiseLevelWidget'); const icon = document.getElementById('noiseIcon'); const text = document.getElementById('noiseText');
@@ -2631,12 +2697,57 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         }
         function buildStudentModeUrl() {
             const sheetUrl = getActiveCsvUrl(); const gamesUrl = getActiveGameUrl();
+            const liveUrl = getAutoBackupUrl(); const liveToken = getAutoBackupToken();
             const base = window.location.origin + window.location.pathname;
             let params = new URLSearchParams(); params.set('mode', 'student');
             if (sheetUrl) params.set('sheet', sheetUrl);
             if (gamesUrl) params.set('games', gamesUrl);
+            if (liveUrl && liveToken) { params.set('live', liveUrl); params.set('liveToken', liveToken); }
             return base + '?' + params.toString();
         }
+        // ==================== STUDENT MODE LIVE SYNC (read-only: Phone Status, timer, notes) ====================
+        let syncedTimerState = { active: false };
+        function startLiveStatePolling() {
+            if (!isStudentMode || !getLiveSyncUrl() || !getLiveSyncToken()) return;
+            pollLiveStateOnce();
+            const stagger = 20000 + Math.random() * 20000; // 20-40s, randomized per device so a full class doesn't poll in lockstep
+            liveStatePollTimer = setInterval(pollLiveStateOnce, stagger);
+        }
+        async function pollLiveStateOnce() {
+            const url = getLiveSyncUrl(); const token = getLiveSyncToken(); if (!url || !token) return;
+            try {
+                const sep = url.includes('?') ? '&' : '?';
+                const resp = await fetch(url + sep + 'token=' + encodeURIComponent(token) + '&action=liveState');
+                const json = await resp.json();
+                if (json && json.ok && json.data) applyLiveState(json.data);
+            } catch (e) { /* network hiccup - next poll will try again */ }
+        }
+        function applyLiveState(state) {
+            const statusBadge = document.getElementById('studentStatusBadge');
+            if (statusBadge) {
+                if (state.statusLight && state.statusLight.active && state.statusLight.state !== null && STATUS_LIGHT_STATES[state.statusLight.state]) {
+                    const s = STATUS_LIGHT_STATES[state.statusLight.state];
+                    statusBadge.style.display = 'flex'; statusBadge.style.borderColor = s.color;
+                    document.getElementById('studentStatusDot').style.background = s.color;
+                    document.getElementById('studentStatusText').innerText = s.text;
+                } else { statusBadge.style.display = 'none'; }
+            }
+            syncedTimerState = state.timer || { active: false };
+            renderStudentTimer();
+            const notesEl = document.getElementById('studentNotesText');
+            if (notesEl) notesEl.innerText = (state.notes && state.notes.trim()) ? state.notes : 'No notes shared yet.';
+        }
+        function renderStudentTimer() {
+            const badge = document.getElementById('studentTimerBadge'); if (!badge) return;
+            if (!syncedTimerState || !syncedTimerState.active) { badge.style.display = 'none'; return; }
+            badge.style.display = 'flex';
+            let ms;
+            if (syncedTimerState.running && syncedTimerState.endTime) { ms = syncedTimerState.endTime - Date.now(); if (ms < 0) ms = 0; }
+            else { ms = syncedTimerState.remainingMs || 0; }
+            const totalSeconds = Math.ceil(ms / 1000); const m = Math.floor(totalSeconds / 60); const s = totalSeconds % 60;
+            document.getElementById('studentTimerText').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+        if (isStudentMode) setInterval(renderStudentTimer, 1000); // ticks locally between syncs - no network call each second
         function copyStudentLink() {
             document.getElementById('qrErrorText').innerText = ''; document.getElementById('qrCopyConfirm').innerText = '';
             if (!getActiveCsvUrl()) { document.getElementById('qrErrorText').innerText = 'Connect your Google Sheet in Settings first, so the student link has real data to show.'; return; }
@@ -2955,13 +3066,13 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             initAudio(); 
             if (isRunning) { clearInterval(timerInterval); isRunning = false; document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = "Start"); } 
             else { if (remainingMs > 0) { endTime = Date.now() + remainingMs; isRunning = true; document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = "Pause"); timerInterval = setInterval(updateTimerDisplay, 1000); } }
-            saveTimerState(); checkFloatingTimer();
+            saveTimerState(); checkFloatingTimer(); pushLiveState();
         }
         function clearTimer() {
             clearInterval(timerInterval); isRunning = false; totalTimeMs = 0; remainingMs = 0; endTime = 0; warningPlayed = false; donePlayed = false;
             document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = "Start"); renderTime(0);
             document.querySelectorAll('.sync-progress').forEach(bar => { bar.style.backgroundColor = "var(--primary-color)"; bar.style.width = "0%"; });
-            saveTimerState(); checkFloatingTimer();
+            saveTimerState(); checkFloatingTimer(); pushLiveState();
         }
         function updateTimerDisplay() {
             remainingMs = endTime - Date.now();
