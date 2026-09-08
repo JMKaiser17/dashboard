@@ -1325,7 +1325,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             <span id="statusLightText" style="color:var(--bg-light);font-weight:900;font-size:clamp(0.55rem,0.7vw,0.7rem);white-space:nowrap;">Phones Away</span>
         </div>
         <div class="ticker-wrap" onclick="toggleTickerMode()"><div class="ticker-move"><div class="ticker-item" id="dailyMessage">Loading daily message...</div></div></div>
-        <div class="top-bar">
+        <div class="top-bar" id="teacherTopBar">
             <div class="pill class-pill" onclick="toggleTrackerModal()"><div class="pill-subtitle" id="classPillSubtitle">Today's Schedule</div><div class="current-class" id="classTitle">Loading...</div></div>
             <div id="demoModeBadge" class="pill action-pill" onclick="openSettingsModal()" title="Click to connect your own Google Sheet" style="display:none;background:linear-gradient(145deg,#fff3cd,#ffe69c);border-color:#664d03;">
                 <div class="pill-subtitle" style="color:#664d03;">Click to Connect</div>
@@ -1342,6 +1342,14 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 <div class="pill action-pill" onclick="toggleModal('groupModal')"><div class="pill-subtitle">Sort</div><div class="widget-text">👥 Groups</div></div>
                 <div class="pill action-pill" onclick="openWheelModal()"><div class="pill-subtitle">Selector</div><div class="widget-text">🎲 Spin</div></div>
                 <div class="pill clock-pill clock" id="clockDisplay" onclick="toggleModal('examModal')">08:00:00 AM</div>
+            </div>
+        </div>
+        <div class="top-bar" id="studentTopBar" style="display:none;">
+            <div class="pill class-pill"><div class="pill-subtitle">Today's Schedule</div><div class="current-class" id="studentClassTitle">Loading...</div></div>
+            <div class="right-pills">
+                <button onclick="showStudentAgenda()" style="background:var(--bg-light);color:#111;border:2px solid var(--primary-color);padding:10px 22px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;">📋 Today's Plan</button>
+                <button onclick="showStudentGames()" style="background:var(--primary-color);color:#fff;border:2px solid var(--primary-color);padding:10px 22px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;">🎮 Games</button>
+                <div class="pill clock-pill clock" id="studentClockDisplay">08:00:00 AM</div>
             </div>
         </div>
         
@@ -1652,6 +1660,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             if(document.getElementById('themePrimary')) { document.getElementById('themePrimary').value = primary; document.getElementById('themeDark').value = dark; document.getElementById('themeLight').value = light; document.getElementById('themeMid').value = mid; document.getElementById('themeBg').value = bg; document.getElementById('themeGlow').value = glow; document.getElementById('settingMascot').value = mascot; document.getElementById('settingLeaderboard').value = leaderboard; document.getElementById('settingTeacher').value = teacher; document.getElementById('settingWatermark').value = watermark === 'SouthGarner_Titans_Logo1.png' ? '' : watermark; document.getElementById('settingMuteSounds').checked = isSoundMuted(); document.getElementById('settingHotSeatTime').value = getGameTimerSetting('hotseat_time', 45); document.getElementById('settingFFTime').value = getGameTimerSetting('ff_time', 60); document.getElementById('settingDebateTime').value = getGameTimerSetting('debate_time', 60); }
         }
         loadThemeSettings();
+        if (isStudentMode) { document.getElementById('teacherTopBar').style.display = 'none'; document.getElementById('studentTopBar').style.display = 'flex'; document.body.classList.add('student-mode'); }
         ensureFirstUseTimestamp(); updateBackupReminderUI(); checkFirstRun();
         setTimeout(sendAutoBackup, 30000); // attempts shortly after load (safe - sendAutoBackup no-ops if not due yet), then re-checked every 15 min via setInterval above
 
@@ -1684,6 +1693,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function playDoneChime() { playTone(523.25, 0, 1.5, 0.15); playTone(659.25, 0.2, 1.5, 0.15); playTone(783.99, 0.4, 1.5, 0.15); playTone(1046.50, 0.6, 2.0, 0.15); }
 
         let activeBlockData = null; let lastActiveBlockId = null; let isFocusMode = false; let isSlideMode = false; let isGameStage = false; let activeBoard = 'mainBento'; let isTransitioning = false; let needsDataRender = true; 
+        const isStudentMode = new URLSearchParams(window.location.search).get('mode') === 'student';
         let lastGenuinelyActiveBlock = null;
         let currentSlides = []; let currentSlideIndex = -1; let isMarketTicker = false;
         let gameVaultData = []; let miniGameLists = { hotseat: [], titansays: [], hivemind: [], debate: [], taboo: [], factorfiction: [], bullmarket: [], vault: [] };
@@ -1742,7 +1752,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         }
 
         // --- First-run onboarding ---
-        function checkFirstRun() { if (!localStorage.getItem('titan_onboarding_seen') && !getActiveCsvUrl()) { document.getElementById('onboardingModal').classList.add('active'); } }
+        function checkFirstRun() { if (isStudentMode) return; if (!localStorage.getItem('titan_onboarding_seen') && !getActiveCsvUrl()) { document.getElementById('onboardingModal').classList.add('active'); } }
         function dismissOnboarding(openSettingsAfter) { localStorage.setItem('titan_onboarding_seen', '1'); document.getElementById('onboardingModal').classList.remove('active'); if (openSettingsAfter) openSettingsModal(); }
 
         // --- Backup reminder ---
@@ -2014,6 +2024,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function toggleFocusMode() { if (isTransitioning) return; isFocusMode = !isFocusMode; isSlideMode = false; isGameStage = false; document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active'); updateBoardDisplays(); }
         function toggleSlideMode() { if (isTransitioning) return; isSlideMode = !isSlideMode; isFocusMode = false; isGameStage = false; if (isSlideMode) document.body.classList.add('slide-mode-active'); else document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active'); updateBoardDisplays(); if (isSlideMode) renderSlide(); }
         function toggleGameStage() { if (isTransitioning) return; isGameStage = !isGameStage; isSlideMode = false; isFocusMode = false; if (isGameStage) { document.body.classList.add('game-mode-active'); buildDynamicGameMenu(); } else { document.body.classList.remove('game-mode-active'); } document.body.classList.remove('slide-mode-active'); updateBoardDisplays(); }
+        function showStudentGames() { if (isTransitioning || isGameStage) return; isGameStage = true; isSlideMode = false; isFocusMode = false; document.body.classList.add('game-mode-active'); document.body.classList.remove('slide-mode-active'); buildDynamicGameMenu(); updateBoardDisplays(); }
+        function showStudentAgenda() { if (isTransitioning || !isGameStage) return; isGameStage = false; isSlideMode = false; isFocusMode = false; document.body.classList.remove('game-mode-active'); document.body.classList.remove('slide-mode-active'); updateBoardDisplays(); }
 
         const GAME_ACCENT_COLORS = { jeopardy: 'var(--primary-color)', biddingwar: 'var(--primary-color)', hotseat: 'var(--primary-color)', taboo: 'var(--primary-color)', titansays: 'var(--primary-color)', hivemind: 'var(--primary-color)', debate: 'var(--primary-color)', vault: 'var(--primary-color)', factorfiction: 'var(--primary-color)', bullmarket: 'var(--primary-color)', gridlock: 'var(--primary-color)', survey: 'var(--primary-color)', gauntlet: 'var(--primary-color)' };
         const GAME_ICONS = { jeopardy: '❓', biddingwar: '🔨', hotseat: '🔥', taboo: '🚫', titansays: '🗣️', hivemind: '🐝', debate: '⚖️', vault: '🔒', factorfiction: '🕵️', bullmarket: '📈', gridlock: '🔲', survey: '🗳️', gauntlet: '🪜' };
@@ -2479,6 +2491,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             if (isTyping) return; 
 
             if (event.key === 'Escape') { const activeModals = document.querySelectorAll('.modal.active'); activeModals.forEach(modal => { if (modal.id === 'wheelModal') closeWheelModal(); else modal.classList.remove('active'); }); checkFloatingTimer(); return; }
+            if (isStudentMode) return; // no teacher shortcuts in student mode
             
             if (event.shiftKey) {
                 if (event.key.toLowerCase() === 'c') fireBigConfetti(); if (event.key.toLowerCase() === 't') toggleModal('tardyModal');
@@ -2699,7 +2712,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         // ==================== CLASS RECAP PDF ====================
         let recapPromptedIds = new Set(); let recapPendingBlock = null;
         function maybeOfferRecapPrompt(block) {
-            if (!block || !block.id || recapPromptedIds.has(block.id)) return;
+            if (isStudentMode || !block || !block.id || recapPromptedIds.has(block.id)) return;
             recapPromptedIds.add(block.id); recapPendingBlock = block;
             document.getElementById('recapPromptText').innerText = `Save a recap PDF of today's "${block.title}" for absent students?`;
             toggleModal('recapPromptModal');
@@ -2839,7 +2852,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             const now = new Date(); let hours = now.getHours(); let minutes = now.getMinutes(); let seconds = now.getSeconds(); let ampm = hours >= 12 ? 'PM' : 'AM';
             hours = hours % 12; hours = hours ? hours : 12; minutes = minutes < 10 ? '0' + minutes : minutes; seconds = seconds < 10 ? '0' + seconds : seconds;
             let timeStr = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
-            document.getElementById('clockDisplay').innerText = timeStr; document.getElementById('examClockDisplay').innerText = timeStr;
+            document.getElementById('clockDisplay').innerText = timeStr; document.getElementById('examClockDisplay').innerText = timeStr; document.getElementById('studentClockDisplay').innerText = timeStr;
             let nowMs = now.getTime(); let activeBlock = null; let forcedBlock = schedule.find(b => b.forced); let isGenuinelyInSession = false;
             if (forcedBlock) { activeBlock = forcedBlock; isGenuinelyInSession = true; } 
             else { for (let block of schedule) { let startMs = block.date.getTime() + (block.start * 60000); let endMs = block.date.getTime() + (block.end * 60000); if (nowMs >= startMs && nowMs < endMs) { activeBlock = block; isGenuinelyInSession = true; break; } } if (!activeBlock) { activeBlock = schedule.find(b => { let endMs = b.date.getTime() + (b.end * 60000); return endMs > nowMs; }); } }
@@ -2860,7 +2873,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     loadClassPoints();
                     let icon = "🏫"; let lowerTitle = activeBlock.title.toLowerCase();
                     if (lowerTitle.includes("economics") || lowerTitle.includes("finance")) icon = "💵"; else if (lowerTitle.includes("psychology") || lowerTitle.includes("sociology")) icon = "🧠"; else if (lowerTitle.includes("planning")) icon = "☕";
-                    document.getElementById('classTitle').innerText = `${icon} ${activeBlock.title}`;
+                    document.getElementById('classTitle').innerText = `${icon} ${activeBlock.title}`; document.getElementById('studentClassTitle').innerText = activeBlock.title;
                     let newEqText = activeBlock.eq || "No EQ provided today."; let newStandardsText = activeBlock.standards || "";
                     if (newEqText !== lastRenderedEQ || newStandardsText !== lastRenderedStandards) {
                         let eqTextEl = document.getElementById('eqText'); eqTextEl.innerText = newEqText; eqTextEl.scrollTop = 0;
@@ -2891,7 +2904,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     if (!isGroupWheelMode && activeBlockData && activeBlockData.roster) { drawWheel(getActiveWheelItems()); }
                     setTimeout(autoFitCardText, 50);
                 } else {
-                    document.getElementById('classTitle').innerText = "Outside School Hours"; let eqTextElOff = document.getElementById('eqText'); eqTextElOff.innerText = ""; eqTextElOff.scrollTop = 0; document.getElementById('standardsText').innerText = ""; document.getElementById('warmupText').innerText = "Have a great day!"; document.getElementById('warmupModalText').innerText = "Have a great day!"; document.getElementById('agendaItems').innerHTML = ""; document.getElementById('remindersItems').innerHTML = "";
+                    document.getElementById('classTitle').innerText = "Outside School Hours"; document.getElementById('studentClassTitle').innerText = "Outside School Hours"; let eqTextElOff = document.getElementById('eqText'); eqTextElOff.innerText = ""; eqTextElOff.scrollTop = 0; document.getElementById('standardsText').innerText = ""; document.getElementById('warmupText').innerText = "Have a great day!"; document.getElementById('warmupModalText').innerText = "Have a great day!"; document.getElementById('agendaItems').innerHTML = ""; document.getElementById('remindersItems').innerHTML = "";
                     if(!isMarketTicker) document.getElementById('dailyMessage').innerText = "Have a wonderful evening!";
                     currentSlides = []; if (lastActiveBlockId !== currentActiveId) currentSlideIndex = -1;
                 }
