@@ -1299,6 +1299,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             <input type="text" id="qrUrlInput" placeholder="Paste a link (Google Form, Slides, etc.)" style="flex:1;min-width:250px;max-width:450px;padding:14px;border-radius:12px;border:2px solid var(--primary-color);font-size:1.1rem;box-sizing:border-box;">
             <button onclick="generateQRCode()" style="background:var(--primary-color);color:#fff;border:none;padding:14px 28px;border-radius:12px;font-weight:bold;cursor:pointer;font-size:1.1rem;">Generate</button>
         </div>
+        <div style="display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
+            <button onclick="loadStudentLinkIntoQR()" style="background:var(--bg-light);color:#111;border:2px solid var(--bg-mid);padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:0.9rem;">🎓 Use My Student Mode Link</button>
+            <button onclick="copyStudentLink()" style="background:var(--bg-light);color:#111;border:2px solid var(--bg-mid);padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:0.9rem;">📋 Copy Link (no QR needed)</button>
+        </div>
+        <p id="qrCopyConfirm" style="color:#388e3c;font-weight:bold;font-size:0.9rem;min-height:1.2em;margin:0 0 10px 0;"></p>
         <p id="qrErrorText" style="color:#d32f2f;font-weight:bold;min-height:1.4em;margin:5px 0;"></p>
         <div id="qrCodeDisplay" style="display:none;margin:15px auto;padding:16px;background:#fff;border-radius:16px;"></div>
         <p id="qrUrlLabel" style="color:#666;font-size:0.95rem;word-break:break-all;margin:10px 0 0 0;display:none;"></p>
@@ -1709,8 +1714,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         setInterval(() => { if(isMarketTicker) updateTickerDisplay(); }, 4000);
 
         // ==================== SETTINGS PERSISTENCE (theme, sheet URLs, terminology) ====================
-        function getActiveCsvUrl() { return localStorage.getItem('titan_sheet_url') || ""; }
-        function getActiveGameUrl() { return localStorage.getItem('titan_game_url') || ""; }
+        function getActiveCsvUrl() { const urlParam = new URLSearchParams(window.location.search).get('sheet'); if (urlParam) return urlParam; return localStorage.getItem('titan_sheet_url') || ""; }
+        function getActiveGameUrl() { const urlParam = new URLSearchParams(window.location.search).get('games'); if (urlParam) return urlParam; return localStorage.getItem('titan_game_url') || ""; }
         function getAutoBackupUrl() { return localStorage.getItem('titan_autobackup_url') || ""; }
         function getAutoBackupToken() { return localStorage.getItem('titan_autobackup_token') || ""; }
         function saveSettings() {
@@ -2623,6 +2628,29 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             document.getElementById('qrUrlLabel').style.display = 'none';
             document.getElementById('qrEditBtn').style.display = 'none';
             document.getElementById('qrErrorText').innerText = '';
+        }
+        function buildStudentModeUrl() {
+            const sheetUrl = getActiveCsvUrl(); const gamesUrl = getActiveGameUrl();
+            const base = window.location.origin + window.location.pathname;
+            let params = new URLSearchParams(); params.set('mode', 'student');
+            if (sheetUrl) params.set('sheet', sheetUrl);
+            if (gamesUrl) params.set('games', gamesUrl);
+            return base + '?' + params.toString();
+        }
+        function copyStudentLink() {
+            document.getElementById('qrErrorText').innerText = ''; document.getElementById('qrCopyConfirm').innerText = '';
+            if (!getActiveCsvUrl()) { document.getElementById('qrErrorText').innerText = 'Connect your Google Sheet in Settings first, so the student link has real data to show.'; return; }
+            const url = buildStudentModeUrl();
+            navigator.clipboard.writeText(url).then(() => {
+                document.getElementById('qrCopyConfirm').innerText = '✓ Copied! Paste it into Canvas, an email, anywhere.';
+            }).catch(() => {
+                document.getElementById('qrErrorText').innerText = 'Could not copy automatically. Link: ' + url;
+            });
+        }
+        function loadStudentLinkIntoQR() {
+            if (!getActiveCsvUrl()) { document.getElementById('qrErrorText').innerText = 'Connect your Google Sheet in Settings first, so the student link has real data to show.'; return; }
+            document.getElementById('qrUrlInput').value = buildStudentModeUrl();
+            generateQRCode();
         }
         function openQRModal() {
             toggleModal('qrModal');
