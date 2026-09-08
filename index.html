@@ -1078,7 +1078,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         #topSourceTabs { display:none; flex-grow:1; justify-content:center; align-items:center; gap:clamp(6px,1vw,15px); margin:0 clamp(4px,0.5vw,10px); padding:6px 0; min-width:0; overflow:hidden; }
         .ticker-wrap { width:100%; background-color:var(--secondary-dark); border-radius:12px; overflow:hidden; padding:clamp(6px,1vh,12px) 0; box-shadow:0 6px 15px rgba(0,0,0,0.6),inset 0 0 10px rgba(var(--primary-rgb),0.2); position:relative; z-index:2; max-height:clamp(35px,6vh,60px); cursor:pointer; flex-shrink:0; transition:all 0.3s ease; border:1px solid rgba(var(--primary-hover-rgb),0.3); } .ticker-wrap:hover { background-color:var(--ticker-hover); border-color:rgba(var(--primary-hover-rgb),0.6); } .ticker-move { display:inline-block; white-space:nowrap; padding-left:100%; animation:ticker 30s linear infinite; } .ticker-item { display:inline-block; font-size:clamp(1.1rem,1.6vw,2.2rem); font-weight:600; color:var(--bg-light); letter-spacing:0.5px; font-variant-numeric:tabular-nums; margin-top:2px; } @keyframes ticker { 0% { transform:translate(0,0); } 100% { transform:translate(-100%,0); } }
         body.slide-mode-active .ticker-wrap, body.game-mode-active .ticker-wrap { max-height:0; opacity:0; padding-top:0; padding-bottom:0; margin-bottom:-8px; } body.slide-mode-active .top-bar, body.game-mode-active .top-bar { min-height:clamp(40px,6vh,60px); padding-bottom:2px; } body.slide-mode-active .class-pill, body.game-mode-active .class-pill { max-width:clamp(130px,20vw,300px); } body.slide-mode-active .pill, body.game-mode-active .pill { padding:clamp(2px,0.5vh,6px) clamp(6px,0.8vw,12px); } body.slide-mode-active .current-class, body.game-mode-active .current-class { font-size:clamp(0.9rem,1.2vw,1.4rem); } body.slide-mode-active .widget-text, body.game-mode-active .widget-text { font-size:clamp(0.7rem,0.9vw,1.1rem); } body.slide-mode-active .pill-subtitle, body.game-mode-active .pill-subtitle { font-size:clamp(0.4rem,0.5vw,0.6rem); } body.slide-mode-active .clock, body.game-mode-active .clock { font-size:clamp(1rem,1.3vw,1.6rem); padding:clamp(2px,0.5vh,6px) clamp(6px,0.8vw,12px); width:clamp(120px,12vw,180px); }
-        @media (max-width:1200px) { .top-bar { flex-wrap:wrap; height:auto !important; } #topSourceTabs { order:3; width:100%; margin:5px 0 0 0 !important; } }
+        @media (max-width:1200px) { .top-bar { flex-wrap:wrap; height:auto !important; } #topSourceTabs { order:3; width:100%; margin:5px 0 0 0 !important; } .status-light-badge { position:absolute !important; bottom:clamp(10px,1.8vh,26px); left:clamp(10px,1.8vw,26px); } }
         .bento-grid { display:grid; grid-template-columns:1fr 1.3fr; grid-template-rows:minmax(0,1.1fr) minmax(0,0.9fr); gap:clamp(10px,1.5vw,24px); flex-grow:1; min-height:0; }
         .card { background:linear-gradient(145deg,#ffffff,var(--bg-light)); border-radius:clamp(12px,1.5vw,22px); padding:clamp(12px,2vw,32px); color:var(--secondary-dark); box-shadow:0 10px 25px rgba(0,0,0,0.45),inset 0 2px 0px rgba(255,255,255,0.9),inset 0 -2px 5px rgba(0,0,0,0.05); overflow-y:auto; border-left:clamp(5px,0.6vw,10px) solid var(--primary-color); display:flex; flex-direction:column; min-height:0; transition:transform 0.2s ease,box-shadow 0.2s ease; } .card:hover { box-shadow:0 14px 30px rgba(0,0,0,0.55),inset 0 2px 0px rgba(255,255,255,0.9); } .card h2 { margin-top:0; color:var(--primary-color); font-size:clamp(1.6rem,2.8vw,3.5rem); margin-bottom:clamp(10px,1.5vh,20px); font-weight:700; line-height:1.1; letter-spacing:-0.5px; text-shadow:0 1px 1px rgba(255,255,255,0.8); }
         .expandable-title { cursor:pointer; transition:opacity 0.2s; display:flex; justify-content:space-between; align-items:center; } .expandable-title:hover { opacity:0.7; } .expand-badge { font-size:0.38em; color:#fff; background:var(--primary-color); padding:6px 14px; border-radius:20px; font-weight:800; text-transform:uppercase; letter-spacing:1px; box-shadow:0 3px 8px rgba(var(--primary-rgb),0.4); }
@@ -1248,8 +1248,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             <div style="background:var(--bg-light);padding:20px;border-radius:16px;margin-top:15px;">
                 <h3 style="color:var(--primary-color);margin:0 0 10px 0;font-size:1.2rem;">⌨️ Keyboard Shortcuts Reference</h3>
                 <div class="cheat-grid" style="font-size:0.9rem;">
-                    <div><p><kbd>Shift</kbd> + <kbd>Z</kbd> Zen Mode</p><p><kbd>Shift</kbd> + <kbd>P</kbd> Presentation</p><p><kbd>Shift</kbd> + <kbd>G</kbd> Game Hub</p><p><kbd>Shift</kbd> + <kbd>R</kbd> Roster/Points</p></div>
-                    <div><p><kbd>Shift</kbd> + <kbd>N</kbd> Rapid Cold Call</p><p><kbd>Shift</kbd> + <kbd>D</kbd> Eyes Up Front</p><p><kbd>Shift</kbd> + <kbd>T</kbd> Tardy Screen</p><p><kbd>Shift</kbd> + <kbd>L</kbd> Status Light</p><p><kbd>Shift</kbd> + <kbd>Q</kbd> QR Code</p><p><kbd>Shift</kbd> + <kbd>0</kbd> Settings Menu</p><p><kbd>ESC</kbd> Close Active Screen</p></div>
+                    <div><p><kbd>Shift</kbd> + <kbd>Z</kbd> Zen Mode</p><p><kbd>Shift</kbd> + <kbd>P</kbd> Presentation</p><p><kbd>Shift</kbd> + <kbd>G</kbd> Game Hub</p><p><kbd>Shift</kbd> + <kbd>R</kbd> Roster</p><p><kbd>Shift</kbd> + <kbd>B</kbd> Leaderboard</p><p><kbd>Shift</kbd> + <kbd>W</kbd> Expand Warm-Up</p></div>
+                    <div><p><kbd>Shift</kbd> + <kbd>N</kbd> Rapid Cold Call</p><p><kbd>Shift</kbd> + <kbd>D</kbd> Eyes Up Front</p><p><kbd>Shift</kbd> + <kbd>T</kbd> Tardy Screen</p><p><kbd>Shift</kbd> + <kbd>E</kbd> Exam Mode</p><p><kbd>Shift</kbd> + <kbd>L</kbd> Status Light</p><p><kbd>Shift</kbd> + <kbd>S</kbd> Spin Wheel</p></div>
+                    <div><p><kbd>Shift</kbd> + <kbd>M</kbd> Timer</p><p><kbd>Shift</kbd> + <kbd>Q</kbd> QR Code</p><p><kbd>Shift</kbd> + <kbd>C</kbd> Confetti</p><p><kbd>Shift</kbd> + <kbd>0</kbd> Settings Menu</p><p><kbd>Space</kbd> Start/Pause Timer</p><p><kbd>ESC</kbd> Close Active Screen</p></div>
                 </div>
             </div>
             <div style="display:flex;gap:15px;justify-content:center;margin-top:15px;">
@@ -1325,10 +1326,6 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
     <!-- MAIN DASHBOARD -->
     <div class="dashboard-wrapper">
-        <div id="statusLightBadge" onclick="cycleStatusLightState()" title="Click to cycle: Phones Away / Reference Only / Phones Allowed" style="display:none;position:absolute;bottom:clamp(10px,1.8vh,26px);left:clamp(10px,1.8vw,26px);background:var(--secondary-dark);border:clamp(1px,0.25vw,2px) solid #e53935;padding:clamp(4px,0.7vh,7px) clamp(8px,1vw,11px);border-radius:50px;z-index:50;box-shadow:0 5px 14px rgba(0,0,0,0.6);cursor:pointer;align-items:center;gap:6px;transition:transform 0.2s;">
-            <div id="statusLightDot" style="width:9px;height:9px;border-radius:50%;background:#e53935;flex-shrink:0;box-shadow:0 0 6px #e53935;"></div>
-            <span id="statusLightText" style="color:var(--bg-light);font-weight:900;font-size:clamp(0.55rem,0.7vw,0.7rem);white-space:nowrap;">Phones Away</span>
-        </div>
         <div class="ticker-wrap" onclick="toggleTickerMode()"><div class="ticker-move"><div class="ticker-item" id="dailyMessage">Loading daily message...</div></div></div>
         <div class="top-bar" id="teacherTopBar">
             <div class="pill class-pill" onclick="toggleTrackerModal()"><div class="pill-subtitle" id="classPillSubtitle">Today's Schedule</div><div class="current-class" id="classTitle">Loading...</div></div>
@@ -1346,6 +1343,10 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 <div class="pill action-pill" onclick="toggleSlideMode()"><div class="pill-subtitle">Present</div><div class="widget-text">📺 Slides</div></div>
                 <div class="pill action-pill" onclick="toggleModal('groupModal')"><div class="pill-subtitle">Sort</div><div class="widget-text">👥 Groups</div></div>
                 <div class="pill action-pill" onclick="openWheelModal()"><div class="pill-subtitle">Selector</div><div class="widget-text">🎲 Spin</div></div>
+                <div id="statusLightBadge" class="status-light-badge" onclick="cycleStatusLightState()" title="Click to cycle: Phones Away / Reference Only / Phones Allowed" style="display:none;background:var(--secondary-dark);border:clamp(1px,0.25vw,2px) solid #e53935;padding:clamp(4px,0.7vh,7px) clamp(8px,1vw,11px);border-radius:50px;z-index:50;box-shadow:0 5px 14px rgba(0,0,0,0.6);cursor:pointer;align-items:center;gap:6px;transition:transform 0.2s;">
+                    <div id="statusLightDot" style="width:9px;height:9px;border-radius:50%;background:#e53935;flex-shrink:0;box-shadow:0 0 6px #e53935;"></div>
+                    <span id="statusLightText" style="color:var(--bg-light);font-weight:900;font-size:clamp(0.55rem,0.7vw,0.7rem);white-space:nowrap;">Phones Away</span>
+                </div>
                 <div class="pill clock-pill clock" id="clockDisplay" onclick="toggleModal('examModal')">08:00:00 AM</div>
             </div>
         </div>
@@ -1813,7 +1814,6 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function snoozeBackupReminder() { localStorage.setItem('titan_backup_snooze_until', (Date.now() + 3 * 86400000).toString()); updateBackupReminderUI(); }
         function updateBackupReminderUI() {
             const overdue = isBackupOverdue();
-            const dot = document.getElementById('backupReminderDot'); if (dot) dot.style.display = overdue ? 'block' : 'none';
             const banner = document.getElementById('backupReminderBanner'); if (banner) banner.style.display = overdue ? 'flex' : 'none';
             const statusEl = document.getElementById('lastBackupStatus');
             if (statusEl) { let lastBackup = localStorage.getItem('titan_last_backup_at'); let days = daysSinceLastBackup(); statusEl.innerText = lastBackup ? `Last backup: ${days === 0 ? 'today' : days + ' day' + (days === 1 ? '' : 's') + ' ago'}.` : "You haven't downloaded a backup yet."; }
@@ -1835,7 +1835,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 .then(() => { localStorage.setItem('titan_last_backup_at', Date.now().toString()); localStorage.removeItem('titan_backup_snooze_until'); updateBackupReminderUI(); })
                 .catch(() => { /* silent - network hiccup, will retry next time sendAutoBackup runs */ });
         }
-        setInterval(sendAutoBackup, 15 * 60 * 1000); // checks every 15 min whether 2 hours have actually passed; harmless no-op otherwise
+        setInterval(sendAutoBackup, 15 * 60 * 1000); // checks every 15 min whether a full day has actually passed; harmless no-op otherwise
 
         function testAutoBackupConnection() {
             const statusEl = document.getElementById('autoBackupTestStatus'); if (!statusEl) return;
@@ -1859,7 +1859,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             schedule = [{
                 date: now, forced: false, id: '1', title: 'Intro to the Dashboard', start: 0, end: 1440,
                 eq: 'How can this dashboard help manage our classroom flow and gamify participation?', standards: 'Standard(s): Tech.1.1',
-                warmup: 'Welcome to your new classroom dashboard! \n\nClick the "Expand" button in the top right.',
+                warmup: 'Welcome to your new classroom dashboard! \n\nClick the "Expand" button in the top right.\n\nTwo more worth trying: Shift + Q generates a QR code students can scan for their own agenda + games view, and Shift + L gives you a quick Phones status light.',
                 message: 'Welcome to your customizable classroom dashboard!', ticker: '📈 AAPL: $225.00 (+1.25%) | 📉 TSLA: $210.00 (-0.50%)',
                 resources: 'Example Slide=https://docs.google.com/presentation/d/e/2PACX-1vT5K-9W8x0hA34-0QvE8vA/embed?start=false&loop=false&delayms=3000',
                 agenda: ['Take attendance with Roster', 'Review Warm-Up', 'Play a Mini-Game', 'Independent Work (Zen Mode)'],
