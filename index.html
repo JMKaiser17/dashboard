@@ -1623,6 +1623,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             </div>
 
     <script>
+        // Must be declared first - referenced very early in the init sequence below.
+        const isStudentMode = new URLSearchParams(window.location.search).get('mode') === 'student';
         // Global Game Timer declarations to prevent scope errors
         let ffTimerInterval; 
         let ffTimeLeft = 60; 
@@ -1693,7 +1695,6 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function playDoneChime() { playTone(523.25, 0, 1.5, 0.15); playTone(659.25, 0.2, 1.5, 0.15); playTone(783.99, 0.4, 1.5, 0.15); playTone(1046.50, 0.6, 2.0, 0.15); }
 
         let activeBlockData = null; let lastActiveBlockId = null; let isFocusMode = false; let isSlideMode = false; let isGameStage = false; let activeBoard = 'mainBento'; let isTransitioning = false; let needsDataRender = true; 
-        const isStudentMode = new URLSearchParams(window.location.search).get('mode') === 'student';
         let lastGenuinelyActiveBlock = null;
         let currentSlides = []; let currentSlideIndex = -1; let isMarketTicker = false;
         let gameVaultData = []; let miniGameLists = { hotseat: [], titansays: [], hivemind: [], debate: [], taboo: [], factorfiction: [], bullmarket: [], vault: [] };
