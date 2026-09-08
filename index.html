@@ -1191,7 +1191,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <p style="color:#666;font-size:0.75rem;margin:4px 0 15px 0;">Expects columns: Date, ID, Title, Start, End, EQ, Standards, Warmup, Message, Ticker, Resources, Agenda, Reminders, Roster.</p>
                     <label style="font-weight:bold;color:var(--secondary-dark);font-size:0.9rem;">Game Vault CSV Link</label>
                     <input type="text" id="gameVaultUrlInput" placeholder="https://docs.google.com/spreadsheets/.../pub?output=csv" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--bg-mid);font-family:monospace;font-size:0.9rem;">
-                    <p style="color:#666;font-size:0.75rem;margin:4px 0 0 0;">Expects columns: Status (ACTIVE to show), ID, Type, Title, Category, Prompt, Answer, Value.</p>
+                    <p style="color:#666;font-size:0.75rem;margin:4px 0 0 0;">Expects columns: Status (ACTIVE to show everyone, TEACHER_ONLY to hide just from Student Mode links while keeping it on your own dashboard), ID, Type, Title, Category, Prompt, Answer, Value.</p>
                 </div>
                 <div style="background:var(--bg-light);padding:20px;border-radius:16px;">
                     <h3 style="color:var(--primary-color);margin:0 0 10px 0;font-size:1.2rem;">Theme & Terminology</h3>
@@ -1358,7 +1358,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <span id="studentStatusText" style="color:var(--bg-light);font-weight:bold;font-size:0.85rem;white-space:nowrap;">Phones Away</span>
                 </div>
                 <button onclick="showStudentAgenda()" style="background:var(--bg-light);color:#111;border:2px solid var(--primary-color);padding:10px 22px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;">📋 Today's Plan</button>
-                <button onclick="showStudentGames()" style="background:var(--primary-color);color:#fff;border:2px solid var(--primary-color);padding:10px 22px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;">🎮 Games</button>
+                <button id="studentGamesNavBtn" onclick="showStudentGames()" style="background:var(--primary-color);color:#fff;border:2px solid var(--primary-color);padding:10px 22px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;">🎮 Games</button>
                 <button onclick="showStudentNotes()" style="background:var(--bg-light);color:#111;border:2px solid var(--bg-mid);padding:10px 22px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;">📝 Notes</button>
                 <div class="pill clock-pill clock" id="studentClockDisplay">08:00:00 AM</div>
             </div>
@@ -1677,7 +1677,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             if (watermark) document.documentElement.style.setProperty('--mascot-url', `url('${watermark}')`);
             let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans'; let leaderboard = localStorage.getItem('titan_setting_leaderboard') || 'Titan Cup'; let teacher = localStorage.getItem('titan_setting_teacher') || 'the teacher';
             document.getElementById('dynamicLeaderboardTitle').innerText = `🏆 ${leaderboard} Leaderboard`; document.getElementById('dynamicAskTeacher').innerText = `Then ask ${teacher}.`; document.getElementById('dynamicJeopardyTitle').innerText = `${mascot} Jeopardy`;
-            if(document.getElementById('themePrimary')) { document.getElementById('themePrimary').value = primary; document.getElementById('themeDark').value = dark; document.getElementById('themeLight').value = light; document.getElementById('themeMid').value = mid; document.getElementById('themeBg').value = bg; document.getElementById('themeGlow').value = glow; document.getElementById('settingMascot').value = mascot; document.getElementById('settingLeaderboard').value = leaderboard; document.getElementById('settingTeacher').value = teacher; document.getElementById('settingWatermark').value = watermark === 'SouthGarner_Titans_Logo1.png' ? '' : watermark; document.getElementById('settingMuteSounds').checked = isSoundMuted(); document.getElementById('settingHotSeatTime').value = getGameTimerSetting('hotseat_time', 45); document.getElementById('settingFFTime').value = getGameTimerSetting('ff_time', 60); document.getElementById('settingDebateTime').value = getGameTimerSetting('debate_time', 60); }
+            if(document.getElementById('themePrimary')) { document.getElementById('themePrimary').value = primary; document.getElementById('themeDark').value = dark; document.getElementById('themeLight').value = light; document.getElementById('themeMid').value = mid; document.getElementById('themeBg').value = bg; document.getElementById('themeGlow').value = glow; document.getElementById('settingMascot').value = mascot; document.getElementById('settingLeaderboard').value = leaderboard; document.getElementById('settingTeacher').value = teacher; document.getElementById('settingWatermark').value = watermark === 'SouthGarner_Titans_Logo1.png' ? '' : watermark; document.getElementById('settingMuteSounds').checked = isSoundMuted(); document.getElementById('settingHotSeatTime').value = getGameTimerSetting('hotseat_time', 45); document.getElementById('settingFFTime').value = getGameTimerSetting('ff_time', 60); document.getElementById('settingDebateTime').value = getGameTimerSetting('debate_time', 60);
+            }
         }
         loadThemeSettings();
         if (isStudentMode) { document.getElementById('teacherTopBar').style.display = 'none'; document.getElementById('studentTopBar').style.display = 'flex'; document.body.classList.add('student-mode'); startLiveStatePolling(); }
@@ -1930,7 +1931,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function parseGameVault(csvText) {
             gameVaultData = [];
             parseCsv(csvText).forEach(row => {
-                if (getCol(row, 'Status').toUpperCase() !== 'ACTIVE') return;
+                const status = getCol(row, 'Status').toUpperCase();
+                if (status !== 'ACTIVE' && status !== 'TEACHER_ONLY') return; // neither recognized active status - skip entirely
+                if (isStudentMode && status === 'TEACHER_ONLY') return; // student devices never receive this row at all - protects every downstream use (decks, boards, questions), not just the hub tile
                 gameVaultData.push({ id: getCol(row, 'ID'), type: getCol(row, 'Type').toLowerCase(), title: getCol(row, 'Title'), pack: getCol(row, 'Pack'), category: getCol(row, 'Category'), prompt: getCol(row, 'Prompt'), answer: getCol(row, 'Answer'), value: getCol(row, 'Value') });
             });
             if(isGameStage) buildDynamicGameMenu();
