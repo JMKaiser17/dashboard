@@ -1338,16 +1338,16 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 <div class="widget-text" id="staleDataText" style="color:#8b0000;font-size:clamp(0.75rem,1vw,1.1rem);">⚠️ Showing Cached Data</div>
             </div>
             <div id="topSourceTabs"></div>
+            <div id="statusLightBadge" class="status-light-badge" onclick="cycleStatusLightState()" title="Click to cycle: Phones Away / Reference Only / Phones Allowed" style="display:none;background:var(--secondary-dark);border:clamp(1px,0.25vw,2px) solid #e53935;padding:clamp(4px,0.7vh,7px) clamp(8px,1vw,11px);border-radius:50px;z-index:50;box-shadow:0 5px 14px rgba(0,0,0,0.6);cursor:pointer;align-items:center;gap:6px;transition:transform 0.2s;flex-shrink:0;">
+                <div id="statusLightDot" style="width:9px;height:9px;border-radius:50%;background:#e53935;flex-shrink:0;box-shadow:0 0 6px #e53935;"></div>
+                <span id="statusLightText" style="color:var(--bg-light);font-weight:900;font-size:clamp(0.55rem,0.7vw,0.7rem);white-space:nowrap;">Phones Away</span>
+            </div>
             <div class="right-pills">
                 <div class="pill action-pill" onclick="toggleModal('timerModal')"><div class="pill-subtitle">Countdown</div><div class="widget-text sync-timer" style="color:var(--primary-color);">00:00</div></div>
                 <div class="pill action-pill" onclick="toggleSlideMode()"><div class="pill-subtitle">Present</div><div class="widget-text">📺 Slides</div></div>
                 <div class="pill action-pill" onclick="toggleModal('groupModal')"><div class="pill-subtitle">Sort</div><div class="widget-text">👥 Groups</div></div>
                 <div class="pill action-pill" onclick="openWheelModal()"><div class="pill-subtitle">Selector</div><div class="widget-text">🎲 Spin</div></div>
-                <div id="statusLightBadge" class="status-light-badge" onclick="cycleStatusLightState()" title="Click to cycle: Phones Away / Reference Only / Phones Allowed" style="display:none;background:var(--secondary-dark);border:clamp(1px,0.25vw,2px) solid #e53935;padding:clamp(4px,0.7vh,7px) clamp(8px,1vw,11px);border-radius:50px;z-index:50;box-shadow:0 5px 14px rgba(0,0,0,0.6);cursor:pointer;align-items:center;gap:6px;transition:transform 0.2s;">
-                    <div id="statusLightDot" style="width:9px;height:9px;border-radius:50%;background:#e53935;flex-shrink:0;box-shadow:0 0 6px #e53935;"></div>
-                    <span id="statusLightText" style="color:var(--bg-light);font-weight:900;font-size:clamp(0.55rem,0.7vw,0.7rem);white-space:nowrap;">Phones Away</span>
-                </div>
-                <div class="pill clock-pill clock" id="clockDisplay" onclick="toggleModal('examModal')">08:00:00 AM</div>
+            <div class="pill clock-pill clock" id="clockDisplay" onclick="toggleModal('examModal')">08:00:00 AM</div>
             </div>
         </div>
         <div class="top-bar" id="studentTopBar" style="display:none;">
