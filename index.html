@@ -1436,16 +1436,16 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                 <p id="manualRecapStatus" style="color:var(--gray-600);font-size:0.85rem;margin:10px 0 0 0;min-height:1.2em;"></p>
             </div>
             <div class="ui-box-6" style="background:var(--bg-light);border-radius:var(--radius-md);">
-                <h3 class="ui-heading-2" style="color:var(--primary-color);font-size:1.2rem;">☁️ Auto Backup (optional)</h3>
-                <p class="ui-text-2" style="color:var(--gray-500);font-size:0.8rem;">Connects to a small script on your own spreadsheet that silently saves your theme, settings, and sheet URLs about once a day. Doesn't include attendance, scores, or notes - use the manual backup below or the Class Recap PDF for those. Leave blank to keep using manual backups only.</p>
+                <h3 class="ui-heading-2" style="color:var(--primary-color);font-size:1.2rem;">☁️ Live Sync (optional)</h3>
+                <p class="ui-text-2" style="color:var(--gray-500);font-size:0.8rem;">Connects to a small script (Code.gs) on your own spreadsheet so Student Mode devices see your phone status, timer, and notes, and Reinforcement Lab scores reach your scoreboard. Leave blank if you don't use those.</p>
                 <div style="display:grid;grid-template-columns:2fr 1fr;gap:15px;">
                     <div>
-                        <label style="font-weight:bold;color:var(--secondary-dark);font-size:0.9rem;">Backup Web App URL</label>
+                        <label style="font-weight:bold;color:var(--secondary-dark);font-size:0.9rem;">Live Sync Web App URL</label>
                         <input type="text" id="autoBackupUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="ui-field-1" style="width:100%;border-radius:var(--radius-sm);border:2px solid var(--bg-mid);font-family:monospace;font-size:0.9rem;">
                     </div>
                     <div>
                         <label style="font-weight:bold;color:var(--secondary-dark);font-size:0.9rem;">Secret Token</label>
-                        <input type="text" id="autoBackupTokenInput" placeholder="matches BACKUP_SECRET" class="ui-field-1" style="width:100%;border-radius:var(--radius-sm);border:2px solid var(--bg-mid);font-family:monospace;font-size:0.9rem;">
+                        <input type="text" id="autoBackupTokenInput" placeholder="matches BACKUP_SECRET in Code.gs" class="ui-field-1" style="width:100%;border-radius:var(--radius-sm);border:2px solid var(--bg-mid);font-family:monospace;font-size:0.9rem;">
                     </div>
                 </div>
                 <div style="display:flex;align-items:center;gap:12px;margin-top:12px;">
@@ -1466,15 +1466,11 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                 <button onclick="toggleModal('settingsModal')" class="close-btn" style="margin-top:0;padding:12px 30px;font-size:1.2rem;">Cancel</button>
             </div>
             <div style="border-top:2px solid var(--bg-mid);margin-top:15px;padding-top:15px;text-align:center;">
-                <div id="backupReminderBanner" style="display:none;background:#fff3cd;color:var(--amber-900);border:2px solid #ffca28;border-radius:var(--radius-md);padding:10px 16px;margin-bottom:12px;align-items:center;justify-content:space-between;gap:10px;text-align:left;">
-                    <span>⚠️ It's been a while since your last backup — download one to protect your points, attendance, and settings.</span>
-                    <button onclick="snoozeBackupReminder()" style="background:transparent;border:1.5px solid var(--amber-900);color:var(--amber-900);padding:5px 14px;border-radius:var(--radius-lg);cursor:pointer;font-weight:bold;font-size:0.85rem;white-space:nowrap;">Remind me later</button>
-                </div>
-                <p style="color:var(--gray-600);font-size:0.9rem;margin:0 0 4px 0;">Backup saves your custom theme, URLs, class points, and attendance data.</p>
+                <p style="color:var(--gray-600);font-size:0.9rem;margin:0 0 4px 0;">The settings file copies your theme, settings, sheet links, and Live Sync secret to another computer. It doesn't include points or attendance (the Class Recap PDF covers those). Keep it private, since it contains your secret.</p>
                 <p id="lastBackupStatus" class="ui-heading-2" style="color:var(--gray-600);font-size:0.8rem;font-style:italic;"></p>
                 <div style="display:flex;gap:12px;justify-content:center;">
-                    <button onclick="downloadBackup()" class="ui-btn-5" style="background:var(--primary-color);color:var(--white);border:none;border-radius:var(--radius-md);font-weight:bold;font-size:1rem;box-shadow:var(--shadow-sm);">⬇️ Download Backup File</button>
-                    <button onclick="document.getElementById('restoreFileInput').click()" class="ui-btn-5" style="background:var(--bg-light);color:var(--ink);border:2px solid var(--bg-mid);border-radius:var(--radius-md);font-weight:bold;font-size:1rem;box-shadow:var(--shadow-sm);">⬆️ Restore from File</button>
+                    <button onclick="downloadBackup()" class="ui-btn-5" style="background:var(--primary-color);color:var(--white);border:none;border-radius:var(--radius-md);font-weight:bold;font-size:1rem;box-shadow:var(--shadow-sm);">⬇️ Download Settings File</button>
+                    <button onclick="document.getElementById('restoreFileInput').click()" class="ui-btn-5" style="background:var(--bg-light);color:var(--ink);border:2px solid var(--bg-mid);border-radius:var(--radius-md);font-weight:bold;font-size:1rem;box-shadow:var(--shadow-sm);">⬆️ Load Settings File</button>
                     <input type="file" id="restoreFileInput" accept="application/json" style="display:none;" onchange="restoreBackup(this)">
                 </div>
             </div>
@@ -2287,12 +2283,12 @@ html[data-board-style="atoms"] .dashboard-wrapper {
 
         const DASHBOARD_STORAGE_PREFIXES = ['titan_', 'classPoints_', 'checklist_'];
         const LIGHT_BACKUP_KEYS = [
-            'titan_setting_primary', 'titan_setting_dark', 'titan_setting_light', 'titan_setting_mid', 'titan_setting_bg', 'titan_setting_glow',
+            'titan_setting_primary', 'titan_setting_dark', 'titan_setting_light', 'titan_setting_mid', 'titan_setting_board_style',
             'titan_setting_mascot', 'titan_setting_watermark', 'titan_setting_teacher', 'titan_setting_leaderboard',
             'titan_setting_muted', 'titan_setting_hotseat_time', 'titan_setting_ff_time', 'titan_setting_debate_time',
             'titan_sheet_url', 'titan_game_url', 'titan_autobackup_url', 'titan_autobackup_token',
         ];
-        // ==================== BACKUP & RESTORE (manual download + Apps Script auto-backup) ====================
+        // ==================== SETTINGS FILE (manual download / load) ====================
         function isDashboardStorageKey(key) { return DASHBOARD_STORAGE_PREFIXES.some(prefix => key.startsWith(prefix)); }
         function collectDashboardBackupData_() {
             // Deliberately narrow: theme/settings/config only. Restore (below) stays broad and can still
@@ -2301,8 +2297,8 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         }
         function downloadBackup() {
             const payload = { source: 'Classroom Dashboard Backup', exportedAt: new Date().toISOString(), data: collectDashboardBackupData_() };
-            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `dashboard-backup-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-            store.setItem('titan_last_backup_at', Date.now().toString()); store.removeItem('titan_backup_snooze_until'); updateBackupReminderUI();
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `dashboard-settings-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+            store.setItem('titan_last_backup_at', Date.now().toString()); updateBackupReminderUI();
         }
         function restoreBackup(fileInput) {
             const file = fileInput.files && fileInput.files[0]; if (!file) return; const reader = new FileReader();
@@ -2310,8 +2306,8 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                 let payload; try { payload = JSON.parse(e.target.result); } catch (err) { alert("Couldn't read that file."); fileInput.value = ''; return; }
                 const data = payload && payload.data ? payload.data : payload; const keys = Object.keys(data || {}).filter(isDashboardStorageKey);
                 if (keys.length === 0) { alert("No dashboard data found."); fileInput.value = ''; return; }
-                if (!confirm(`Overwrite ${keys.length} items with backup?`)) { fileInput.value = ''; return; }
-                keys.forEach(key => store.setItem(key, data[key])); alert("Backup restored! Reloading..."); location.reload();
+                if (!confirm(`Replace ${keys.length} settings on this computer with the ones in this file?`)) { fileInput.value = ''; return; }
+                keys.forEach(key => store.setItem(key, data[key])); alert("Settings loaded! Reloading..."); location.reload();
             }; reader.readAsText(file);
         }
 
@@ -2319,54 +2315,32 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function checkFirstRun() { if (isStudentMode) return; if (!store.getItem('titan_onboarding_seen') && !getActiveCsvUrl()) { document.getElementById('onboardingModal').classList.add('active'); } }
         function dismissOnboarding(openSettingsAfter) { store.setItem('titan_onboarding_seen', '1'); document.getElementById('onboardingModal').classList.remove('active'); if (openSettingsAfter) openSettingsModal(); }
 
-        // --- Backup reminder ---
+        // --- Settings file (manual download / load) ---
         function ensureFirstUseTimestamp() { if (!store.getItem('titan_first_used_at')) store.setItem('titan_first_used_at', Date.now().toString()); }
         function daysSinceLastBackup() {
             let baseline = store.getItem('titan_last_backup_at') || store.getItem('titan_first_used_at'); if (!baseline) return 0;
             return Math.floor((Date.now() - parseInt(baseline, 10)) / 86400000);
         }
-        function isBackupOverdue() {
-            let snoozeUntil = parseInt(store.getItem('titan_backup_snooze_until') || '0', 10); if (Date.now() < snoozeUntil) return false;
-            return daysSinceLastBackup() >= 7;
-        }
-        function snoozeBackupReminder() { store.setItem('titan_backup_snooze_until', (Date.now() + 3 * 86400000).toString()); updateBackupReminderUI(); }
-        function updateBackupReminderUI() {
-            const overdue = isBackupOverdue();
-            const banner = document.getElementById('backupReminderBanner'); if (banner) banner.style.display = overdue ? 'flex' : 'none';
-            const statusEl = document.getElementById('lastBackupStatus');
-            if (statusEl) { let lastBackup = store.getItem('titan_last_backup_at'); let days = daysSinceLastBackup(); statusEl.innerText = lastBackup ? `Last backup: ${days === 0 ? 'today' : days + ' day' + (days === 1 ? '' : 's') + ' ago'}.` : "You haven't downloaded a backup yet."; }
+        function updateBackupReminderUI() { // just the "last downloaded" note under the settings-file buttons
+            const statusEl = document.getElementById('lastBackupStatus'); if (!statusEl) return;
+            const last = store.getItem('titan_last_backup_at'); const days = daysSinceLastBackup();
+            statusEl.innerText = last ? `Settings file last downloaded ${days === 0 ? 'today' : days + ' day' + (days === 1 ? '' : 's') + ' ago'}.` : '';
         }
 
-        // --- Auto Backup (sends to your own Apps Script Web App, if configured) ---
-        function sendAutoBackup() {
-            const url = getAutoBackupUrl(); if (!url) return; // not configured - manual backups remain the only path, by design
-            const lastBackup = parseInt(store.getItem('titan_last_backup_at') || '0', 10);
-            const backupIntervalMs = 24 * 60 * 60 * 1000; // once a day - settings/theme data rarely changes
-            if (Date.now() - lastBackup < backupIntervalMs) return; // not due yet - keeps a page reload from re-sending early
-            const payload = JSON.stringify({ token: getAutoBackupToken(), data: collectDashboardBackupData_() });
-            // Apps Script Web Apps don't support CORS preflight for POST, so this must be a
-            // "simple request" (text/plain, no-cors). That means we can't read the response -
-            // we only know the browser was able to reach the URL, not that the sheet actually
-            // updated. That's why the manual backup button and reminder banner stay in place
-            // as a fallback: this is a nice-to-have layer on top, not a replacement.
-            fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
-                .then(() => { store.setItem('titan_last_backup_at', Date.now().toString()); store.removeItem('titan_backup_snooze_until'); updateBackupReminderUI(); })
-                .catch(() => { /* silent - network hiccup, will retry next time sendAutoBackup runs */ });
-        }
-        setInterval(sendAutoBackup, 15 * 60 * 1000); // checks every 15 min whether a full day has actually passed; harmless no-op otherwise
 
         function testAutoBackupConnection() {
             const statusEl = document.getElementById('autoBackupTestStatus'); if (!statusEl) return;
             const url = document.getElementById('autoBackupUrlInput').value.trim(); const token = document.getElementById('autoBackupTokenInput').value.trim();
-            if (!url || !token) { statusEl.style.color = '#d32f2f'; statusEl.innerText = 'Enter both the URL and token first.'; return; }
-            statusEl.style.color = '#555'; statusEl.innerText = 'Testing...';
-            fetch(url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(token))
+            if (!url || !token) { statusEl.style.color = 'var(--red-700)'; statusEl.innerText = 'Enter both the URL and the secret first.'; return; }
+            statusEl.style.color = 'var(--gray-600)'; statusEl.innerText = 'Testing...';
+            fetch(url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(token) + '&action=liveState')
                 .then(res => res.json())
                 .then(json => {
-                    if (json && json.ok) { statusEl.style.color = '#2e7d32'; statusEl.innerText = json.timestamp ? `Connected! Last backup on file: ${new Date(json.timestamp).toLocaleString()}.` : 'Connected! No backups saved yet - that\'s normal before the first one runs.'; }
-                    else { statusEl.style.color = '#d32f2f'; statusEl.innerText = 'Reached the script, but it reported: ' + (json && json.error ? json.error : 'unknown error') + '. Check the token matches BACKUP_SECRET.'; }
+                    if (json && json.ok) { statusEl.style.color = 'var(--green-700)'; statusEl.innerText = 'Connected! Live Sync is ready.'; }
+                    else { const err = json && json.error ? String(json.error) : 'unknown error'; statusEl.style.color = 'var(--red-700)';
+                        statusEl.innerText = /^setup/.test(err) ? 'The script still has the placeholder secret. Set BACKUP_SECRET in Code.gs, then redeploy.' : err === 'unauthorized' ? "The secret doesn't match BACKUP_SECRET in Code.gs." : 'Reached the script, but it reported: ' + err; }
                 })
-                .catch(() => { statusEl.style.color = '#d32f2f'; statusEl.innerText = 'Could not reach that URL. Double-check the deployment is set to "Anyone" access and the URL is correct.'; });
+                .catch(() => { statusEl.style.color = 'var(--red-700)'; statusEl.innerText = 'Could not reach that URL. Check the deployment is set to "Anyone" access and the URL ends in /exec.'; });
         }
 
         // ==================== SCHEDULE DATA LOADING & CSV PARSING ====================
@@ -4188,7 +4162,6 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             loadThemeSettings();
             if (isStudentMode) { document.getElementById('teacherTopBar').style.display = 'none'; document.getElementById('studentTopBar').style.display = 'flex'; document.body.classList.add('student-mode'); startLiveStatePolling(); }
             ensureFirstUseTimestamp(); updateBackupReminderUI(); checkFirstRun();
-            setTimeout(sendAutoBackup, 30000); // attempts shortly after load (safe - sendAutoBackup no-ops if not due yet), then re-checked every 15 min
             fetchAgendaData(); fetchGameVaultData(); setInterval(updateDashboard, 1000); setInterval(fetchAgendaData, 60000);
             loadTimerState();
         }
