@@ -1207,7 +1207,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                         <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Mascot/Greeting</label><input type="text" id="settingMascot" value="" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--bg-mid);"></div>
                         <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Leaderboard</label><input type="text" id="settingLeaderboard" value="" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--bg-mid);"></div>
-                        <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Teacher Name</label><input type="text" id="settingTeacher" placeholder="Mr. Kaiser" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--bg-mid);"></div>
+                        <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Teacher Name</label><input type="text" id="settingTeacher" placeholder="e.g. Ms. Rivera" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--bg-mid);"></div>
                         <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Watermark URL</label><input type="text" id="settingWatermark" placeholder="https://..." style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--bg-mid);font-family:monospace;font-size:0.8rem;"></div>
                     </div>
                 </div>
@@ -2114,8 +2114,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         // Sticky columns inherit from the most recent earlier row with the same ID when left blank.
         // Daily columns never inherit: a stale warm-up on the board is worse than an empty one.
         // Typing "none" in a sticky cell clears it; "none" in Title retires that class.
-        const SCHEDULE_STICKY_COLS = ['Title', 'Start', 'End', 'Roster', 'EQ', 'Standards', 'Resources'];
-        const SCHEDULE_DAILY_COLS = ['Warmup', 'Message', 'Ticker', 'Agenda', 'Reminders'];
+        const SCHEDULE_STICKY_COLS = ['Title', 'Start', 'End', 'Roster', 'EQ', 'Standards', 'Resources', 'Ticker'];
+        const SCHEDULE_DAILY_COLS = ['Warmup', 'Agenda', 'Reminders', 'Message'];
         // Row numbers match the sheet: parsed WITHOUT skipping blank lines (a blank sheet row still exports as ",,,"),
         // so record i is sheet row i + 2 (row 1 is the header).
         function readScheduleEntries(csvText, issues) {
@@ -2156,7 +2156,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             let t;
             let block = { date: new Date(date.getTime()), forced: !!forced, carried: !!carried, id: id, title: sticky.Title || 'Class Block', start: 0, end: 0,
                 eq: sticky.EQ || '', standards: sticky.Standards ? `Standard(s): ${sticky.Standards}` : "", resources: sticky.Resources || '',
-                warmup: daily.Warmup || '', message: daily.Message || '', ticker: daily.Ticker || '', agenda: [], reminders: [], roster: [] };
+                warmup: daily.Warmup || '', message: daily.Message || '', ticker: sticky.Ticker || '', agenda: [], reminders: [], roster: [] };
             t = parseSheetTime(sticky.Start || ''); if (t !== null) block.start = t;
             t = parseSheetTime(sticky.End || ''); if (t !== null) block.end = t;
             if (sticky.Roster) block.roster = sticky.Roster.split(',').map(s => s.trim()).filter(s => s !== "");
