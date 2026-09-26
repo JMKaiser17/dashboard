@@ -1355,10 +1355,53 @@ html[data-board-style="atoms"] .dashboard-wrapper {
 .ui-btn-14{padding:20px 40px;cursor:pointer;flex:1 1 200px;max-width:300px;}
 .ui-btn-15{padding:15px 25px;cursor:pointer;}
 .ui-box-22{flex-direction:column;align-items:center;gap:14px;text-align:center;max-width:560px;}
+
+        /* ---- Opening mode (warm-up + check-in) ---- */
+        #openingModeBoard { display:none; flex-grow:1; min-height:0; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:clamp(10px,1.5vw,24px); }
+        #openingModeBoard.no-checkin { grid-template-columns:minmax(0,1fr); }
+        #openingModeBoard.no-checkin .card-checkin { display:none; }
+        #openingModeBoard .card-checkin { overflow:hidden; }
+        .opening-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-shrink:0; }
+        .opening-head h2 { margin-bottom:6px; }
+        .opening-head-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+        .opening-bar { display:flex; align-items:center; flex-wrap:wrap; gap:clamp(8px,1vw,16px); margin:0 0 clamp(10px,1.6vh,22px) 0; padding-bottom:clamp(8px,1.2vh,16px); border-bottom:2px solid rgba(var(--primary-rgb),0.18); flex-shrink:0; }
+        .opening-timer { font-size:clamp(2.4rem,4.6vw,5.8rem); font-weight:800; line-height:1; color:var(--primary-color); font-variant-numeric:tabular-nums; letter-spacing:-1px; }
+        .opening-timer.is-idle { opacity:0.35; }
+        .opening-controls { display:flex; gap:8px; flex-wrap:wrap; }
+        .opening-controls button, .opening-chip, .timer-return-chip { font-family:'Poppins',sans-serif; font-size:clamp(0.8rem,0.95vw,1.05rem); font-weight:700; color:var(--primary-color); background:var(--bg-light); border:2px solid rgba(var(--primary-rgb),0.35); border-radius:var(--radius-pill); padding:6px 14px; cursor:pointer; }
+        .opening-controls button:hover, .opening-chip:hover { background:var(--bg-mid); }
+        .opening-controls .opening-primary { background:var(--primary-color); color:var(--white); border-color:var(--primary-color); }
+        .opening-controls button:focus-visible, .opening-chip:focus-visible, .timer-return-chip:focus-visible, .checkin-tile:focus-visible { outline:3px solid var(--primary-color); outline-offset:2px; }
+        #openingWarmupText { font-size:clamp(1.9rem,3.3vw,4.6rem); line-height:1.35; }
+        .timer-return-row { display:flex; justify-content:center; margin-top:10px; }
+        .opening-bar .timer-return-row { margin-top:0; margin-left:auto; }
+        .timer-return-chip { display:inline-flex; align-items:center; gap:8px; background:transparent; }
+        .timer-return-chip .chip-dot { width:0.8em; height:0.8em; border-radius:var(--radius-round); border:2px solid currentColor; flex-shrink:0; }
+        .timer-return-chip.is-on { background:var(--primary-color); color:var(--white); border-color:var(--primary-color); }
+        .timer-return-chip.is-on .chip-dot { background:currentColor; }
+        .zen-timer-core .timer-return-row { width:100%; }
+        .game-timer-card .timer-return-chip { color:var(--bg-light); border-color:rgba(255,255,255,0.45); }
+        .game-timer-card .timer-return-chip.is-on { background:var(--bg-light); color:var(--ink); border-color:var(--bg-light); }
+        .checkin-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-shrink:0; }
+        .checkin-head h2 { margin-bottom:4px; }
+        .checkin-count { font-size:clamp(1rem,1.4vw,1.7rem); font-weight:800; color:var(--primary-color); white-space:nowrap; font-variant-numeric:tabular-nums; }
+        .card .checkin-hint { font-size:clamp(0.95rem,1.25vw,1.5rem); color:var(--gray-600); margin:0 0 clamp(8px,1.2vh,16px) 0; flex-shrink:0; }
+        .checkin-grid { flex:1 1 auto; min-height:0; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(7em,1fr)); grid-auto-rows:minmax(2.6em,auto); gap:clamp(6px,0.7vw,12px); align-content:start; font-size:clamp(0.95rem,1.25vw,1.5rem); padding:2px; }
+        .checkin-tile { font-family:'Poppins',sans-serif; font-size:1em; font-weight:700; text-align:left; color:var(--ink); background:var(--white); border:2px solid rgba(var(--primary-rgb),0.25); border-radius:var(--radius-lg); padding:0.4em 0.6em; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; transition:background-color 0.15s,color 0.15s,border-color 0.15s; }
+        .checkin-tile.is-here { background:var(--primary-color); border-color:var(--primary-color); color:var(--white); }
+        .checkin-mark { margin-right:0.35em; }
+        /* Time's up: a slanted band in the class color crosses the screen, the board swaps underneath, and it exits the far side */
+        #timesUpSweep { position:fixed; top:0; bottom:0; left:-20vw; width:140vw; z-index:100000; pointer-events:none; display:none; align-items:center; justify-content:center;
+            background:linear-gradient(100deg,var(--board-grad-start) 0%,var(--primary-color) 45%,var(--board-grad-end) 100%); transform:translateX(-110%) skewX(-12deg); }
+        #timesUpSweep span { transform:skewX(12deg); font-family:'Poppins',sans-serif; font-weight:800; font-size:clamp(3rem,9vw,10rem); color:var(--white); letter-spacing:-2px; text-shadow:0 6px 30px rgba(0,0,0,0.35); }
+        #timesUpSweep.run { display:flex; animation:timesUpSweep 1.6s cubic-bezier(.7,0,.3,1) forwards; }
+        @keyframes timesUpSweep { 0% { transform:translateX(-110%) skewX(-12deg); } 24% { transform:translateX(0) skewX(-12deg); } 68% { transform:translateX(0) skewX(-12deg); } 100% { transform:translateX(110%) skewX(-12deg); } }
+        @media (prefers-reduced-motion: reduce) { #timesUpSweep.run { animation:none; display:none; } .checkin-tile { transition:none; } }
 </style>
 </head>
 <body>
-    <div id="floatingTimer" class="sync-timer" onclick="toggleModal('timerModal')" title="Open Timer">00:00</div>
+    <div id="timesUpSweep" aria-hidden="true"><span>Time's up</span></div>
+<div id="floatingTimer" class="sync-timer" onclick="toggleModal('timerModal')" title="Open Timer">00:00</div>
     <div id="coldCallToast">Student Name</div>
     <div id="dailyDoubleOverlay"><h1>Daily<br>Double!</h1></div>
 
@@ -1495,7 +1538,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         </div>
     </div>
 
-    <div class="modal" id="timerModal"><div class="leaderboard-wrapper ui-box-8" style="max-width:650px;"><h1 class="lb-header">⏱️ Class Timer</h1><div class="timer-display sync-timer" style="font-size:clamp(4.5rem,8vw,8.5rem);margin:20px 0;color:var(--secondary-dark);">00:00</div><div class="progress-bar-container" style="height:20px;margin-bottom:25px;background-color:var(--bg-mid);"><div class="progress-bar sync-progress" style="background-color:var(--primary-color);"></div></div><div class="timer-controls" style="display:flex;gap:12px;margin-bottom:10px;width:100%;"><button onclick="addTime(0.5)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">+30s</button><button onclick="addTime(1)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">+1m</button><button onclick="addTime(5)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">+5m</button><button onclick="toggleTimer()" class="action-btn sync-btn-start" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">Start</button><button onclick="clearTimer()" class="stop-btn" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">Clear</button></div><button class="close-btn" onclick="toggleModal('timerModal')" style="margin-top:15px;">Run in Background</button></div></div>
+    <div class="modal" id="timerModal"><div class="leaderboard-wrapper ui-box-8" style="max-width:650px;"><h1 class="lb-header">⏱️ Class Timer</h1><div class="timer-display sync-timer" style="font-size:clamp(4.5rem,8vw,8.5rem);margin:20px 0;color:var(--secondary-dark);">00:00</div><div class="progress-bar-container" style="height:20px;margin-bottom:25px;background-color:var(--bg-mid);"><div class="progress-bar sync-progress" style="background-color:var(--primary-color);"></div></div><div class="timer-controls" style="display:flex;gap:12px;margin-bottom:10px;width:100%;"><button onclick="addTime(0.5)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">+30s</button><button onclick="addTime(1)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">+1m</button><button onclick="addTime(5)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">+5m</button><button onclick="toggleTimer()" class="action-btn sync-btn-start" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">Start</button><button onclick="clearTimer()" class="stop-btn" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">Clear</button></div><div class="timer-return-row"><button type="button" class="timer-return-chip" aria-pressed="false" onclick="toggleTimerReturn()" title="When this timer ends, go back to the main board"><span class="chip-dot" aria-hidden="true"></span>↩ Back to main when done</button></div><button class="close-btn" onclick="toggleModal('timerModal')" style="margin-top:15px;">Run in Background</button></div></div>
     <div class="modal" id="pointsModal"><div class="leaderboard-wrapper"><h1 class="lb-header" id="dynamicLeaderboardTitle">🏆 Class Cup Leaderboard</h1><div class="lb-current-class" id="pointsControlSection"><div class="lb-current-info" style="min-width:0;flex:1;"><h2>Active Period</h2><h3 id="currentClassPointsTitle">Loading...</h3></div><div style="display:flex;align-items:center;gap:12px;flex-shrink:0;"><div class="lb-score-display" id="classPointsDisplay">0</div><div class="lb-controls"><button class="btn-sub" onclick="updatePoints(-1)">-</button><button class="btn-add" onclick="updatePoints(1)">+</button></div></div></div><div class="lb-chart" id="leaderboardContainer"></div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;"><div class="ui-box-9" style="display:flex;"><button onclick="resetAllPoints()" class="ui-btn-5" style="background:transparent;color:var(--secondary-dark);border:2px solid var(--secondary-dark);font-size:1.1rem;border-radius:var(--radius-lg);font-weight:bold;">Reset Scores</button><button id="pointsUndoBtn" onclick="undoLastPointsChange()" class="ui-btn-5" style="display:none;background:transparent;color:var(--primary-color);border:2px solid var(--primary-color);font-size:1.1rem;border-radius:var(--radius-lg);font-weight:bold;">↩️ Undo</button></div><button class="close-btn" onclick="togglePointsModal()" style="margin:0;padding:10px 25px;font-size:1.2rem;">Close</button></div></div></div>
     <div class="modal" id="wheelModal"><h1 id="wheelWinnerDisplay" class="ui-box-8" style="font-size:clamp(2.5rem,4vw,4.5rem);margin:0 0 20px 0;width:100%;">SPIN THE WHEEL</h1><div class="wheel-container" onclick="executeSpin()"><div class="wheel-pointer">▼</div><div class="wheel" id="spinningWheel"></div></div><div style="display:flex;gap:15px;margin-top:clamp(15px,2vh,25px);justify-content:center;flex-wrap:wrap;"><button id="wheelToggleBtn" onclick="toggleWheelMode()" class="ui-btn-6" style="background:var(--primary-color);color:var(--white);border:2px solid var(--white);font-size:clamp(1.1rem,1.5vw,1.8rem);border-radius:var(--radius-pill);font-weight:bold;box-shadow:var(--shadow-md);">Mode: Students</button><button onclick="resetWheelPicks()" class="ui-btn-6" style="background:var(--secondary-dark);color:var(--bg-light);border:2px solid var(--primary-color);font-size:clamp(1.1rem,1.5vw,1.8rem);border-radius:var(--radius-pill);font-weight:bold;box-shadow:var(--shadow-md);">Reset Picks</button><button class="close-btn" onclick="closeWheelModal()" style="margin-top:0;">Close</button></div></div>
     <div class="modal" id="qrModal"><div class="leaderboard-wrapper ui-box-8" style="max-width:700px;">
@@ -1587,7 +1630,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         
         <div class="bento-grid" id="mainBento">
             <div class="card card-agenda"><h2>Today's Agenda</h2><ul id="agendaItems"><li>Loading data...</li></ul></div>
-            <div class="card card-warmup"><h2 class="expandable-title" onclick="toggleWarmupModal()"><span>Warm-Up Activity</span><span class="expand-badge">⛶ Expand</span></h2><p id="warmupText" style="white-space:pre-wrap;">Loading data...</p></div>
+            <div class="card card-warmup"><h2 class="expandable-title" onclick="expandWarmup()"><span>Warm-Up Activity</span><span class="expand-badge">⛶ Expand</span></h2><p id="warmupText" style="white-space:pre-wrap;">Loading data...</p></div>
             <div class="card-bottom-split">
                 <div class="sub-card"><h3>Essential Question</h3><p id="eqText">Loading data...</p></div>
                 <div class="sub-card"><h3>Standards</h3><p id="standardsText">Loading data...</p></div>
@@ -1606,7 +1649,22 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                     <div class="zen-timer-display sync-timer">00:00</div>
                     <div class="zen-progress-bg"><div class="zen-progress-bar sync-progress"></div></div>
                     <div class="zen-timer-controls"><button onclick="addTime(0.5)">+30s</button><button onclick="addTime(1)">+1m</button><button onclick="addTime(5)">+5m</button><button onclick="toggleTimer()" class="action-btn sync-btn-start">Start</button><button onclick="clearTimer()" class="stop-btn">Clear</button></div>
+                    <div class="timer-return-row"><button type="button" class="timer-return-chip" aria-pressed="false" onclick="toggleTimerReturn()" title="When this timer ends, go back to the main board"><span class="chip-dot" aria-hidden="true"></span>↩ Back to main when done</button></div>
                 </div>
+            </div>
+        </div>
+
+        <div id="openingModeBoard">
+            <div class="card card-checkin" id="checkinCard"><div class="checkin-head"><h2>Check In</h2><span class="checkin-count" id="checkinCount"></span></div><p class="checkin-hint">Tap your name when you walk in.</p><div class="checkin-grid" id="checkinGrid"></div></div>
+            <div class="card opening-warmup-card">
+                <div class="opening-head"><h2>Warm-Up Activity</h2><div class="opening-head-actions"><button type="button" class="opening-chip" id="checkinToggleBtn" aria-pressed="true" onclick="toggleOpeningCheckin()">Check-in: On</button><button type="button" class="opening-chip" onclick="toggleOpeningMode()" title="Back to the main board (Shift+W)">✕ Main board</button></div></div>
+                <div class="opening-bar">
+                    <div class="opening-timer sync-timer" id="openingTimer">05:00</div>
+                    <div class="opening-controls" id="openingIdleControls"><button type="button" onclick="adjustOpeningLength(-1)" aria-label="One minute shorter">−1</button><button type="button" class="opening-primary" id="openingStartBtn" onclick="openingStartTimer()">▶ Start 5 min</button><button type="button" onclick="adjustOpeningLength(1)" aria-label="One minute longer">+1</button></div>
+                    <div class="opening-controls" id="openingLiveControls" style="display:none;"><button type="button" class="opening-primary sync-btn-start" onclick="toggleTimer()">Pause</button><button type="button" onclick="addTime(1)">+1 min</button><button type="button" onclick="clearTimer()">Clear</button></div>
+                    <div class="timer-return-row"><button type="button" class="timer-return-chip" aria-pressed="false" onclick="toggleTimerReturn()" title="When this timer ends, go back to the main board"><span class="chip-dot" aria-hidden="true"></span>↩ Back to main when done</button></div>
+                </div>
+                <p id="openingWarmupText" style="white-space:pre-wrap;"></p>
             </div>
         </div>
 
@@ -1652,6 +1710,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                     <div class="game-timer-display sync-timer">00:00</div>
                     <div class="zen-progress-bg" style="background:var(--gray-800);margin-bottom:clamp(20px,3vh,40px);width:85%;"><div class="zen-progress-bar sync-progress" style="background-color:var(--bg-light);"></div></div>
                     <div class="zen-timer-controls" style="width:85%;"><button onclick="addTime(0.5)" style="background:var(--gray-700);">+30s</button><button onclick="addTime(1)" style="background:var(--gray-700);">+1m</button><button onclick="addTime(5)" style="background:var(--gray-700);">+5m</button><button onclick="toggleTimer()" class="action-btn sync-btn-start">Start</button><button onclick="clearTimer()" class="stop-btn">Clear</button></div>
+                    <div class="timer-return-row"><button type="button" class="timer-return-chip" aria-pressed="false" onclick="toggleTimerReturn()" title="When this timer ends, go back to the main board"><span class="chip-dot" aria-hidden="true"></span>↩ Back to main when done</button></div>
                 </div>
 
                 <div id="jeopardyContainer">
@@ -1953,6 +2012,9 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         })();
         let timerInterval, endTime = 0, totalTimeMs = 0, remainingMs = 0, isRunning = false, warningPlayed = false, donePlayed = false; // timer state: toggleModal -> checkFloatingTimer reads totalTimeMs, so this must exist before init code can open a modal
         let sheetIssues = { schedule: [], games: [] }; // preflight findings, shown by the Sheet Issues pill
+        let timerReturnBoard = ''; // board to leave for the main board when the current timer ends ('' = stay put); saved with the timer
+        let timerReturnChoice = null; // chip flipped while no timer exists: true/false overrides the default for the next timer
+        let checkinSignature = ''; // last rendered check-in grid, so it only rebuilds when something changed
         let liveStatePollTimer = null; // declared here (not near its usage below) - referenced by code that runs immediately during init
         // Global Game Timer declarations to prevent scope errors
         let ffTimerInterval; 
@@ -2198,7 +2260,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function playWarningChime() { playTone(440, 0, 0.6, 0.15); playTone(523.25, 0.3, 0.8, 0.15); }
         function playDoneChime() { playTone(523.25, 0, 1.5, 0.15); playTone(659.25, 0.2, 1.5, 0.15); playTone(783.99, 0.4, 1.5, 0.15); playTone(1046.50, 0.6, 2.0, 0.15); }
 
-        let activeBlockData = null; let lastActiveBlockId = null; let isFocusMode = false; let isSlideMode = false; let isGameStage = false; let activeBoard = 'mainBento'; let isTransitioning = false; let needsDataRender = true; 
+        let activeBlockData = null; let lastActiveBlockId = null; let isFocusMode = false; let isSlideMode = false; let isGameStage = false; let isOpeningMode = false; let activeBoard = 'mainBento'; let isTransitioning = false; let needsDataRender = true; 
         let lastGenuinelyActiveBlock = null;
         let currentSlides = []; let currentSlideIndex = -1; let isMarketTicker = false;
         let gameVaultData = []; let miniGameLists = { hotseat: [], titansays: [], hivemind: [], debate: [], taboo: [], factorfiction: [], bullmarket: [], vault: [] };
@@ -2607,7 +2669,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function renderTracker() {
             const container = document.getElementById('trackerContainer'); container.innerHTML = '';
             if (!activeBlockData || !activeBlockData.roster || activeBlockData.roster.length === 0) { container.innerHTML = '<p style="text-align:center; font-size:1.5rem; padding:20px; color:var(--ink); grid-column:1 / -1;">No active roster available.</p>'; return; }
-            let classId = activeBlockData.id; let trackingData = JSON.parse(store.getItem('titan_tracker_' + classId) || '{}'); let absentList = JSON.parse(store.getItem('titan_absent_' + classId) || '[]'); let hpData = JSON.parse(store.getItem('titan_hallpass_active_' + classId) || '{}');
+            let classId = activeBlockData.id; let trackingData = JSON.parse(store.getItem('titan_tracker_' + classId) || '{}'); let absentList = getAbsentList(classId); let hpData = JSON.parse(store.getItem('titan_hallpass_active_' + classId) || '{}');
             activeBlockData.roster.forEach(student => {
                 if (trackingData[student] === undefined) trackingData[student] = 0; 
                 let score = trackingData[student]; let isAbsent = absentList.includes(student); let isOut = hpData[student] !== undefined;
@@ -2634,14 +2696,24 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         }
         setInterval(updateHallPassIndicators, 1000);
 
-        window.toggleAbsent = function(student, classId) { let absentKey = 'titan_absent_' + classId; let absentList = JSON.parse(store.getItem(absentKey) || '[]'); if (absentList.includes(student)) { absentList = absentList.filter(s => s !== student); } else { absentList.push(student); } store.setItem(absentKey, JSON.stringify(absentList)); renderTracker(); };
+        // Absences are stored per class per DAY (titan_absent_<id>_<yyyy-mm-dd>, the date of the class on screen).
+        // The old key had no date, so yesterday's absences were still marked today.
+        function dayStamp(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+        function absentKeyFor(classId) { let d = (activeBlockData && activeBlockData.id === classId && activeBlockData.date) ? activeBlockData.date : new Date(); return 'titan_absent_' + classId + '_' + dayStamp(d); }
+        function getAbsentList(classId) { try { let v = JSON.parse(store.getItem(absentKeyFor(classId)) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+        function pruneOldAbsences() {
+            let cutoff = Date.now() - 30 * 86400000; let old = [];
+            for (let i = 0; i < store.length; i++) { let k = store.key(i); let m = k && k.match(/^titan_absent_.*_(\d{4})-(\d{2})-(\d{2})$/); if (m && new Date(+m[1], +m[2] - 1, +m[3]).getTime() < cutoff) old.push(k); }
+            old.forEach(k => store.removeItem(k));
+        }
+        window.toggleAbsent = function(student, classId) { let absentKey = absentKeyFor(classId); let absentList = JSON.parse(store.getItem(absentKey) || '[]'); if (absentList.includes(student)) { absentList = absentList.filter(s => s !== student); } else { absentList.push(student); } store.setItem(absentKey, JSON.stringify(absentList)); renderTracker(); };
         window.toggleAllAbsences = function() {
-            if (!activeBlockData || !activeBlockData.roster) return; let absentKey = 'titan_absent_' + activeBlockData.id; let currentAbsences = JSON.parse(store.getItem(absentKey) || '[]');
-            if (currentAbsences.length >= activeBlockData.roster.length && activeBlockData.roster.length > 0) { if (confirm("Mark ALL students as PRESENT?")) { store.removeItem(absentKey); renderTracker(); } } 
-            else { if (confirm("Mark ALL students as ABSENT?")) { store.setItem(absentKey, JSON.stringify(activeBlockData.roster)); renderTracker(); } }
+            if (!activeBlockData || !activeBlockData.roster) return; let absentKey = absentKeyFor(activeBlockData.id); let currentAbsences = getAbsentList(activeBlockData.id);
+            if (currentAbsences.length >= activeBlockData.roster.length && activeBlockData.roster.length > 0) { if (confirm("Mark ALL students as PRESENT?")) { store.setItem(absentKey, '[]'); renderTracker(); renderCheckinGrid(true); } } 
+            else { if (confirm("Mark ALL students as ABSENT?")) { store.setItem(absentKey, JSON.stringify(activeBlockData.roster)); renderTracker(); renderCheckinGrid(true); } }
         };
         window.clearPointsData = function() { if (!activeBlockData) return; if (confirm("Clear ALL participation data for this class?")) { store.removeItem('titan_tracker_' + activeBlockData.id); renderTracker(); } };
-        window.copyAbsencesData = function() { if (!activeBlockData) return; let absentList = JSON.parse(store.getItem('titan_absent_' + activeBlockData.id) || '[]'); if (absentList.length === 0) { alert("No absences."); return; } let absText = "Absent:\n" + absentList.join('\n'); if (!navigator.clipboard || !navigator.clipboard.writeText) { alert(absText); return; } navigator.clipboard.writeText(absText).then(() => alert("Copied!")).catch(e => alert(absText)); };
+        window.copyAbsencesData = function() { if (!activeBlockData) return; let absentList = getAbsentList(activeBlockData.id); if (absentList.length === 0) { alert("No absences."); return; } let absText = "Absent:\n" + absentList.join('\n'); if (!navigator.clipboard || !navigator.clipboard.writeText) { alert(absText); return; } navigator.clipboard.writeText(absText).then(() => alert("Copied!")).catch(e => alert(absText)); };
         function csvEscape(field) { let s = String(field); return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
         function exportScoresCSV() {
             let rows = [['Period', 'Student', 'Score']]; let seenIds = new Set(); let foundAny = false;
@@ -2698,9 +2770,9 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         }
 
         // ==================== BOARD MODE SWITCHING (Focus / Slide / Game Stage) ====================
-        function toggleFocusMode() { if (isTransitioning) return; isFocusMode = !isFocusMode; isSlideMode = false; isGameStage = false; document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active'); updateBoardDisplays(); }
-        function toggleSlideMode() { if (isTransitioning) return; isSlideMode = !isSlideMode; isFocusMode = false; isGameStage = false; if (isSlideMode) document.body.classList.add('slide-mode-active'); else document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active'); updateBoardDisplays(); if (isSlideMode) renderSlide(); }
-        function toggleGameStage() { if (isTransitioning) return; isGameStage = !isGameStage; isSlideMode = false; isFocusMode = false; if (isGameStage) { document.body.classList.add('game-mode-active'); buildDynamicGameMenu(); } else { document.body.classList.remove('game-mode-active'); } document.body.classList.remove('slide-mode-active'); updateBoardDisplays(); }
+        function toggleFocusMode() { if (isTransitioning) return; isFocusMode = !isFocusMode; isSlideMode = false; isGameStage = false; isOpeningMode = false; document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active'); updateBoardDisplays(); }
+        function toggleSlideMode() { if (isTransitioning) return; isSlideMode = !isSlideMode; isFocusMode = false; isGameStage = false; isOpeningMode = false; if (isSlideMode) document.body.classList.add('slide-mode-active'); else document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active'); updateBoardDisplays(); if (isSlideMode) renderSlide(); }
+        function toggleGameStage() { if (isTransitioning) return; isGameStage = !isGameStage; isSlideMode = false; isFocusMode = false; isOpeningMode = false; if (isGameStage) { document.body.classList.add('game-mode-active'); buildDynamicGameMenu(); } else { document.body.classList.remove('game-mode-active'); } document.body.classList.remove('slide-mode-active'); updateBoardDisplays(); }
         function showStudentGames() {
             if (isTransitioning) return;
             document.getElementById('studentNotesView').style.display = 'none';
@@ -3120,12 +3192,12 @@ html[data-board-style="atoms"] .dashboard-wrapper {
 
         // ==================== BOARD DISPLAY SWITCHING & NOTEPAD ====================
         function updateBoardDisplays() {
-            let targetBoard = 'mainBento'; if (isSlideMode) targetBoard = 'slideModeBoard'; else if (isFocusMode) targetBoard = 'focusModeBoard'; else if (isGameStage) targetBoard = 'gameModeBoard';
+            let targetBoard = 'mainBento'; if (isSlideMode) targetBoard = 'slideModeBoard'; else if (isFocusMode) targetBoard = 'focusModeBoard'; else if (isGameStage) targetBoard = 'gameModeBoard'; else if (isOpeningMode) targetBoard = 'openingModeBoard';
             if (targetBoard === activeBoard) return; const oldBoard = document.getElementById(activeBoard); const newBoard = document.getElementById(targetBoard); const topTabs = document.getElementById('topSourceTabs');
             if (targetBoard === 'slideModeBoard') { topTabs.style.display = 'flex'; renderSlide(); } else { topTabs.style.display = 'none'; }
-            if (targetBoard === 'slideModeBoard' || activeBoard === 'slideModeBoard') { oldBoard.style.display = 'none'; oldBoard.style.animation = ''; newBoard.style.display = (targetBoard === 'slideModeBoard') ? 'flex' : 'grid'; newBoard.style.animation = ''; activeBoard = targetBoard; isTransitioning = false; if (targetBoard === 'mainBento') setTimeout(autoFitCardText, 50); return; }
+            if (targetBoard === 'slideModeBoard' || activeBoard === 'slideModeBoard') { oldBoard.style.display = 'none'; oldBoard.style.animation = ''; newBoard.style.display = (targetBoard === 'slideModeBoard') ? 'flex' : 'grid'; newBoard.style.animation = ''; activeBoard = targetBoard; isTransitioning = false; if (targetBoard === 'mainBento') setTimeout(autoFitCardText, 50); renderReturnChips(); return; }
             isTransitioning = true; oldBoard.style.animation = 'boardFadeOut 0.3s ease forwards';
-            setTimeout(() => { oldBoard.style.display = 'none'; oldBoard.style.animation = ''; newBoard.style.display = (targetBoard === 'gameModeBoard') ? 'flex' : 'grid'; newBoard.style.animation = 'boardFadeIn 0.5s ease forwards'; activeBoard = targetBoard; if (targetBoard !== 'gameModeBoard') closeGameModule(); if (targetBoard === 'mainBento') setTimeout(autoFitCardText, 50); isTransitioning = false; }, 300); 
+            setTimeout(() => { oldBoard.style.display = 'none'; oldBoard.style.animation = ''; newBoard.style.display = (targetBoard === 'gameModeBoard') ? 'flex' : 'grid'; newBoard.style.animation = 'boardFadeIn 0.5s ease forwards'; activeBoard = targetBoard; if (targetBoard !== 'gameModeBoard') closeGameModule(); if (targetBoard === 'mainBento') setTimeout(autoFitCardText, 50); if (targetBoard === 'openingModeBoard') setTimeout(fitOpeningBoard, 50); isTransitioning = false; renderReturnChips(); renderOpeningControls(); }, 300); 
         }
 
         let notesPushDebounceTimer = null;
@@ -3187,10 +3259,11 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             const hasTime = totalTimeMs > 0; const activeModals = document.querySelectorAll('.modal.active'); let isBlockingView = false;
             if (activeModals.length > 0) isBlockingView = !document.getElementById('timerModal').classList.contains('active');
             floatingTimer.style.display = (hasTime && isBlockingView) ? 'block' : 'none';
+            renderReturnChips(); renderOpeningControls();
         }
 
         function triggerColdCall() {
-            if (!activeBlockData || !activeBlockData.roster) return; let absentList = JSON.parse(store.getItem('titan_absent_' + activeBlockData.id) || '[]'); let presentRoster = activeBlockData.roster.filter(s => !absentList.includes(s));
+            if (!activeBlockData || !activeBlockData.roster) return; let absentList = getAbsentList(activeBlockData.id); let presentRoster = activeBlockData.roster.filter(s => !absentList.includes(s));
             if(presentRoster.length === 0) { playTone(150, 0, 0.3, 0.2); return; }
             let pick = presentRoster[Math.floor(Math.random() * presentRoster.length)]; let toast = document.getElementById('coldCallToast'); toast.innerText = pick; toast.classList.add('show'); playTone(880, 0, 0.3, 0.1); 
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
@@ -3209,7 +3282,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                 if (event.key.toLowerCase() === 'g') toggleGameStage(); if (event.key.toLowerCase() === 'r') toggleTrackerModal(); 
                 if (event.key.toLowerCase() === 'd') toggleModal('eyesUpModal'); if (event.key.toLowerCase() === 'b') togglePointsModal();
                 if (event.key.toLowerCase() === 'm') toggleModal('timerModal'); if (event.key.toLowerCase() === 'e') toggleModal('examModal');
-                if (event.key.toLowerCase() === 'w') toggleWarmupModal(); if (event.key.toLowerCase() === 'n') triggerColdCall();
+                if (event.key.toLowerCase() === 'w') expandWarmup(); if (event.key.toLowerCase() === 'n') triggerColdCall();
                 if (event.key.toLowerCase() === 'l') toggleStatusLight();
                 if (event.key.toLowerCase() === 'q') openQRModal();
                 if (event.code === 'Digit0' || event.code === 'Numpad0' || event.key === ')' || event.key === '0' || event.code === 'KeyO' || event.key.toLowerCase() === 'o') { event.preventDefault(); openSettingsModal(); }
@@ -3248,7 +3321,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         
         function generateGroups() {
             if (!activeBlockData || activeBlockData.roster.length === 0) { alert("No roster available for this period!"); return; }
-            let absentList = JSON.parse(store.getItem('titan_absent_' + activeBlockData.id) || '[]'); let presentRoster = activeBlockData.roster.filter(s => !absentList.includes(s));
+            let absentList = getAbsentList(activeBlockData.id); let presentRoster = activeBlockData.roster.filter(s => !absentList.includes(s));
             if (presentRoster.length === 0) { alert("Everyone is marked absent!"); return; }
             let historyKey = 'titan_group_history_' + activeBlockData.id; let history = JSON.parse(store.getItem(historyKey) || '{}');
             let bestGroups = []; let bestScore = Infinity;
@@ -3424,14 +3497,14 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                 let groups = []; const container = document.getElementById('groupsContainer');
                 if (container && container.children.length > 0) { const cards = container.querySelectorAll('.group-card'); cards.forEach((card, index) => { const h4 = card.querySelector('h4'); groups.push(h4 ? h4.textContent.trim() : `Group ${index + 1}`); }); }
                 if (groups.length === 0 && activeBlockData && activeBlockData.roster && activeBlockData.roster.length > 0) {
-                    let absentList = JSON.parse(store.getItem('titan_absent_' + activeBlockData.id) || '[]'); let presentCount = activeBlockData.roster.filter(s => !absentList.includes(s)).length;
+                    let absentList = getAbsentList(activeBlockData.id); let presentCount = activeBlockData.roster.filter(s => !absentList.includes(s)).length;
                     let expectedGroupCount = Math.ceil(presentCount / targetGroupSize); if (expectedGroupCount > 1 && (presentCount % targetGroupSize === 1)) expectedGroupCount -= 1;
                     for (let i = 1; i <= expectedGroupCount; i++) groups.push(`Group ${i}`);
                 } 
                 if (groups.length === 0) { let fallbackCount = Math.max(2, targetGroupSize); for (let i = 1; i <= fallbackCount; i++) groups.push(`Group ${i}`); }
                 return groups;
             } else {
-                if (!activeBlockData || !activeBlockData.roster) return []; let absentList = JSON.parse(store.getItem('titan_absent_' + activeBlockData.id) || '[]'); return activeBlockData.roster.filter(s => !absentList.includes(s));
+                if (!activeBlockData || !activeBlockData.roster) return []; let absentList = getAbsentList(activeBlockData.id); return activeBlockData.roster.filter(s => !absentList.includes(s));
             }
         }
 
@@ -3679,19 +3752,127 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                     currentSlides = []; if (lastActiveBlockId !== currentActiveId) currentSlideIndex = -1;
                 }
                 lastActiveBlockId = currentActiveId;
+                if (isOpeningMode) renderOpeningBoard();
             }
+            if (activeBoard === 'openingModeBoard') { try { renderCheckinGrid(false); } catch (e) { console.error('Check-in grid error', e); } }
         }
+
+        // ==================== TIMER "BACK TO MAIN" + TIME'S UP SWEEP ====================
+        // A timer can carry a return board. When it ends while that board is still on screen, the dashboard sweeps back to
+        // the main board. New timers default to returning when started in Opening or Focus mode; the chip changes it per timer.
+        function returnsByDefault() {
+            if (activeBoard === 'mainBento') return false;
+            if (timerReturnChoice !== null) return timerReturnChoice;
+            return activeBoard === 'openingModeBoard' || activeBoard === 'focusModeBoard';
+        }
+        function timerExists() { return totalTimeMs > 0 || remainingMs > 0 || isRunning; }
+        function toggleTimerReturn() {
+            if (activeBoard === 'mainBento') return;
+            if (timerExists()) timerReturnBoard = timerReturnBoard === activeBoard ? '' : activeBoard;
+            else timerReturnChoice = !returnsByDefault();
+            saveTimerState(); renderReturnChips();
+        }
+        function renderReturnChips() {
+            const chips = document.querySelectorAll('.timer-return-chip'); if (!chips.length) return;
+            const on = timerExists() ? timerReturnBoard === activeBoard : returnsByDefault();
+            chips.forEach(c => { c.style.display = activeBoard === 'mainBento' ? 'none' : ''; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', String(on)); });
+        }
+        function goToMainBoard() {
+            isFocusMode = false; isSlideMode = false; isGameStage = false; isOpeningMode = false;
+            document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active');
+            updateBoardDisplays();
+        }
+        function returnToMainAfterTimer() {
+            if (activeBoard === 'mainBento') return;
+            const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const sweep = document.getElementById('timesUpSweep');
+            if (reduce || !sweep) { goToMainBoard(); return; }
+            sweep.classList.remove('run'); void sweep.offsetWidth; sweep.classList.add('run');
+            setTimeout(goToMainBoard, 380); // the board swaps while the sweep covers the screen
+            setTimeout(() => sweep.classList.remove('run'), 1700);
+        }
+
+        // ==================== OPENING MODE (warm-up + check-in) ====================
+        // Opened from the Warm-Up card's Expand badge or Shift+W. Nothing starts on its own: the teacher taps Start.
+        // Check-in on/off and the warm-up length are remembered per class.
+        function expandWarmup() { if (isStudentMode) toggleWarmupModal(); else toggleOpeningMode(); }
+        function toggleOpeningMode() {
+            if (isTransitioning || isStudentMode) return;
+            isOpeningMode = !isOpeningMode; isFocusMode = false; isSlideMode = false; isGameStage = false;
+            document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active');
+            if (isOpeningMode) renderOpeningBoard();
+            updateBoardDisplays();
+        }
+        function openingClassId() { return activeBlockData ? activeBlockData.id : ''; }
+        function openingHasRoster() { return !!(activeBlockData && activeBlockData.roster && activeBlockData.roster.length > 0); }
+        function isCheckinOn() { return openingHasRoster() && store.getItem('titan_opening_checkin_' + openingClassId()) !== '0'; }
+        function getOpeningMinutes() { let v = parseInt(store.getItem('titan_opening_minutes_' + openingClassId()), 10); return (v >= 1 && v <= 30) ? v : 5; }
+        function renderOpeningBoard() {
+            const board = document.getElementById('openingModeBoard'); if (!board) return;
+            const text = document.getElementById('openingWarmupText');
+            if (text) text.innerText = activeBlockData ? (activeBlockData.warmup || 'No Warm-Up provided today.') : 'Have a great day!';
+            const on = isCheckinOn(); board.classList.toggle('no-checkin', !on);
+            const toggleBtn = document.getElementById('checkinToggleBtn');
+            if (toggleBtn) { toggleBtn.style.display = openingHasRoster() ? '' : 'none'; toggleBtn.innerText = on ? 'Check-in: On' : 'Check-in: Off'; toggleBtn.setAttribute('aria-pressed', String(on)); }
+            // First check-in of the day for this class: everyone starts not checked in. An existing list for today is left alone.
+            if (on) { let k = absentKeyFor(activeBlockData.id); if (store.getItem(k) === null) store.setItem(k, JSON.stringify(activeBlockData.roster)); }
+            renderCheckinGrid(true); renderOpeningControls();
+            if (activeBoard === 'openingModeBoard') setTimeout(fitOpeningBoard, 30);
+        }
+        function toggleOpeningCheckin() {
+            if (!openingHasRoster()) return;
+            store.setItem('titan_opening_checkin_' + openingClassId(), isCheckinOn() ? '0' : '1'); renderOpeningBoard();
+        }
+        function adjustOpeningLength(delta) {
+            if (!activeBlockData) return; let v = Math.min(30, Math.max(1, getOpeningMinutes() + delta));
+            store.setItem('titan_opening_minutes_' + openingClassId(), String(v)); renderOpeningControls();
+        }
+        function openingStartTimer() {
+            if (timerExists()) return; initAudio(); addTime(getOpeningMinutes()); toggleTimer();
+        }
+        function renderOpeningControls() {
+            const idle = document.getElementById('openingIdleControls'); const live = document.getElementById('openingLiveControls'); if (!idle || !live) return;
+            const hasTimer = timerExists(); idle.style.display = hasTimer ? 'none' : ''; live.style.display = hasTimer ? '' : 'none';
+            const startBtn = document.getElementById('openingStartBtn'); const label = '▶ Start ' + getOpeningMinutes() + ' min';
+            if (startBtn && startBtn.innerText !== label) startBtn.innerText = label;
+            const timerEl = document.getElementById('openingTimer'); if (timerEl) timerEl.classList.toggle('is-idle', !hasTimer);
+            if (!hasTimer && timerEl) timerEl.innerText = String(getOpeningMinutes()).padStart(2, '0') + ':00';
+        }
+        function fitOpeningBoard() {
+            const el = document.getElementById('openingWarmupText'); const card = el && el.closest('.card');
+            if (el && card) { el.style.fontSize = ''; let size = parseFloat(window.getComputedStyle(el).fontSize) || 24; for (let i = 0; i < 60 && card.scrollHeight > card.clientHeight && size > 14; i++) { size -= 2; el.style.fontSize = size + 'px'; } }
+            fitCheckinGrid();
+        }
+        // Check-in grid: names only (no points or hall pass buttons within reach of a line of students).
+        function renderCheckinGrid(force) {
+            const grid = document.getElementById('checkinGrid'); if (!grid) return;
+            if (!isCheckinOn()) { if (force) { grid.innerHTML = ''; checkinSignature = ''; } return; }
+            const roster = activeBlockData.roster; const absent = getAbsentList(activeBlockData.id);
+            const sig = absentKeyFor(activeBlockData.id) + '|' + roster.join('\u0001') + '|' + absent.join('\u0001');
+            if (!force && sig === checkinSignature) return; checkinSignature = sig;
+            grid.innerHTML = roster.map(name => { const here = !absent.includes(name);
+                return `<button type="button" class="checkin-tile${here ? ' is-here' : ''}" aria-pressed="${here}" onclick="checkInTap(${jsArg(name)})">${here ? '<span class="checkin-mark" aria-hidden="true">✓</span>' : ''}${escapeHtml(name)}</button>`; }).join('');
+            const count = document.getElementById('checkinCount');
+            if (count) count.innerText = roster.filter(n => !absent.includes(n)).length + ' of ' + roster.length + ' here';
+            fitCheckinGrid();
+        }
+        function fitCheckinGrid() {
+            const grid = document.getElementById('checkinGrid'); if (!grid || !grid.clientHeight) return; grid.style.fontSize = '';
+            let size = parseFloat(window.getComputedStyle(grid).fontSize) || 16;
+            for (let i = 0; i < 40 && grid.scrollHeight > grid.clientHeight + 2 && size > 11; i++) { size -= 1; grid.style.fontSize = size + 'px'; }
+        }
+        window.checkInTap = function(student) { if (!activeBlockData) return; window.toggleAbsent(student, activeBlockData.id); renderCheckinGrid(true); };
 
         // (initial fetch + dashboard intervals start in boot() at the bottom)
 
         // --- BACKGROUND TIMER LOGIC ---
         // (timer state declared in the top block - toggleModal reads totalTimeMs, so it must exist before any init code opens a modal)
 
-        function saveTimerState() { store.setItem('titan_timer', JSON.stringify({ endTime, totalTimeMs, remainingMs, isRunning, warningPlayed, donePlayed })); }
+        function saveTimerState() { store.setItem('titan_timer', JSON.stringify({ endTime, totalTimeMs, remainingMs, isRunning, warningPlayed, donePlayed, returnBoard: timerReturnBoard })); }
         function loadTimerState() {
             let saved = store.getItem('titan_timer');
             if (saved) {
-                let state = JSON.parse(saved); totalTimeMs = state.totalTimeMs || 0; isRunning = state.isRunning || false; endTime = state.endTime || 0; remainingMs = state.remainingMs || 0; warningPlayed = state.warningPlayed || false; donePlayed = state.donePlayed || false;
+                let state = JSON.parse(saved); totalTimeMs = state.totalTimeMs || 0; isRunning = state.isRunning || false; endTime = state.endTime || 0; remainingMs = state.remainingMs || 0; warningPlayed = state.warningPlayed || false; donePlayed = state.donePlayed || false; timerReturnBoard = typeof state.returnBoard === 'string' ? state.returnBoard : '';
                 if (isRunning) { remainingMs = endTime - Date.now(); if (remainingMs > 0) { document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = "Pause"); timerInterval = setInterval(updateTimerDisplay, 1000); updateTimerDisplay(); } else { clearTimer(); } } 
                 else if (remainingMs > 0) { renderTime(remainingMs); document.querySelectorAll('.sync-progress').forEach(bar => { bar.style.width = ((remainingMs / totalTimeMs) * 100) + "%"; bar.style.backgroundColor = "var(--primary-color)"; }); }
             }
@@ -3702,8 +3883,10 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             m = m < 10 ? "0" + m : m; s = s < 10 ? "0" + s : s; document.querySelectorAll('.sync-timer').forEach(el => el.innerText = m + ":" + s);
         }
         function addTime(minutes) {
+            let isNewTimer = totalTimeMs <= 0 && remainingMs <= 0 && !isRunning;
             let addMs = minutes * 60 * 1000; totalTimeMs += addMs; remainingMs += addMs; if (isRunning) endTime += addMs; 
             if (remainingMs > 60000) warningPlayed = false; if (remainingMs > 0) donePlayed = false;
+            if (isNewTimer) { timerReturnBoard = returnsByDefault() ? activeBoard : ''; timerReturnChoice = null; }
             saveTimerState(); renderTime(remainingMs);
             document.querySelectorAll('.sync-timer').forEach(el => el.classList.remove('pulse'));
             document.querySelectorAll('.sync-progress').forEach(bar => { if (totalTimeMs > 0) bar.style.width = ((remainingMs / totalTimeMs) * 100) + "%"; bar.style.backgroundColor = "var(--primary-color)"; });
@@ -3716,7 +3899,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             saveTimerState(); checkFloatingTimer(); pushLiveState();
         }
         function clearTimer() {
-            clearInterval(timerInterval); isRunning = false; totalTimeMs = 0; remainingMs = 0; endTime = 0; warningPlayed = false; donePlayed = false;
+            clearInterval(timerInterval); isRunning = false; totalTimeMs = 0; remainingMs = 0; endTime = 0; warningPlayed = false; donePlayed = false; timerReturnBoard = ''; timerReturnChoice = null;
             document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = "Start"); renderTime(0);
             document.querySelectorAll('.sync-progress').forEach(bar => { bar.style.backgroundColor = "var(--primary-color)"; bar.style.width = "0%"; });
             saveTimerState(); checkFloatingTimer(); pushLiveState();
@@ -3724,7 +3907,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function updateTimerDisplay() {
             remainingMs = endTime - Date.now();
             if (remainingMs <= 60000 && remainingMs > 0 && !warningPlayed && totalTimeMs > 0) { playWarningChime(); warningPlayed = true; saveTimerState(); }
-            if (remainingMs <= 0) { if (!donePlayed && totalTimeMs > 0) { playDoneChime(); donePlayed = true; } clearTimer(); return; }
+            if (remainingMs <= 0) { const returnFrom = timerReturnBoard; if (!donePlayed && totalTimeMs > 0) { playDoneChime(); donePlayed = true; } clearTimer(); if (returnFrom && returnFrom === activeBoard) returnToMainAfterTimer(); return; }
             renderTime(remainingMs);
             document.querySelectorAll('.sync-progress').forEach(bar => {
                 bar.style.width = ((remainingMs / totalTimeMs) * 100) + "%";
@@ -4161,9 +4344,10 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             preserveLegacyBranding();
             loadThemeSettings();
             if (isStudentMode) { document.getElementById('teacherTopBar').style.display = 'none'; document.getElementById('studentTopBar').style.display = 'flex'; document.body.classList.add('student-mode'); startLiveStatePolling(); }
+            if (!isStudentMode) { try { pruneOldAbsences(); } catch (e) { /* storage trouble: keep going */ } }
             ensureFirstUseTimestamp(); updateBackupReminderUI(); checkFirstRun();
             fetchAgendaData(); fetchGameVaultData(); setInterval(updateDashboard, 1000); setInterval(fetchAgendaData, 60000);
-            loadTimerState();
+            loadTimerState(); renderReturnChips();
         }
         boot();
     </script>
