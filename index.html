@@ -1062,7 +1062,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
     </script>
     <style>
-        :root { --primary-color:#5A2B81; --primary-rgb:90,43,129; --primary-hover:#7339a3; --primary-hover-rgb:115,57,163; --secondary-dark:#111111; --secondary-rgb:17,17,17; --bg-light:#e2e4e9; --bg-light-rgb:226,228,233; --bg-mid:#c0c2c9; --bg-mid-rgb:192,194,201; --page-bg-base:#0d0b12; --page-bg-glow:#3a2253; --board-grad-start:#48216c; --board-grad-end:#29123c; --ticker-hover:#181522; --jeopardy-grad-end:#3e1b59; --game-hub-bg:#2a1b38; --pulse-warning:#d4b5ec; --mascot-url:url('SouthGarner_Titans_Logo1.png'); }
+        :root { --primary-color:#5A2B81; --primary-rgb:90,43,129; --primary-hover:#7339a3; --primary-hover-rgb:115,57,163; --secondary-dark:#111111; --secondary-rgb:17,17,17; --bg-light:#e2e4e9; --bg-light-rgb:226,228,233; --bg-mid:#c0c2c9; --bg-mid-rgb:192,194,201; --page-bg-base:#0d0b12; --page-bg-glow:#3a2253; --board-grad-start:#48216c; --board-grad-end:#29123c; --ticker-hover:#181522; --jeopardy-grad-end:#3e1b59; --game-hub-bg:#2a1b38; --pulse-warning:#d4b5ec; --mascot-url:none; }
         ::-webkit-scrollbar { display:none; } * { -ms-overflow-style:none; scrollbar-width:none; box-sizing:border-box; }
         body { font-family:'Poppins',sans-serif; background-color:var(--page-bg-base); background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E"),radial-gradient(circle at 50% -20%,var(--page-bg-glow) 0%,var(--page-bg-base) 75%); margin:0; padding:1.5vh 1.5vw; display:flex; justify-content:center; align-items:center; height:100vh; width:100vw; overflow:hidden; transition:background-color 0.3s; }
         .dashboard-wrapper { background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E"),repeating-linear-gradient(-45deg,rgba(255,255,255,0.02),rgba(255,255,255,0.02) 2px,transparent 2px,transparent 16px),linear-gradient(135deg,var(--board-grad-start) 0%,var(--board-grad-end) 100%); width:100%; height:100%; border-radius:clamp(12px,1.8vw,25px); padding:clamp(10px,1.8vw,30px); display:flex; flex-direction:column; gap:clamp(8px,1.5vh,20px); box-shadow:0 20px 50px rgba(0,0,0,0.8),inset 0 1px 2px rgba(255,255,255,0.2),inset 0 0 20px rgba(var(--primary-rgb),0.3); position:relative; min-height:0; border:1px solid rgba(var(--primary-hover-rgb),0.3); }
@@ -1205,8 +1205,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     </div>
                     <p style="color:#666;font-size:0.75rem;margin:0 0 15px 0;">Light &amp; Mid Accent auto-match your Primary color unless you set them yourself here.</p>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                        <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Mascot/Greeting</label><input type="text" id="settingMascot" value="Titans" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--bg-mid);"></div>
-                        <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Leaderboard</label><input type="text" id="settingLeaderboard" value="Titan Cup" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--bg-mid);"></div>
+                        <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Mascot/Greeting</label><input type="text" id="settingMascot" value="" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--bg-mid);"></div>
+                        <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Leaderboard</label><input type="text" id="settingLeaderboard" value="" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--bg-mid);"></div>
                         <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Teacher Name</label><input type="text" id="settingTeacher" placeholder="Mr. Kaiser" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--bg-mid);"></div>
                         <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Watermark URL</label><input type="text" id="settingWatermark" placeholder="https://..." style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--bg-mid);font-family:monospace;font-size:0.8rem;"></div>
                     </div>
@@ -1292,7 +1292,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     </div>
 
     <div class="modal" id="timerModal"><div class="leaderboard-wrapper" style="max-width:650px;text-align:center;"><h1 class="lb-header">⏱️ Class Timer</h1><div class="timer-display sync-timer" style="font-size:clamp(4.5rem,8vw,8.5rem);margin:20px 0;color:var(--secondary-dark);">00:00</div><div class="progress-bar-container" style="height:20px;margin-bottom:25px;background-color:var(--bg-mid);"><div class="progress-bar sync-progress" style="background-color:var(--primary-color);"></div></div><div class="timer-controls" style="display:flex;gap:12px;margin-bottom:10px;width:100%;"><button onclick="addTime(0.5)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:12px;">+30s</button><button onclick="addTime(1)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:12px;">+1m</button><button onclick="addTime(5)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:12px;">+5m</button><button onclick="toggleTimer()" class="action-btn sync-btn-start" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:12px;">Start</button><button onclick="clearTimer()" class="stop-btn" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:12px;">Clear</button></div><button class="close-btn" onclick="toggleModal('timerModal')" style="margin-top:15px;">Run in Background</button></div></div>
-    <div class="modal" id="pointsModal"><div class="leaderboard-wrapper"><h1 class="lb-header" id="dynamicLeaderboardTitle">🏆 Titan Cup Leaderboard</h1><div class="lb-current-class" id="pointsControlSection"><div class="lb-current-info" style="min-width:0;flex:1;"><h2>Active Period</h2><h3 id="currentClassPointsTitle">Loading...</h3></div><div style="display:flex;align-items:center;gap:12px;flex-shrink:0;"><div class="lb-score-display" id="classPointsDisplay">0</div><div class="lb-controls"><button class="btn-sub" onclick="updatePoints(-1)">-</button><button class="btn-add" onclick="updatePoints(1)">+</button></div></div></div><div class="lb-chart" id="leaderboardContainer"></div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;"><div style="display:flex;gap:10px;"><button onclick="resetAllPoints()" style="background:transparent;color:var(--secondary-dark);border:2px solid var(--secondary-dark);padding:8px 20px;font-size:1.1rem;border-radius:20px;font-weight:bold;cursor:pointer;">Reset Scores</button><button id="pointsUndoBtn" onclick="undoLastPointsChange()" style="display:none;background:transparent;color:var(--primary-color);border:2px solid var(--primary-color);padding:8px 20px;font-size:1.1rem;border-radius:20px;font-weight:bold;cursor:pointer;">↩️ Undo</button></div><button class="close-btn" onclick="togglePointsModal()" style="margin:0;padding:10px 25px;font-size:1.2rem;">Close</button></div></div></div>
+    <div class="modal" id="pointsModal"><div class="leaderboard-wrapper"><h1 class="lb-header" id="dynamicLeaderboardTitle">🏆 Class Cup Leaderboard</h1><div class="lb-current-class" id="pointsControlSection"><div class="lb-current-info" style="min-width:0;flex:1;"><h2>Active Period</h2><h3 id="currentClassPointsTitle">Loading...</h3></div><div style="display:flex;align-items:center;gap:12px;flex-shrink:0;"><div class="lb-score-display" id="classPointsDisplay">0</div><div class="lb-controls"><button class="btn-sub" onclick="updatePoints(-1)">-</button><button class="btn-add" onclick="updatePoints(1)">+</button></div></div></div><div class="lb-chart" id="leaderboardContainer"></div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;"><div style="display:flex;gap:10px;"><button onclick="resetAllPoints()" style="background:transparent;color:var(--secondary-dark);border:2px solid var(--secondary-dark);padding:8px 20px;font-size:1.1rem;border-radius:20px;font-weight:bold;cursor:pointer;">Reset Scores</button><button id="pointsUndoBtn" onclick="undoLastPointsChange()" style="display:none;background:transparent;color:var(--primary-color);border:2px solid var(--primary-color);padding:8px 20px;font-size:1.1rem;border-radius:20px;font-weight:bold;cursor:pointer;">↩️ Undo</button></div><button class="close-btn" onclick="togglePointsModal()" style="margin:0;padding:10px 25px;font-size:1.2rem;">Close</button></div></div></div>
     <div class="modal" id="wheelModal"><h1 id="wheelWinnerDisplay" style="font-size:clamp(2.5rem,4vw,4.5rem);margin:0 0 20px 0;text-align:center;width:100%;">SPIN THE WHEEL</h1><div class="wheel-container" onclick="executeSpin()"><div class="wheel-pointer">▼</div><div class="wheel" id="spinningWheel"></div></div><div style="display:flex;gap:15px;margin-top:clamp(15px,2vh,25px);justify-content:center;flex-wrap:wrap;"><button id="wheelToggleBtn" onclick="toggleWheelMode()" style="background:var(--primary-color);color:#ffffff;border:2px solid #ffffff;padding:clamp(10px,1.5vh,16px) clamp(24px,2.5vw,40px);font-size:clamp(1.1rem,1.5vw,1.8rem);border-radius:50px;font-weight:bold;cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,0.3);">Mode: Students</button><button onclick="resetWheelPicks()" style="background:var(--secondary-dark);color:var(--bg-light);border:2px solid var(--primary-color);padding:clamp(10px,1.5vh,16px) clamp(24px,2.5vw,40px);font-size:clamp(1.1rem,1.5vw,1.8rem);border-radius:50px;font-weight:bold;cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,0.3);">Reset Picks</button><button class="close-btn" onclick="closeWheelModal()" style="margin-top:0;">Close</button></div></div>
     <div class="modal" id="qrModal"><div class="leaderboard-wrapper" style="max-width:700px;text-align:center;">
         <h1 style="color:var(--primary-color);margin:0 0 20px 0;">📱 Scan to Open</h1>
@@ -1319,6 +1319,12 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             <button onclick="generateRecapPDF()" style="background:var(--primary-color);color:#fff;border:none;padding:12px 28px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;">📄 Generate PDF</button>
         </div>
     </div></div>
+    <div class="modal" id="sheetIssuesModal"><div class="leaderboard-wrapper" style="max-width:800px;max-height:85vh;overflow-y:auto;text-align:left;">
+        <h1 style="color:var(--primary-color);margin:0 0 8px 0;">⚠️ Sheet Issues</h1>
+        <p style="font-size:1rem;color:var(--secondary-dark);margin:0;">The dashboard is still running. These rows were skipped or may not show what you meant. Fix them in the sheet and this updates on the next sync (about a minute).</p>
+        <div id="sheetIssuesList"></div>
+        <div style="text-align:center;margin-top:20px;"><button onclick="toggleModal('sheetIssuesModal')" style="background:var(--primary-color);color:#fff;border:none;padding:12px 28px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;">Close</button></div>
+    </div></div>
     <div class="modal" id="groupModal"><button id="clearHistoryBtn" onclick="clearGroupHistory()" style="display:none;position:absolute;top:clamp(20px,3vh,40px);right:clamp(20px,3vw,40px);background:var(--bg-mid);color:#111;border:none;border-radius:50px;padding:8px 16px;font-weight:bold;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.3);z-index:10;">Clear History</button><h1 style="color:#fff;margin-bottom:4px;margin-top:0;">RANDOM GROUPS</h1><div style="display:flex;gap:10px;margin-bottom:6px;align-items:center;justify-content:center;flex-wrap:wrap;"><div class="group-controls"><button onclick="changeGroupSize(-1)">-</button><span id="groupSizeDisplay">Size: 2</span><button onclick="changeGroupSize(1)">+</button></div><button class="btn-generate" onclick="generateGroups()">Shuffle & Generate</button></div><div class="groups-grid" id="groupsContainer"></div><div id="groupAwardRow" style="display:none;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:2px dashed rgba(255,255,255,0.2);"><label style="color:#fff;font-weight:bold;font-size:0.95rem;">🏆 Award</label><select id="awardGroupSelect" style="padding:10px;border-radius:8px;border:2px solid var(--primary-color);font-size:1rem;font-weight:bold;"></select><input type="number" id="awardGroupPoints" value="1" style="width:65px;padding:10px;border-radius:8px;border:2px solid var(--primary-color);text-align:center;font-size:1rem;font-weight:bold;"><label style="color:#fff;font-weight:bold;font-size:0.95rem;">points to their scores</label><button onclick="awardPointsToGroup()" style="background:var(--primary-color);color:#fff;border:none;padding:10px 22px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;">Award</button><span id="groupAwardConfirm" style="color:#69f0ae;font-weight:bold;font-size:0.95rem;min-width:140px;"></span></div><button class="close-btn" onclick="toggleModal('groupModal')" style="margin-top:6px;">Close</button></div>
     <div class="modal alert-screen" id="tardyModal"><h1>CLASS HAS STARTED</h1><p>If you are standing, you are tardy.<br>Please be seated and begin your Warm-Up activity immediately.</p><button class="close-btn" onclick="toggleModal('tardyModal')">Dismiss</button></div>
     <div class="modal blackout-screen" id="eyesUpModal"><h1>👀 EYES UP FRONT</h1><p style="color:var(--bg-mid);">Voices off, please.</p><button class="close-btn" onclick="toggleModal('eyesUpModal')" style="margin-top:50px;">Resume</button></div>
@@ -1336,6 +1342,10 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             <div id="staleDataBadge" class="pill action-pill" onclick="retryFetchNow()" title="Click to retry fetching your sheet now" style="display:none;background:linear-gradient(145deg,#ffe0e0,#ffc2c2);border-color:#8b0000;">
                 <div class="pill-subtitle" style="color:#8b0000;">Click to Retry</div>
                 <div class="widget-text" id="staleDataText" style="color:#8b0000;font-size:clamp(0.75rem,1vw,1.1rem);">⚠️ Showing Cached Data</div>
+            </div>
+            <div id="sheetIssuesBadge" class="pill action-pill" onclick="openSheetIssues()" title="Some sheet rows couldn't be read. Click to see which." style="display:none;background:linear-gradient(145deg,#fff1dc,#ffd9a8);border-color:#b26a00;">
+                <div class="pill-subtitle" style="color:#7a4a00;">Click to Review</div>
+                <div class="widget-text" id="sheetIssuesText" style="color:#7a4a00;font-size:clamp(0.75rem,1vw,1.1rem);">⚠️ Sheet Issues</div>
             </div>
             <div id="topSourceTabs"></div>
             <div id="statusLightBadge" class="status-light-badge" onclick="cycleStatusLightState()" title="Click to cycle: Phones Away / Reference Only / Phones Allowed" style="display:none;background:var(--secondary-dark);border:clamp(1px,0.25vw,2px) solid #e53935;padding:clamp(4px,0.7vh,7px) clamp(8px,1vw,11px);border-radius:50px;z-index:50;box-shadow:0 5px 14px rgba(0,0,0,0.6);cursor:pointer;align-items:center;gap:6px;transition:transform 0.2s;flex-shrink:0;">
@@ -1441,7 +1451,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 </div>
 
                 <div id="jeopardyContainer">
-                    <div style="display:flex;justify-content:space-between;align-items:center;"><h2 id="dynamicJeopardyTitle" style="color:var(--bg-light);margin:0;font-size:clamp(1.5rem,2vw,3rem);font-weight:900;text-transform:uppercase;letter-spacing:1px;text-shadow:0 2px 6px rgba(0,0,0,0.5);">Titan Jeopardy</h2><div style="display:flex;gap:10px;"><button onclick="resetJeopardyBoard()" style="background:transparent;color:var(--bg-light);border:2px solid var(--bg-light);padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1.1rem;">Reset Board</button><button onclick="closeGameModule()" style="background:var(--bg-light);border:none;padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1.1rem;color:#111;">Back to Hub</button></div></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;"><h2 id="dynamicJeopardyTitle" style="color:var(--bg-light);margin:0;font-size:clamp(1.5rem,2vw,3rem);font-weight:900;text-transform:uppercase;letter-spacing:1px;text-shadow:0 2px 6px rgba(0,0,0,0.5);">Class Jeopardy</h2><div style="display:flex;gap:10px;"><button onclick="resetJeopardyBoard()" style="background:transparent;color:var(--bg-light);border:2px solid var(--bg-light);padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1.1rem;">Reset Board</button><button onclick="closeGameModule()" style="background:var(--bg-light);border:none;padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1.1rem;color:#111;">Back to Hub</button></div></div>
                     <div class="jeopardy-grid" id="jeopardyBoard"></div>
                 </div>
                 
@@ -1703,6 +1713,42 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     <script>
         // Must be declared first - referenced very early in the init sequence below.
         const isStudentMode = new URLSearchParams(window.location.search).get('mode') === 'student';
+        const DEFAULT_MASCOT = 'Class'; const DEFAULT_LEADERBOARD = 'Class Cup'; // neutral for colleagues; your own install keeps its saved values (see preserveLegacyBranding)
+        // Storage namespace: every GitHub Pages site you own shares one origin (you.github.io), so a test copy at
+        // /dashboard-test/ would otherwise read and write the live copy's data. Keys are prefixed with the page's
+        // folder; app code keeps using the plain names ('titan_tracker_3') and never sees the prefix.
+        const STORE_NS = (function () { let dir = String(window.location.pathname || '').replace(/[^\/]*$/, '').replace(/^\/+|\/+$/g, ''); return dir ? 'ns:' + dir + '|' : ''; })();
+        // If the browser refuses storage (site data blocked by device policy, some privacy modes), touching
+        // window.localStorage throws and used to kill the whole app at the first read. Fall back to memory:
+        // everything works for the session, it just isn't saved across reloads.
+        const STORE_PERSISTENT = (function () { try { const ls = window.localStorage; ls.setItem('__probe', '1'); ls.removeItem('__probe'); return true; } catch (e) { return false; } })();
+        const storeBacking = STORE_PERSISTENT ? window.localStorage : (function () {
+            const m = new Map();
+            return { getItem: k => (m.has(String(k)) ? m.get(String(k)) : null), setItem: (k, v) => { m.set(String(k), String(v)); }, removeItem: k => { m.delete(String(k)); },
+                key: i => (Array.from(m.keys())[i] === undefined ? null : Array.from(m.keys())[i]), get length() { return m.size; } };
+        })();
+        if (!STORE_PERSISTENT) console.warn('Browser storage unavailable - dashboard data will not be saved after this session.');
+        const store = {
+            getItem(k) { return storeBacking.getItem(STORE_NS + k); },
+            setItem(k, v) { storeBacking.setItem(STORE_NS + k, v); },
+            removeItem(k) { storeBacking.removeItem(STORE_NS + k); },
+            _keys() { let out = []; for (let i = 0; i < storeBacking.length; i++) { let k = storeBacking.key(i); if (k === null) continue; if (STORE_NS ? k.startsWith(STORE_NS) : !k.startsWith('ns:')) out.push(STORE_NS ? k.slice(STORE_NS.length) : k); } return out; },
+            get length() { return this._keys().length; },
+            key(i) { let ks = this._keys(); return i >= 0 && i < ks.length ? ks[i] : null; }
+        };
+        // One-time copy of pre-namespace data into this copy's namespace. Copies, never moves: if two copies
+        // both migrate, each starts with its own copy of the old data and they diverge from there.
+        (function migrateStorageNamespace() {
+            if (!STORE_NS || !STORE_PERSISTENT) return; const ls = storeBacking;
+            try {
+                if (ls.getItem(STORE_NS + '__ns_migrated')) return;
+                let oldKeys = []; for (let i = 0; i < ls.length; i++) { let k = ls.key(i); if (k && (k.startsWith('titan_') || k.startsWith('classPoints_'))) oldKeys.push(k); } // collect first: writing while iterating shifts key(i)
+                oldKeys.forEach(k => { if (ls.getItem(STORE_NS + k) === null) ls.setItem(STORE_NS + k, ls.getItem(k)); });
+                ls.setItem(STORE_NS + '__ns_migrated', Date.now().toString());
+            } catch (e) { console.warn('Storage migration skipped', e); }
+        })();
+        let timerInterval, endTime = 0, totalTimeMs = 0, remainingMs = 0, isRunning = false, warningPlayed = false, donePlayed = false; // timer state: toggleModal -> checkFloatingTimer reads totalTimeMs, so this must exist before init code can open a modal
+        let sheetIssues = { schedule: [], games: [] }; // preflight findings, shown by the Sheet Issues pill
         let liveStatePollTimer = null; // declared here (not near its usage below) - referenced by code that runs immediately during init
         // Global Game Timer declarations to prevent scope errors
         let ffTimerInterval; 
@@ -1721,10 +1767,10 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             return '#' + [r, g, b].map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, '0')).join('');
         }
         function loadThemeSettings() {
-            let primary = localStorage.getItem('titan_setting_primary') || '#5A2B81'; let dark = localStorage.getItem('titan_setting_dark') || '#111111';
-            let light = localStorage.getItem('titan_setting_light') || mixColor(primary, '#ffffff', 0.86); let mid = localStorage.getItem('titan_setting_mid') || mixColor(primary, '#ffffff', 0.62);
-            let bg = localStorage.getItem('titan_setting_bg') || '#0d0b12'; let glow = localStorage.getItem('titan_setting_glow') || '#3a2253';
-            let watermark = localStorage.getItem('titan_setting_watermark') || 'SouthGarner_Titans_Logo1.png';
+            let primary = store.getItem('titan_setting_primary') || '#5A2B81'; let dark = store.getItem('titan_setting_dark') || '#111111';
+            let light = store.getItem('titan_setting_light') || mixColor(primary, '#ffffff', 0.86); let mid = store.getItem('titan_setting_mid') || mixColor(primary, '#ffffff', 0.62);
+            let bg = store.getItem('titan_setting_bg') || '#0d0b12'; let glow = store.getItem('titan_setting_glow') || '#3a2253';
+            let watermark = store.getItem('titan_setting_watermark') || '';
             let hoverColor = adjustBrightness(primary, 15); let boardGradEnd = adjustBrightness(glow, -15);
             let jeopardyGradEnd = mixColor(primary, '#000000', 0.55); let gameHubBg = mixColor(primary, '#000000', 0.65);
             document.documentElement.style.setProperty('--primary-color', primary); document.documentElement.style.setProperty('--primary-rgb', hexToRgb(primary));
@@ -1735,16 +1781,13 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             document.documentElement.style.setProperty('--page-bg-base', bg); document.documentElement.style.setProperty('--page-bg-glow', glow);
             document.documentElement.style.setProperty('--board-grad-start', glow); document.documentElement.style.setProperty('--board-grad-end', boardGradEnd);
             document.documentElement.style.setProperty('--jeopardy-grad-end', jeopardyGradEnd); document.documentElement.style.setProperty('--game-hub-bg', gameHubBg);
-            if (watermark) document.documentElement.style.setProperty('--mascot-url', `url('${watermark}')`);
-            let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans'; let leaderboard = localStorage.getItem('titan_setting_leaderboard') || 'Titan Cup'; let teacher = localStorage.getItem('titan_setting_teacher') || 'the teacher';
+            document.documentElement.style.setProperty('--mascot-url', watermark ? `url(${JSON.stringify(watermark)})` : 'none'); // JSON.stringify quotes safely even if the URL has a quote in it
+            let mascot = store.getItem('titan_setting_mascot') || DEFAULT_MASCOT; let leaderboard = store.getItem('titan_setting_leaderboard') || DEFAULT_LEADERBOARD; let teacher = store.getItem('titan_setting_teacher') || 'the teacher';
             document.getElementById('dynamicLeaderboardTitle').innerText = `🏆 ${leaderboard} Leaderboard`; document.getElementById('dynamicAskTeacher').innerText = `Then ask ${teacher}.`; document.getElementById('dynamicJeopardyTitle').innerText = `${mascot} Jeopardy`;
-            if(document.getElementById('themePrimary')) { document.getElementById('themePrimary').value = primary; document.getElementById('themeDark').value = dark; document.getElementById('themeLight').value = light; document.getElementById('themeMid').value = mid; document.getElementById('themeBg').value = bg; document.getElementById('themeGlow').value = glow; document.getElementById('settingMascot').value = mascot; document.getElementById('settingLeaderboard').value = leaderboard; document.getElementById('settingTeacher').value = teacher; document.getElementById('settingWatermark').value = watermark === 'SouthGarner_Titans_Logo1.png' ? '' : watermark; document.getElementById('settingMuteSounds').checked = isSoundMuted(); document.getElementById('settingHotSeatTime').value = getGameTimerSetting('hotseat_time', 45); document.getElementById('settingFFTime').value = getGameTimerSetting('ff_time', 60); document.getElementById('settingDebateTime').value = getGameTimerSetting('debate_time', 60);
+            if(document.getElementById('themePrimary')) { document.getElementById('themePrimary').value = primary; document.getElementById('themeDark').value = dark; document.getElementById('themeLight').value = light; document.getElementById('themeMid').value = mid; document.getElementById('themeBg').value = bg; document.getElementById('themeGlow').value = glow; document.getElementById('settingMascot').value = mascot; document.getElementById('settingLeaderboard').value = leaderboard; document.getElementById('settingTeacher').value = teacher; document.getElementById('settingWatermark').value = watermark; document.getElementById('settingMuteSounds').checked = isSoundMuted(); document.getElementById('settingHotSeatTime').value = getGameTimerSetting('hotseat_time', 45); document.getElementById('settingFFTime').value = getGameTimerSetting('ff_time', 60); document.getElementById('settingDebateTime').value = getGameTimerSetting('debate_time', 60);
             }
         }
-        loadThemeSettings();
-        if (isStudentMode) { document.getElementById('teacherTopBar').style.display = 'none'; document.getElementById('studentTopBar').style.display = 'flex'; document.body.classList.add('student-mode'); startLiveStatePolling(); }
-        ensureFirstUseTimestamp(); updateBackupReminderUI(); checkFirstRun();
-        setTimeout(sendAutoBackup, 30000); // attempts shortly after load (safe - sendAutoBackup no-ops if not due yet), then re-checked every 15 min via setInterval above
+        // Startup calls live in boot() at the bottom of this script, so every top-level let/const exists before any of them run.
 
         window.addEventListener('click', function(event) {
             if (event.target.classList.contains('modal')) {
@@ -1763,8 +1806,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         let audioCtx;
         // ==================== AUDIO SYSTEM (all game sounds route through playTone -> isSoundMuted) ====================
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
-        function isSoundMuted() { return localStorage.getItem('titan_setting_muted') === 'true'; }
-        function getGameTimerSetting(key, defaultVal) { let v = parseInt(localStorage.getItem('titan_setting_' + key), 10); return (!isNaN(v) && v > 0) ? v : defaultVal; }
+        function isSoundMuted() { return store.getItem('titan_setting_muted') === 'true'; }
+        function getGameTimerSetting(key, defaultVal) { let v = parseInt(store.getItem('titan_setting_' + key), 10); return (!isNaN(v) && v > 0) ? v : defaultVal; }
         function playTone(freq, startTimeOffset, duration, vol, type='sine') {
             if (isSoundMuted()) return;
             initAudio(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.type = type; osc.frequency.value = freq;
@@ -1784,17 +1827,17 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function updateTickerDisplay() {
             const el = document.getElementById('dailyMessage');
             if (isMarketTicker) { let rawTickerText = (activeBlockData && activeBlockData.ticker) ? activeBlockData.ticker : "Awaiting Market Data..."; let formattedTicker = escapeHtml(rawTickerText).replace(/(\(\+[^)]+\))/g, '<span style="color:#a3e6b5;">$1</span>').replace(/(\(-[^)]+\))/g, '<span style="color:#ff9999;">$1</span>'); el.innerHTML = formattedTicker.split('|').join(' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '); } 
-            else { let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans'; el.innerText = activeBlockData ? (activeBlockData.message || `Welcome ${mascot}! Let's make today a great day to learn.`) : "Loading daily message..."; }
+            else { let mascot = store.getItem('titan_setting_mascot') || DEFAULT_MASCOT; el.innerText = activeBlockData ? (activeBlockData.message || `Welcome ${mascot}! Let's make today a great day to learn.`) : "Loading daily message..."; }
         }
         setInterval(() => { if(isMarketTicker) updateTickerDisplay(); }, 4000);
 
         // ==================== SETTINGS PERSISTENCE (theme, sheet URLs, terminology) ====================
-        function getActiveCsvUrl() { const urlParam = new URLSearchParams(window.location.search).get('sheet'); if (urlParam) return urlParam; return localStorage.getItem('titan_sheet_url') || ""; }
-        function getActiveGameUrl() { const urlParam = new URLSearchParams(window.location.search).get('games'); if (urlParam) return urlParam; return localStorage.getItem('titan_game_url') || ""; }
+        function getActiveCsvUrl() { const urlParam = new URLSearchParams(window.location.search).get('sheet'); if (urlParam) return urlParam; return store.getItem('titan_sheet_url') || ""; }
+        function getActiveGameUrl() { const urlParam = new URLSearchParams(window.location.search).get('games'); if (urlParam) return urlParam; return store.getItem('titan_game_url') || ""; }
         function getLiveSyncUrl() { const urlParam = new URLSearchParams(window.location.search).get('live'); if (urlParam) return urlParam; return getAutoBackupUrl(); }
         function getLiveSyncToken() { const urlParam = new URLSearchParams(window.location.search).get('liveToken'); if (urlParam) return urlParam; return getAutoBackupToken(); }
-        function getAutoBackupUrl() { return localStorage.getItem('titan_autobackup_url') || ""; }
-        function getAutoBackupToken() { return localStorage.getItem('titan_autobackup_token') || ""; }
+        function getAutoBackupUrl() { return store.getItem('titan_autobackup_url') || ""; }
+        function getAutoBackupToken() { return store.getItem('titan_autobackup_token') || ""; }
         function pushLiveState() {
             const url = getAutoBackupUrl(); const token = getAutoBackupToken();
             if (!url || !token) return; // live sync isn't configured - silently does nothing, same spirit as auto-backup
@@ -1812,18 +1855,18 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         }
         function saveSettings() {
             let inputUrl = document.getElementById('customSheetUrlInput').value.trim(); let gameUrl = document.getElementById('gameVaultUrlInput').value.trim();
-            if(inputUrl) localStorage.setItem('titan_sheet_url', inputUrl); if(gameUrl) localStorage.setItem('titan_game_url', gameUrl);
-            localStorage.setItem('titan_autobackup_url', document.getElementById('autoBackupUrlInput').value.trim());
-            localStorage.setItem('titan_autobackup_token', document.getElementById('autoBackupTokenInput').value.trim());
-            localStorage.setItem('titan_setting_primary', document.getElementById('themePrimary').value); localStorage.setItem('titan_setting_dark', document.getElementById('themeDark').value);
-            localStorage.setItem('titan_setting_light', document.getElementById('themeLight').value); localStorage.setItem('titan_setting_mid', document.getElementById('themeMid').value);
-            localStorage.setItem('titan_setting_bg', document.getElementById('themeBg').value); localStorage.setItem('titan_setting_glow', document.getElementById('themeGlow').value);
-            localStorage.setItem('titan_setting_mascot', document.getElementById('settingMascot').value); localStorage.setItem('titan_setting_leaderboard', document.getElementById('settingLeaderboard').value);
-            localStorage.setItem('titan_setting_teacher', document.getElementById('settingTeacher').value); localStorage.setItem('titan_setting_watermark', document.getElementById('settingWatermark').value.trim() || 'SouthGarner_Titans_Logo1.png');
-            localStorage.setItem('titan_setting_muted', document.getElementById('settingMuteSounds').checked ? 'true' : 'false');
-            localStorage.setItem('titan_setting_hotseat_time', parseInt(document.getElementById('settingHotSeatTime').value, 10) || 45);
-            localStorage.setItem('titan_setting_ff_time', parseInt(document.getElementById('settingFFTime').value, 10) || 60);
-            localStorage.setItem('titan_setting_debate_time', parseInt(document.getElementById('settingDebateTime').value, 10) || 60);
+            if(inputUrl) store.setItem('titan_sheet_url', inputUrl); if(gameUrl) store.setItem('titan_game_url', gameUrl);
+            store.setItem('titan_autobackup_url', document.getElementById('autoBackupUrlInput').value.trim());
+            store.setItem('titan_autobackup_token', document.getElementById('autoBackupTokenInput').value.trim());
+            store.setItem('titan_setting_primary', document.getElementById('themePrimary').value); store.setItem('titan_setting_dark', document.getElementById('themeDark').value);
+            store.setItem('titan_setting_light', document.getElementById('themeLight').value); store.setItem('titan_setting_mid', document.getElementById('themeMid').value);
+            store.setItem('titan_setting_bg', document.getElementById('themeBg').value); store.setItem('titan_setting_glow', document.getElementById('themeGlow').value);
+            store.setItem('titan_setting_mascot', document.getElementById('settingMascot').value); store.setItem('titan_setting_leaderboard', document.getElementById('settingLeaderboard').value);
+            store.setItem('titan_setting_teacher', document.getElementById('settingTeacher').value); store.setItem('titan_setting_watermark', document.getElementById('settingWatermark').value.trim()); // blank = no logo
+            store.setItem('titan_setting_muted', document.getElementById('settingMuteSounds').checked ? 'true' : 'false');
+            store.setItem('titan_setting_hotseat_time', parseInt(document.getElementById('settingHotSeatTime').value, 10) || 45);
+            store.setItem('titan_setting_ff_time', parseInt(document.getElementById('settingFFTime').value, 10) || 60);
+            store.setItem('titan_setting_debate_time', parseInt(document.getElementById('settingDebateTime').value, 10) || 60);
             loadThemeSettings(); alert("Settings saved successfully! Refreshing data..."); toggleModal('settingsModal'); fetchAgendaData(); fetchGameVaultData();
         }
 
@@ -1839,12 +1882,12 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function collectDashboardBackupData_() {
             // Deliberately narrow: theme/settings/config only. Restore (below) stays broad and can still
             // fully restore an older, fuller backup file - this scope only affects what NEW backups collect.
-            const data = {}; LIGHT_BACKUP_KEYS.forEach(key => { const v = localStorage.getItem(key); if (v !== null) data[key] = v; }); return data;
+            const data = {}; LIGHT_BACKUP_KEYS.forEach(key => { const v = store.getItem(key); if (v !== null) data[key] = v; }); return data;
         }
         function downloadBackup() {
             const payload = { source: 'Classroom Dashboard Backup', exportedAt: new Date().toISOString(), data: collectDashboardBackupData_() };
             const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `dashboard-backup-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-            localStorage.setItem('titan_last_backup_at', Date.now().toString()); localStorage.removeItem('titan_backup_snooze_until'); updateBackupReminderUI();
+            store.setItem('titan_last_backup_at', Date.now().toString()); store.removeItem('titan_backup_snooze_until'); updateBackupReminderUI();
         }
         function restoreBackup(fileInput) {
             const file = fileInput.files && fileInput.files[0]; if (!file) return; const reader = new FileReader();
@@ -1853,36 +1896,36 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 const data = payload && payload.data ? payload.data : payload; const keys = Object.keys(data || {}).filter(isDashboardStorageKey);
                 if (keys.length === 0) { alert("No dashboard data found."); fileInput.value = ''; return; }
                 if (!confirm(`Overwrite ${keys.length} items with backup?`)) { fileInput.value = ''; return; }
-                keys.forEach(key => localStorage.setItem(key, data[key])); alert("Backup restored! Reloading..."); location.reload();
+                keys.forEach(key => store.setItem(key, data[key])); alert("Backup restored! Reloading..."); location.reload();
             }; reader.readAsText(file);
         }
 
         // --- First-run onboarding ---
-        function checkFirstRun() { if (isStudentMode) return; if (!localStorage.getItem('titan_onboarding_seen') && !getActiveCsvUrl()) { document.getElementById('onboardingModal').classList.add('active'); } }
-        function dismissOnboarding(openSettingsAfter) { localStorage.setItem('titan_onboarding_seen', '1'); document.getElementById('onboardingModal').classList.remove('active'); if (openSettingsAfter) openSettingsModal(); }
+        function checkFirstRun() { if (isStudentMode) return; if (!store.getItem('titan_onboarding_seen') && !getActiveCsvUrl()) { document.getElementById('onboardingModal').classList.add('active'); } }
+        function dismissOnboarding(openSettingsAfter) { store.setItem('titan_onboarding_seen', '1'); document.getElementById('onboardingModal').classList.remove('active'); if (openSettingsAfter) openSettingsModal(); }
 
         // --- Backup reminder ---
-        function ensureFirstUseTimestamp() { if (!localStorage.getItem('titan_first_used_at')) localStorage.setItem('titan_first_used_at', Date.now().toString()); }
+        function ensureFirstUseTimestamp() { if (!store.getItem('titan_first_used_at')) store.setItem('titan_first_used_at', Date.now().toString()); }
         function daysSinceLastBackup() {
-            let baseline = localStorage.getItem('titan_last_backup_at') || localStorage.getItem('titan_first_used_at'); if (!baseline) return 0;
+            let baseline = store.getItem('titan_last_backup_at') || store.getItem('titan_first_used_at'); if (!baseline) return 0;
             return Math.floor((Date.now() - parseInt(baseline, 10)) / 86400000);
         }
         function isBackupOverdue() {
-            let snoozeUntil = parseInt(localStorage.getItem('titan_backup_snooze_until') || '0', 10); if (Date.now() < snoozeUntil) return false;
+            let snoozeUntil = parseInt(store.getItem('titan_backup_snooze_until') || '0', 10); if (Date.now() < snoozeUntil) return false;
             return daysSinceLastBackup() >= 7;
         }
-        function snoozeBackupReminder() { localStorage.setItem('titan_backup_snooze_until', (Date.now() + 3 * 86400000).toString()); updateBackupReminderUI(); }
+        function snoozeBackupReminder() { store.setItem('titan_backup_snooze_until', (Date.now() + 3 * 86400000).toString()); updateBackupReminderUI(); }
         function updateBackupReminderUI() {
             const overdue = isBackupOverdue();
             const banner = document.getElementById('backupReminderBanner'); if (banner) banner.style.display = overdue ? 'flex' : 'none';
             const statusEl = document.getElementById('lastBackupStatus');
-            if (statusEl) { let lastBackup = localStorage.getItem('titan_last_backup_at'); let days = daysSinceLastBackup(); statusEl.innerText = lastBackup ? `Last backup: ${days === 0 ? 'today' : days + ' day' + (days === 1 ? '' : 's') + ' ago'}.` : "You haven't downloaded a backup yet."; }
+            if (statusEl) { let lastBackup = store.getItem('titan_last_backup_at'); let days = daysSinceLastBackup(); statusEl.innerText = lastBackup ? `Last backup: ${days === 0 ? 'today' : days + ' day' + (days === 1 ? '' : 's') + ' ago'}.` : "You haven't downloaded a backup yet."; }
         }
 
         // --- Auto Backup (sends to your own Apps Script Web App, if configured) ---
         function sendAutoBackup() {
             const url = getAutoBackupUrl(); if (!url) return; // not configured - manual backups remain the only path, by design
-            const lastBackup = parseInt(localStorage.getItem('titan_last_backup_at') || '0', 10);
+            const lastBackup = parseInt(store.getItem('titan_last_backup_at') || '0', 10);
             const backupIntervalMs = 24 * 60 * 60 * 1000; // once a day - settings/theme data rarely changes
             if (Date.now() - lastBackup < backupIntervalMs) return; // not due yet - keeps a page reload from re-sending early
             const payload = JSON.stringify({ token: getAutoBackupToken(), data: collectDashboardBackupData_() });
@@ -1892,7 +1935,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             // updated. That's why the manual backup button and reminder banner stay in place
             // as a fallback: this is a nice-to-have layer on top, not a replacement.
             fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
-                .then(() => { localStorage.setItem('titan_last_backup_at', Date.now().toString()); localStorage.removeItem('titan_backup_snooze_until'); updateBackupReminderUI(); })
+                .then(() => { store.setItem('titan_last_backup_at', Date.now().toString()); store.removeItem('titan_backup_snooze_until'); updateBackupReminderUI(); })
                 .catch(() => { /* silent - network hiccup, will retry next time sendAutoBackup runs */ });
         }
         setInterval(sendAutoBackup, 15 * 60 * 1000); // checks every 15 min whether a full day has actually passed; harmless no-op otherwise
@@ -1943,34 +1986,83 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             badge.style.display = isStale ? 'flex' : 'none';
             if (isStale) {
                 const textEl = document.getElementById('staleDataText'); if (!textEl) return;
-                const lastSync = parseInt(localStorage.getItem('titan_last_sync_success_at') || '0', 10);
+                const lastSync = parseInt(store.getItem('titan_last_sync_success_at') || '0', 10);
                 if (!lastSync) { textEl.innerText = '⚠️ Showing Cached Data'; return; }
                 const minsAgo = Math.floor((Date.now() - lastSync) / 60000);
                 let label = minsAgo < 1 ? 'just now' : minsAgo < 60 ? `${minsAgo}m ago` : `${Math.floor(minsAgo / 60)}h ago`;
                 textEl.innerText = `⚠️ Cached Data (synced ${label})`;
             }
         }
+        function renderSheetIssuesBadge() {
+            const badge = document.getElementById('sheetIssuesBadge'); if (!badge) return;
+            const total = sheetIssues.schedule.length + sheetIssues.games.length;
+            badge.style.display = (total > 0 && !isStudentMode) ? 'flex' : 'none';
+            const textEl = document.getElementById('sheetIssuesText'); if (textEl) textEl.innerText = `⚠️ ${total} Sheet Issue${total === 1 ? '' : 's'}`;
+            if (document.getElementById('sheetIssuesModal') && document.getElementById('sheetIssuesModal').classList.contains('active')) renderSheetIssuesList();
+        }
+        function renderSheetIssuesList() {
+            const list = document.getElementById('sheetIssuesList'); if (!list) return;
+            const section = (label, items) => items.length === 0 ? '' : `<h3 style="margin:18px 0 8px 0;color:var(--primary-color);">${escapeHtml(label)}</h3>` +
+                items.map(it => `<div style="padding:10px 14px;margin:6px 0;background:var(--bg-light);border-left:5px solid #b26a00;border-radius:8px;color:#111;"><b>Row ${Number(it.row)}:</b> ${escapeHtml(it.text)}</div>`).join('');
+            const body = section('Schedule sheet', sheetIssues.schedule) + section('Game Vault sheet', sheetIssues.games);
+            list.innerHTML = body || '<p style="color:#111;">No issues found. Everything in your sheets is being read.</p>';
+        }
+        function openSheetIssues() { renderSheetIssuesList(); toggleModal('sheetIssuesModal'); }
         function retryFetchNow() { fetchAgendaData(); fetchGameVaultData(); }
         async function fetchAgendaData() {
             const currentUrl = getActiveCsvUrl(); if (!currentUrl) { loadSandboxData(); setStaleDataBadge(false); return; }
             try {
                 const response = await fetch(currentUrl + (currentUrl.includes('?') ? '&' : '?') + "t=" + new Date().getTime()); if (!response.ok) throw new Error("Network error");
-                const csvText = await response.text(); localStorage.setItem('titan_last_good_csv', csvText); localStorage.setItem('titan_last_sync_success_at', Date.now().toString());
-                processCsvData(csvText); setStaleDataBadge(false);
+                const csvText = await response.text();
+                // Process FIRST, cache only after it worked - otherwise a bad response overwrites the good fallback.
+                if (!processCsvData(csvText)) throw new Error("Sheet returned no usable rows");
+                store.setItem('titan_last_good_csv', csvText); store.setItem('titan_last_good_csv_url', currentUrl); store.setItem('titan_last_sync_success_at', Date.now().toString());
+                setStaleDataBadge(false);
             }
             catch (error) {
-                let cachedCsv = localStorage.getItem('titan_last_good_csv');
-                if (cachedCsv) { processCsvData(cachedCsv); setStaleDataBadge(true); } else { loadSandboxData(); setStaleDataBadge(false); }
+                let cachedCsv = store.getItem('titan_last_good_csv'); let cachedUrl = store.getItem('titan_last_good_csv_url');
+                let cacheMatches = cachedCsv && (!cachedUrl || cachedUrl === currentUrl); // older caches have no URL stamp - still trust them once
+                let usedCache = false; try { usedCache = cacheMatches && processCsvData(cachedCsv); } catch (e) { usedCache = false; }
+                if (usedCache) setStaleDataBadge(true); else if (!schedule || schedule.length === 0) { loadSandboxData(); setStaleDataBadge(false); } else setStaleDataBadge(true);
             }
         }
         async function fetchGameVaultData() {
             const gameUrl = getActiveGameUrl(); if (!gameUrl) return;
-            try { const response = await fetch(gameUrl + (gameUrl.includes('?') ? '&' : '?') + "t=" + new Date().getTime()); parseGameVault(await response.text()); } 
-            catch (error) { console.warn("Failed to fetch Game Vault"); }
+            try {
+                const response = await fetch(gameUrl + (gameUrl.includes('?') ? '&' : '?') + "t=" + new Date().getTime()); if (!response.ok) throw new Error("Network error");
+                const csvText = await response.text();
+                // A real vault has Status and Type headers; an unpublished/permission-error response is an HTML page.
+                const header = (csvText.split(/\r?\n/)[0] || '').toLowerCase();
+                if (!header.includes('status') || !header.includes('type')) throw new Error("Not a Game Vault CSV");
+                parseGameVault(csvText);
+                store.setItem('titan_last_good_games_csv', csvText); store.setItem('titan_last_good_games_url', gameUrl);
+            }
+            catch (error) {
+                console.warn("Failed to fetch Game Vault - using last good copy if there is one");
+                const cached = store.getItem('titan_last_good_games_csv');
+                if (cached && store.getItem('titan_last_good_games_url') === gameUrl) { try { parseGameVault(cached); } catch (e) { /* leave hub as-is */ } }
+            }
         }
 
         function getCol(row, name) { const target = name.toLowerCase().replace(/[\s_]+/g, ''); const key = Object.keys(row).find(k => k.toLowerCase().replace(/[\s_]+/g, '') === target); return key && row[key] != null ? row[key].toString().trim() : ''; }
         function parseCsv(csvText) { return Papa.parse(csvText, { header: true, skipEmptyLines: true }).data; }
+        // Safe way to pass sheet text as an argument inside an inline onclick attribute: JSON.stringify makes a valid JS
+        // string literal for ANY content (quotes, backslashes, newlines), escapeHtml then makes that literal
+        // safe inside the double-quoted attribute. The browser decodes the entities before running the handler.
+        function jsArg(value) { return escapeHtml(JSON.stringify(String(value == null ? '' : value))); }
+        // Sheet times: accepts 13:30, 1:30 PM, 1:30:00 PM, 1:30pm, 1:30 p.m. Published CSV exports whatever the
+        // cell DISPLAYS, and Google Sheets' default US time format is "1:30:00 PM", so the suffix must be honored.
+        function parseSheetTime(raw) {
+            const m = String(raw == null ? '' : raw).trim().match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(?:([AaPp])\.?\s*[Mm]?\.?)?$/);
+            if (!m) return null;
+            let h = parseInt(m[1], 10); const min = parseInt(m[2], 10); const ap = m[3] ? m[3].toLowerCase() : '';
+            if (ap === 'p' && h < 12) h += 12; if (ap === 'a' && h === 12) h = 0;
+            if (h > 23 || min > 59) return null;
+            return h * 60 + min;
+        }
+        // Agenda / Reminders cells: items separated by a dash at the start or after a space ("- Warm-up - Notes"),
+        // or by line breaks. Dashes INSIDE words (Warm-up, Pre-test, Supply-and-demand) are left alone.
+        function splitSheetList(raw) { return String(raw == null ? '' : raw).split(/\r?\n|(?:^|\s)-+/).map(x => x.trim()).filter(x => x !== ''); }
         function escapeHtml(str) { return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
         function parseSheetDate(rawDateStr) {
             let clean = rawDateStr.replace(/\*/g, '').trim();
@@ -1989,7 +2081,25 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             let d = new Date(clean); return isNaN(d.getTime()) ? null : d;
         }
 
+        function editDistance(a, b) {
+            let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+            for (let i = 1; i <= a.length; i++) { let cur = [i]; for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; }
+            return prev[b.length];
+        }
+        // Only flags statuses that look like a MISTYPED ACTIVE / TEACHER_ONLY. Anything else (blank, OFF, ARCHIVED)
+        // is treated as a deliberate hide and stays quiet, so the pill doesn't nag about games you turned off on purpose.
+        function checkGameVault(csvText) {
+            let issues = [];
+            Papa.parse(csvText, { header: true, skipEmptyLines: false }).data.forEach((row, i) => {
+                const status = getCol(row, 'Status').toUpperCase(); if (!status || status === 'ACTIVE' || status === 'TEACHER_ONLY') return;
+                const squashed = status.replace(/[\s-]+/g, '_');
+                if (squashed === 'TEACHER_ONLY' || editDistance(status, 'ACTIVE') <= 2 || editDistance(squashed, 'TEACHER_ONLY') <= 3)
+                    issues.push({ row: i + 2, text: `Status "${getCol(row, 'Status')}"${getCol(row, 'Title') ? ` on "${getCol(row, 'Title')}"` : ''} isn't recognized, so this game is hidden. Use ACTIVE or TEACHER_ONLY.` });
+            });
+            return issues;
+        }
         function parseGameVault(csvText) {
+            if (!isStudentMode) { sheetIssues.games = checkGameVault(csvText); renderSheetIssuesBadge(); }
             gameVaultData = [];
             parseCsv(csvText).forEach(row => {
                 const status = getCol(row, 'Status').toUpperCase();
@@ -2000,36 +2110,104 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             if(isGameStage) buildDynamicGameMenu();
         }
 
-        function processCsvData(csvText) {
-            let demoBadge = document.getElementById('demoModeBadge'); if (demoBadge) demoBadge.style.display = 'none';
-            let allParsedBlocks = []; let nowMs = new Date().getTime();
-            parseCsv(csvText).forEach(row => {
-                const rawDateStr = getCol(row, 'Date'); if (!rawDateStr) return;
-                let isForced = rawDateStr.includes('*'); let rowDate = parseSheetDate(rawDateStr); if (!rowDate) return; rowDate.setHours(0, 0, 0, 0);
-                let startStr = getCol(row, 'Start'); let endStr = getCol(row, 'End'); let startMins = 0, endMins = 0;
-                if (startStr.includes(':')) { let p = startStr.split(':'); startMins = parseInt(p[0]) * 60 + parseInt(p[1]); }
-                if (endStr.includes(':')) { let p = endStr.split(':'); endMins = parseInt(p[0]) * 60 + parseInt(p[1]); }
-                let block = { date: rowDate, forced: isForced, id: getCol(row, 'ID'), title: getCol(row, 'Title') || 'Class Block', start: startMins, end: endMins, eq: getCol(row, 'EQ'), standards: getCol(row, 'Standards') ? `Standard(s): ${getCol(row, 'Standards')}` : "", warmup: getCol(row, 'Warmup'), message: getCol(row, 'Message'), ticker: getCol(row, 'Ticker'), resources: getCol(row, 'Resources'), agenda: [], reminders: [], roster: [] };
-                let rosterStr = getCol(row, 'Roster'); if (rosterStr) block.roster = rosterStr.split(',').map(s => s.trim()).filter(s => s !== "");
-                let agendaStr = getCol(row, 'Agenda'); if (agendaStr) block.agenda = agendaStr.split('-').map(s => s.trim()).filter(s => s !== "");
-                let remindersStr = getCol(row, 'Reminders'); if (remindersStr) block.reminders = remindersStr.split('-').map(s => s.trim()).filter(s => s !== "");
-                allParsedBlocks.push(block);
+        // ---- Schedule carry-forward ----
+        // Sticky columns inherit from the most recent earlier row with the same ID when left blank.
+        // Daily columns never inherit: a stale warm-up on the board is worse than an empty one.
+        // Typing "none" in a sticky cell clears it; "none" in Title retires that class.
+        const SCHEDULE_STICKY_COLS = ['Title', 'Start', 'End', 'Roster', 'EQ', 'Standards', 'Resources'];
+        const SCHEDULE_DAILY_COLS = ['Warmup', 'Message', 'Ticker', 'Agenda', 'Reminders'];
+        // Row numbers match the sheet: parsed WITHOUT skipping blank lines (a blank sheet row still exports as ",,,"),
+        // so record i is sheet row i + 2 (row 1 is the header).
+        function readScheduleEntries(csvText, issues) {
+            let entries = [];
+            Papa.parse(csvText, { header: true, skipEmptyLines: false }).data.forEach((row, i) => {
+                const rowNum = i + 2; const values = Object.values(row).map(v => (v == null ? '' : String(v).trim()));
+                if (values.every(v => v === '')) return;
+                const rawDateStr = getCol(row, 'Date'); const hasContent = !!(getCol(row, 'ID') || getCol(row, 'Start') || getCol(row, 'Title') || getCol(row, 'Warmup') || getCol(row, 'EQ'));
+                if (!rawDateStr) { if (hasContent && issues) issues.push({ row: rowNum, text: 'No Date, so this row is skipped.' }); return; }
+                let rowDate = parseSheetDate(rawDateStr);
+                if (!rowDate) { if (hasContent && issues) issues.push({ row: rowNum, text: `Date "${rawDateStr}" isn't a date the dashboard can read, so this row is skipped. Try 9/22/2026.` }); return; } // label-only rows like "WEEK 5" stay quiet
+                rowDate.setHours(0, 0, 0, 0);
+                let cells = {}; SCHEDULE_STICKY_COLS.concat(SCHEDULE_DAILY_COLS).forEach(c => { cells[c] = getCol(row, c); });
+                if (issues) ['Start', 'End'].forEach(c => { let v = cells[c]; if (v && v.toLowerCase() !== 'none' && parseSheetTime(v) === null) issues.push({ row: rowNum, text: `${c} "${v}" isn't a time the dashboard can read, so it's treated as blank. Try 7:25 AM.` }); });
+                entries.push({ date: rowDate, forced: rawDateStr.includes('*'), id: getCol(row, 'ID'), cells: cells, order: i, row: rowNum });
             });
-            if (allParsedBlocks.length === 0) return;
-            allParsedBlocks.sort((a, b) => (a.date.getTime() - b.date.getTime()) || (a.start - b.start));
-            let upcomingBlocks = allParsedBlocks.filter(b => b.date.getTime() + (b.end * 60000) > nowMs);
-            let targetBlocks = []; let forcedRows = allParsedBlocks.filter(b => b.forced);
-            if (forcedRows.length > 0) targetBlocks = allParsedBlocks.filter(b => b.date.getTime() === forcedRows[0].date.getTime());
-            else if (upcomingBlocks.length > 0) targetBlocks = allParsedBlocks.filter(b => b.date.getTime() === upcomingBlocks[0].date.getTime());
-            else targetBlocks = allParsedBlocks.filter(b => b.date.getTime() === allParsedBlocks[allParsedBlocks.length - 1].date.getTime());
-            schedule = targetBlocks; needsDataRender = true; updateDashboard();
+            entries.sort((a, b) => (a.date.getTime() - b.date.getTime()) || (a.order - b.order)); // sheet order breaks ties, so inheritance follows how you typed it
+            return entries;
+        }
+        // ID-level checks, in the same date order the carry-forward uses.
+        function checkScheduleEntries(entries, issues) {
+            let seen = {}; let retiredAt = {};
+            entries.forEach(e => {
+                if (!e.id) return; const title = e.cells.Title; const isRetire = title && title.toLowerCase() === 'none';
+                if (!seen[e.id]) { seen[e.id] = true; if (!title) issues.push({ row: e.row, text: `ID "${e.id}" has no Title on its earliest row. If it's a typo for another ID, fix the ID. If older rows were deleted, fill in this row's Title, times, and roster.` }); }
+                if (isRetire) { retiredAt[e.id] = e.row; return; }
+                if (title) { delete retiredAt[e.id]; return; }
+                if (retiredAt[e.id]) issues.push({ row: e.row, text: `ID "${e.id}" was retired on row ${retiredAt[e.id]} (Title "none"), so this row is hidden. Give it a Title to bring the class back.` });
+            });
+        }
+        function applyStickyCells(prev, cells) {
+            let next = Object.assign({}, prev);
+            SCHEDULE_STICKY_COLS.forEach(c => { let v = cells[c]; if (!v) return; next[c] = v.toLowerCase() === 'none' ? '' : v; });
+            if (cells.Title && cells.Title.toLowerCase() === 'none') next.__retired = true; else if (cells.Title) next.__retired = false;
+            return next;
+        }
+        function scheduleBlockFrom(date, id, sticky, daily, forced, carried) {
+            let t;
+            let block = { date: new Date(date.getTime()), forced: !!forced, carried: !!carried, id: id, title: sticky.Title || 'Class Block', start: 0, end: 0,
+                eq: sticky.EQ || '', standards: sticky.Standards ? `Standard(s): ${sticky.Standards}` : "", resources: sticky.Resources || '',
+                warmup: daily.Warmup || '', message: daily.Message || '', ticker: daily.Ticker || '', agenda: [], reminders: [], roster: [] };
+            t = parseSheetTime(sticky.Start || ''); if (t !== null) block.start = t;
+            t = parseSheetTime(sticky.End || ''); if (t !== null) block.end = t;
+            if (sticky.Roster) block.roster = sticky.Roster.split(',').map(s => s.trim()).filter(s => s !== "");
+            if (daily.Agenda) block.agenda = splitSheetList(daily.Agenda);
+            if (daily.Reminders) block.reminders = splitSheetList(daily.Reminders);
+            return block;
+        }
+        // Every class that has appeared (and isn't retired) shows up on every day. A day's rows override;
+        // classes with no row that day are rebuilt from their sticky values with the daily cards empty.
+        function resolveScheduleDay(entries, day) {
+            let dayMs = day.getTime(); let state = {}; let seenOrder = []; let blocks = []; let idsWithRows = new Set();
+            for (let e of entries) {
+                let eMs = e.date.getTime(); if (eMs > dayMs) break;
+                if (!e.id) { if (eMs === dayMs) blocks.push(scheduleBlockFrom(e.date, '', e.cells, e.cells, e.forced, false)); continue; } // no ID: one-off row, no inheritance
+                if (!state[e.id]) { state[e.id] = {}; seenOrder.push(e.id); }
+                state[e.id] = applyStickyCells(state[e.id], e.cells);
+                if (eMs === dayMs) { idsWithRows.add(e.id); if (!state[e.id].__retired) blocks.push(scheduleBlockFrom(e.date, e.id, state[e.id], e.cells, e.forced, false)); }
+            }
+            seenOrder.forEach(id => { if (!idsWithRows.has(id) && !state[id].__retired) blocks.push(scheduleBlockFrom(day, id, state[id], {}, false, true)); });
+            blocks.sort((a, b) => a.start - b.start);
+            return { blocks: blocks, hasRows: idsWithRows.size > 0 || blocks.some(b => !b.id) };
+        }
+        function pickScheduleDay(entries, now) {
+            let forced = entries.find(e => e.forced);
+            if (forced) return resolveScheduleDay(entries, forced.date).blocks;
+            let nowMs = now.getTime(); let day = new Date(now.getTime()); day.setHours(0, 0, 0, 0);
+            for (let i = 0; i < 21; i++) {
+                let isWeekend = day.getDay() === 0 || day.getDay() === 6;
+                let r = resolveScheduleDay(entries, day);
+                // weekends only count if you actually put rows on them; weekdays are assumed class days
+                if ((!isWeekend || r.hasRows) && r.blocks.some(b => day.getTime() + b.end * 60000 > nowMs)) return r.blocks;
+                day.setDate(day.getDate() + 1);
+            }
+            // nothing resolvable in the next three weeks (e.g. no times entered): fall back to the last dated day in the sheet
+            let lastDay = entries[entries.length - 1].date;
+            return resolveScheduleDay(entries, lastDay).blocks;
+        }
+        function processCsvData(csvText) {
+            let issues = []; let entries = readScheduleEntries(csvText, issues);
+            if (entries.length === 0) return false; // nothing usable (unpublished sheet returns an HTML page, renamed Date column, etc.) - caller falls back to cache
+            let demoBadge = document.getElementById('demoModeBadge'); if (demoBadge) demoBadge.style.display = 'none';
+            checkScheduleEntries(entries, issues); sheetIssues.schedule = issues; renderSheetIssuesBadge();
+            schedule = pickScheduleDay(entries, new Date()); needsDataRender = true; updateDashboard();
+            return true;
         }
 
         // ==================== MODALS, TRACKER (ROSTER) & ATTENDANCE ====================
         window.toggleChecklist = function(el, listKey, itemText) {
-            el.classList.toggle('completed'); let checkedItems = JSON.parse(localStorage.getItem(listKey) || '[]');
+            el.classList.toggle('completed'); let checkedItems = JSON.parse(store.getItem(listKey) || '[]');
             if (el.classList.contains('completed')) { if (!checkedItems.includes(itemText)) checkedItems.push(itemText); } else { checkedItems = checkedItems.filter(i => i !== itemText); }
-            localStorage.setItem(listKey, JSON.stringify(checkedItems));
+            store.setItem(listKey, JSON.stringify(checkedItems));
         };
 
         function toggleModal(modalId) { document.getElementById(modalId).classList.toggle('active'); checkFloatingTimer(); }
@@ -2038,23 +2216,23 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function renderTracker() {
             const container = document.getElementById('trackerContainer'); container.innerHTML = '';
             if (!activeBlockData || !activeBlockData.roster || activeBlockData.roster.length === 0) { container.innerHTML = '<p style="text-align:center; font-size:1.5rem; padding:20px; color:#111; grid-column:1 / -1;">No active roster available.</p>'; return; }
-            let classId = activeBlockData.id; let trackingData = JSON.parse(localStorage.getItem('titan_tracker_' + classId) || '{}'); let absentList = JSON.parse(localStorage.getItem('titan_absent_' + classId) || '[]'); let hpData = JSON.parse(localStorage.getItem('titan_hallpass_active_' + classId) || '{}');
+            let classId = activeBlockData.id; let trackingData = JSON.parse(store.getItem('titan_tracker_' + classId) || '{}'); let absentList = JSON.parse(store.getItem('titan_absent_' + classId) || '[]'); let hpData = JSON.parse(store.getItem('titan_hallpass_active_' + classId) || '{}');
             activeBlockData.roster.forEach(student => {
                 if (trackingData[student] === undefined) trackingData[student] = 0; 
                 let score = trackingData[student]; let isAbsent = absentList.includes(student); let isOut = hpData[student] !== undefined;
                 let nameStyle = `cursor:pointer; transition:all 0.2s; text-decoration:${isAbsent ? 'line-through' : 'none'}; opacity:${isAbsent ? '0.4' : '1'};`;
-                let safeStudentJS = student.replace(/'/g, "\\'").replace(/"/g, "&quot;"); let safeStudentId = student.replace(/['"\s]/g, '-');
+                let safeStudentId = student.replace(/['"\s]/g, '-');
                 let hpButtonStyle = isOut ? 'active' : ''; let hpTimerDisplay = isOut ? `<div class="hp-timer" id="hp-timer-${safeStudentId}">⏱️ Out...</div>` : `<div class="hp-timer" id="hp-timer-${safeStudentId}" style="display:none;"></div>`;
                 let row = document.createElement('div'); row.className = 'tracker-row'; if (isOut) row.id = `tracker-row-${safeStudentId}`;
-                row.innerHTML = `<div style="display:flex; align-items:center; gap:10px; flex-grow:1; min-width:0;"><button class="t-hp-btn ${hpButtonStyle}" onclick="toggleHallPass('${safeStudentJS}', '${classId}')" title="Hall Pass">🚪</button><div class="tracker-name-wrap"><div class="tracker-name" style="${nameStyle}" onclick="toggleAbsent('${safeStudentJS}', '${classId}')">${escapeHtml(student)}</div>${hpTimerDisplay}</div></div><div class="tracker-score-display" id="score-display-${safeStudentId}">${score}</div><div class="tracker-actions"><button class="t-btn t-minus" onclick="logParticipation('${safeStudentJS}', -1, '${classId}')">-</button><button class="t-btn t-plus" onclick="logParticipation('${safeStudentJS}', 1, '${classId}')">+</button></div>`;
+                row.innerHTML = `<div style="display:flex; align-items:center; gap:10px; flex-grow:1; min-width:0;"><button class="t-hp-btn ${hpButtonStyle}" onclick="toggleHallPass(${jsArg(student)}, ${jsArg(classId)})" title="Hall Pass">🚪</button><div class="tracker-name-wrap"><div class="tracker-name" style="${nameStyle}" onclick="toggleAbsent(${jsArg(student)}, ${jsArg(classId)})">${escapeHtml(student)}</div>${hpTimerDisplay}</div></div><div class="tracker-score-display" id="score-display-${safeStudentId}">${score}</div><div class="tracker-actions"><button class="t-btn t-minus" onclick="logParticipation(${jsArg(student)}, -1, ${jsArg(classId)})">-</button><button class="t-btn t-plus" onclick="logParticipation(${jsArg(student)}, 1, ${jsArg(classId)})">+</button></div>`;
                 container.appendChild(row);
             });
             updateHallPassIndicators();
         }
 
-        window.toggleHallPass = function(student, classId) { let hpKey = 'titan_hallpass_active_' + classId; let hpData = JSON.parse(localStorage.getItem(hpKey) || '{}'); if (hpData[student]) delete hpData[student]; else hpData[student] = Date.now(); localStorage.setItem(hpKey, JSON.stringify(hpData)); renderTracker(); };
+        window.toggleHallPass = function(student, classId) { let hpKey = 'titan_hallpass_active_' + classId; let hpData = JSON.parse(store.getItem(hpKey) || '{}'); if (hpData[student]) delete hpData[student]; else hpData[student] = Date.now(); store.setItem(hpKey, JSON.stringify(hpData)); renderTracker(); };
         function updateHallPassIndicators() {
-            if (!activeBlockData) return; let classId = activeBlockData.id; let hpData = JSON.parse(localStorage.getItem('titan_hallpass_active_' + classId) || '{}'); let outCount = Object.keys(hpData).length;
+            if (!activeBlockData) return; let classId = activeBlockData.id; let hpData = JSON.parse(store.getItem('titan_hallpass_active_' + classId) || '{}'); let outCount = Object.keys(hpData).length;
             let subtitleEl = document.getElementById('classPillSubtitle'); if (subtitleEl) { if (outCount > 0) { subtitleEl.innerText = `📍 ${outCount} Student${outCount > 1 ? 's' : ''} Out`; subtitleEl.style.color = 'var(--primary-color)'; } else { subtitleEl.innerText = "Today's Schedule"; subtitleEl.style.color = '#444'; } }
             if (document.getElementById('trackerModal').classList.contains('active')) {
                 Object.keys(hpData).forEach(student => {
@@ -2065,29 +2243,29 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         }
         setInterval(updateHallPassIndicators, 1000);
 
-        window.toggleAbsent = function(student, classId) { let absentKey = 'titan_absent_' + classId; let absentList = JSON.parse(localStorage.getItem(absentKey) || '[]'); if (absentList.includes(student)) { absentList = absentList.filter(s => s !== student); } else { absentList.push(student); } localStorage.setItem(absentKey, JSON.stringify(absentList)); renderTracker(); };
+        window.toggleAbsent = function(student, classId) { let absentKey = 'titan_absent_' + classId; let absentList = JSON.parse(store.getItem(absentKey) || '[]'); if (absentList.includes(student)) { absentList = absentList.filter(s => s !== student); } else { absentList.push(student); } store.setItem(absentKey, JSON.stringify(absentList)); renderTracker(); };
         window.toggleAllAbsences = function() {
-            if (!activeBlockData || !activeBlockData.roster) return; let absentKey = 'titan_absent_' + activeBlockData.id; let currentAbsences = JSON.parse(localStorage.getItem(absentKey) || '[]');
-            if (currentAbsences.length >= activeBlockData.roster.length && activeBlockData.roster.length > 0) { if (confirm("Mark ALL students as PRESENT?")) { localStorage.removeItem(absentKey); renderTracker(); } } 
-            else { if (confirm("Mark ALL students as ABSENT?")) { localStorage.setItem(absentKey, JSON.stringify(activeBlockData.roster)); renderTracker(); } }
+            if (!activeBlockData || !activeBlockData.roster) return; let absentKey = 'titan_absent_' + activeBlockData.id; let currentAbsences = JSON.parse(store.getItem(absentKey) || '[]');
+            if (currentAbsences.length >= activeBlockData.roster.length && activeBlockData.roster.length > 0) { if (confirm("Mark ALL students as PRESENT?")) { store.removeItem(absentKey); renderTracker(); } } 
+            else { if (confirm("Mark ALL students as ABSENT?")) { store.setItem(absentKey, JSON.stringify(activeBlockData.roster)); renderTracker(); } }
         };
-        window.clearPointsData = function() { if (!activeBlockData) return; if (confirm("Clear ALL participation data for this class?")) { localStorage.removeItem('titan_tracker_' + activeBlockData.id); renderTracker(); } };
-        window.copyAbsencesData = function() { if (!activeBlockData) return; let absentList = JSON.parse(localStorage.getItem('titan_absent_' + activeBlockData.id) || '[]'); if (absentList.length === 0) { alert("No absences."); return; } navigator.clipboard.writeText("Absent:\n" + absentList.join('\n')).then(() => alert("Copied!")).catch(e => alert("Failed.")); };
+        window.clearPointsData = function() { if (!activeBlockData) return; if (confirm("Clear ALL participation data for this class?")) { store.removeItem('titan_tracker_' + activeBlockData.id); renderTracker(); } };
+        window.copyAbsencesData = function() { if (!activeBlockData) return; let absentList = JSON.parse(store.getItem('titan_absent_' + activeBlockData.id) || '[]'); if (absentList.length === 0) { alert("No absences."); return; } let absText = "Absent:\n" + absentList.join('\n'); if (!navigator.clipboard || !navigator.clipboard.writeText) { alert(absText); return; } navigator.clipboard.writeText(absText).then(() => alert("Copied!")).catch(e => alert(absText)); };
         function csvEscape(field) { let s = String(field); return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
         function exportScoresCSV() {
             let rows = [['Period', 'Student', 'Score']]; let seenIds = new Set(); let foundAny = false;
             if (typeof schedule !== 'undefined' && schedule.length > 0) {
                 schedule.forEach(block => {
                     if (!block.id || seenIds.has(block.id)) return; seenIds.add(block.id);
-                    let trackingData = JSON.parse(localStorage.getItem('titan_tracker_' + block.id) || '{}');
+                    let trackingData = JSON.parse(store.getItem('titan_tracker_' + block.id) || '{}');
                     let studentNames = Object.keys(trackingData); if (studentNames.length === 0) return;
                     foundAny = true; studentNames.forEach(name => rows.push([block.title || block.id, name, trackingData[name]]));
                 });
             }
-            for (let i = 0; i < localStorage.length; i++) {
-                let key = localStorage.key(i); if (!key || !key.startsWith('titan_tracker_')) continue;
+            for (let i = 0; i < store.length; i++) {
+                let key = store.key(i); if (!key || !key.startsWith('titan_tracker_')) continue;
                 let id = key.substring('titan_tracker_'.length); if (seenIds.has(id)) continue; seenIds.add(id);
-                let trackingData = JSON.parse(localStorage.getItem(key) || '{}');
+                let trackingData = JSON.parse(store.getItem(key) || '{}');
                 let studentNames = Object.keys(trackingData); if (studentNames.length === 0) continue;
                 foundAny = true; studentNames.forEach(name => rows.push([id, name, trackingData[name]]));
             }
@@ -2099,7 +2277,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
         // ==================== CLASS POINTS / LEADERBOARD ====================
         window.logParticipation = function(student, change, classId) {
-            let trackingData = JSON.parse(localStorage.getItem('titan_tracker_' + classId) || '{}'); trackingData[student] = (trackingData[student] || 0) + change; localStorage.setItem('titan_tracker_' + classId, JSON.stringify(trackingData));
+            let trackingData = JSON.parse(store.getItem('titan_tracker_' + classId) || '{}'); trackingData[student] = (trackingData[student] || 0) + change; store.setItem('titan_tracker_' + classId, JSON.stringify(trackingData));
             let safeStudentId = student.replace(/['"\s]/g, '-'); let scoreEl = document.getElementById(`score-display-${safeStudentId}`);
             if(scoreEl) { scoreEl.innerText = trackingData[student]; scoreEl.style.transform = 'scale(1.5)'; scoreEl.style.color = change > 0 ? '#388e3c' : '#d32f2f'; setTimeout(() => { scoreEl.style.transform = 'scale(1)'; scoreEl.style.color = 'var(--primary-color)'; }, 300); }
             pushPointsUndo(() => { window.logParticipation(student, -change, classId); });
@@ -2112,12 +2290,12 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
         let currentClassPoints = 0;
         function togglePointsModal() { toggleModal('pointsModal'); if (document.getElementById('pointsModal').classList.contains('active')) renderLeaderboard(); }
-        function loadClassPoints() { if(activeBlockData && activeBlockData.id) { currentClassPoints = parseInt(localStorage.getItem('classPoints_' + activeBlockData.id)) || 0; } else { currentClassPoints = 0; } }
-        function updatePoints(change) { const classId = activeBlockData ? activeBlockData.id : null; currentClassPoints += change; if(classId) localStorage.setItem('classPoints_' + classId, currentClassPoints); renderLeaderboard(); pushPointsUndo(() => { currentClassPoints -= change; if (classId) localStorage.setItem('classPoints_' + classId, currentClassPoints); renderLeaderboard(); }); }
-        function resetAllPoints() { if (confirm("Reset all scores?")) { for (let i = localStorage.length - 1; i >= 0; i--) { let key = localStorage.key(i); if (key && key.startsWith('classPoints_')) localStorage.removeItem(key); } currentClassPoints = 0; renderLeaderboard(); } }
+        function loadClassPoints() { if(activeBlockData && activeBlockData.id) { currentClassPoints = parseInt(store.getItem('classPoints_' + activeBlockData.id)) || 0; } else { currentClassPoints = 0; } }
+        function updatePoints(change) { const classId = activeBlockData ? activeBlockData.id : null; currentClassPoints += change; if(classId) store.setItem('classPoints_' + classId, currentClassPoints); renderLeaderboard(); pushPointsUndo(() => { currentClassPoints -= change; if (classId) store.setItem('classPoints_' + classId, currentClassPoints); renderLeaderboard(); }); }
+        function resetAllPoints() { if (confirm("Reset all scores?")) { for (let i = store.length - 1; i >= 0; i--) { let key = store.key(i); if (key && key.startsWith('classPoints_')) store.removeItem(key); } currentClassPoints = 0; renderLeaderboard(); } }
         function renderLeaderboard() {
             let lbContainer = document.getElementById('leaderboardContainer'); lbContainer.innerHTML = ''; let classData = []; let maxPoints = 1; 
-            for (let block of schedule) { if (block.title.toLowerCase().includes('planning') || block.roster.length === 0) continue; let pts = parseInt(localStorage.getItem('classPoints_' + block.id)) || 0; if (Math.abs(pts) > maxPoints) maxPoints = Math.abs(pts); classData.push({ id: block.id, title: `Period ${block.id} (${block.title.split('&')[0].trim()})`, points: pts }); }
+            for (let block of schedule) { if (block.title.toLowerCase().includes('planning') || block.roster.length === 0) continue; let pts = parseInt(store.getItem('classPoints_' + block.id)) || 0; if (Math.abs(pts) > maxPoints) maxPoints = Math.abs(pts); classData.push({ id: block.id, title: `Period ${block.id} (${block.title.split('&')[0].trim()})`, points: pts }); }
             classData.sort((a, b) => b.points - a.points);
             classData.forEach((cls, index) => {
                 let widthPct = 0; if (cls.points < 0) widthPct = Math.min(Math.abs(cls.points / maxPoints) * 100, 100); else if (cls.points > 0) widthPct = Math.max((cls.points / maxPoints) * 100, 15);
@@ -2173,9 +2351,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             let matchingGames = gameVaultData.filter(g => g.type === gameType); let uniquePacks = []; let seenTitles = new Set();
             matchingGames.forEach(g => { let gameTitle = g.title ? g.title.toString().trim() : "Untitled Deck"; if (!seenTitles.has(gameTitle)) { seenTitles.add(gameTitle); uniquePacks.push({ title: gameTitle }); } });
             const menu = document.getElementById('gameHubMenu');
-            menu.innerHTML = `<div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; grid-column:1 / -1;"><h2 style="color:#fff; margin:0; font-size:clamp(1.4rem,2vw,2.2rem); text-transform:uppercase;">Select ${displayTitle} Deck</h2><button onclick="buildDynamicGameMenu()" style="background:var(--bg-light);border:none;padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;color:#111;">Back to Hub</button></div>`;
+            menu.innerHTML = `<div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; grid-column:1 / -1;"><h2 style="color:#fff; margin:0; font-size:clamp(1.4rem,2vw,2.2rem); text-transform:uppercase;">Select ${escapeHtml(displayTitle)} Deck</h2><button onclick="buildDynamicGameMenu()" style="background:var(--bg-light);border:none;padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:1rem;color:#111;">Back to Hub</button></div>`;
             if (uniquePacks.length === 0) { menu.innerHTML += `<h3 style="color:var(--bg-mid); text-align:center; width:100%; grid-column:1 / -1;">No decks found.</h3>`; } 
-            else { uniquePacks.forEach(p => { let safeTitle = p.title.replace(/'/g, "\\'"); menu.innerHTML += gameCartridgeHTML(gameType, `openGameModule('${gameType}', '${safeTitle}')`, escapeHtml(p.title), 'Play Now', false); }); }
+            else { uniquePacks.forEach(p => { menu.innerHTML += gameCartridgeHTML(gameType, `openGameModule(${jsArg(gameType)}, ${jsArg(p.title)})`, escapeHtml(p.title), 'Play Now', false); }); }
         }
 
         function buildDynamicGameMenu() {
@@ -2184,13 +2362,13 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             let hasGame = { jeopardy: false, biddingwar: false, hotseat: false, taboo: false, titansays: false, hivemind: false, debate: false, vault: false, factorfiction: false, survey: false, gridlock: false, bullmarket: false, gauntlet: false, reinforcement: false };
             gameVaultData.forEach(row => { if (hasGame[row.type] !== undefined) hasGame[row.type] = true; });
             if (!Object.values(hasGame).some(val => val)) { menu.innerHTML = '<h3 style="color:var(--bg-mid); text-align:center; width:100%;">No games are marked ACTIVE.</h3>'; return; }
-            let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans';
+            let mascot = store.getItem('titan_setting_mascot') || DEFAULT_MASCOT;
             
-            if (hasGame.jeopardy) menu.innerHTML += gameCartridgeHTML('jeopardy', `handlePackSelection('jeopardy', '${mascot} Jeopardy')`, `${mascot} Jeopardy`, 'Select a Deck');
+            if (hasGame.jeopardy) menu.innerHTML += gameCartridgeHTML('jeopardy', `handlePackSelection('jeopardy', ${jsArg(mascot + ' Jeopardy')})`, escapeHtml(mascot + ' Jeopardy'), 'Select a Deck');
             if (hasGame.biddingwar) menu.innerHTML += gameCartridgeHTML('biddingwar', `handlePackSelection('biddingwar', 'The Bidding War')`, 'The Bidding War', 'Select a Deck');
             if (hasGame.hotseat) menu.innerHTML += gameCartridgeHTML('hotseat', `handlePackSelection('hotseat', 'The Hot Seat')`, 'The Hot Seat', 'Select a Deck');
             if (hasGame.taboo) menu.innerHTML += gameCartridgeHTML('taboo', `handlePackSelection('taboo', 'Taboo')`, 'Taboo', 'Select a Deck');
-            if (hasGame.titansays) menu.innerHTML += gameCartridgeHTML('titansays', `handlePackSelection('titansays', '${mascot} Says')`, `${mascot} Says`, 'Select a Deck');
+            if (hasGame.titansays) menu.innerHTML += gameCartridgeHTML('titansays', `handlePackSelection('titansays', ${jsArg(mascot + ' Says')})`, escapeHtml(mascot + ' Says'), 'Select a Deck');
             if (hasGame.hivemind) menu.innerHTML += gameCartridgeHTML('hivemind', `handlePackSelection('hivemind', 'Hivemind')`, 'Hivemind', 'Select a Deck');
             if (hasGame.debate) menu.innerHTML += gameCartridgeHTML('debate', `handlePackSelection('debate', 'Rapid Debate')`, 'Rapid Debate', 'Select a Deck');
             if (hasGame.vault) menu.innerHTML += gameCartridgeHTML('vault', `handlePackSelection('vault', 'The Vault')`, 'The Vault', 'Select a Deck');
@@ -2337,7 +2515,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         }
         function renderSurveyBoard() {
             strikeCount = 0; document.getElementById('surveyStrikes').innerText = "";
-            let board = currentSurveyBoards[surveyIndex]; document.getElementById('surveyDisplay').innerText = board.prompt;
+            let board = currentSurveyBoards[surveyIndex];
+            if (!board) { document.getElementById('surveyDisplay').innerText = "NO SURVEYS LOADED"; document.getElementById('surveyAnswersContainer').innerHTML = ''; return; } // empty deck: Restart/Next stay clickable, so the render itself has to cope
+            document.getElementById('surveyDisplay').innerText = board.prompt;
             let container = document.getElementById('surveyAnswersContainer'); container.innerHTML = '';
             let answers = board.answer.split('|').map((ans, idx) => {
                 let parts = ans.split(':'); return { idx, text: parts[0] ? parts[0].trim() : "Answer", points: parts[1] ? parts[1].trim() : "0" };
@@ -2421,10 +2601,10 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         // ==================== GAME: THE VAULT ====================
         function loadVaultModule(gameTitle) { document.getElementById('vaultContainer').style.display = 'flex'; let items = gameVaultData.filter(g => g.type === 'vault' && g.title.toString().trim() === gameTitle); miniGameLists['vault'] = items.length > 0 ? items : [{prompt:"NO CLUES LOADED", answer:""}]; resetVault(); }
         function nextVaultClue() {
-            let display = document.getElementById('vaultInner'); let playedKey = 'titan_vault_played_' + currentActiveGameTitle; let played = JSON.parse(localStorage.getItem(playedKey) || '[]');
+            let display = document.getElementById('vaultInner'); let playedKey = 'titan_vault_played_' + currentActiveGameTitle; let played = JSON.parse(store.getItem(playedKey) || '[]');
             let available = miniGameLists['vault'].map((item, idx) => idx).filter(idx => !played.includes(idx));
             if (available.length === 0) { display.innerText = "VAULT DEPLETED."; return; }
-            let selectedIdx = available[Math.floor(Math.random() * available.length)]; let selected = miniGameLists['vault'][selectedIdx]; played.push(selectedIdx); localStorage.setItem(playedKey, JSON.stringify(played));
+            let selectedIdx = available[Math.floor(Math.random() * available.length)]; let selected = miniGameLists['vault'][selectedIdx]; played.push(selectedIdx); store.setItem(playedKey, JSON.stringify(played));
             vaultCurrentClues = selected.prompt.split('|').map(c => c.trim()); vaultCurrentClues.answer = selected.answer;
             vaultRevealedCount = 1; vaultClueValue = 500;
             renderVaultClues();
@@ -2451,7 +2631,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             const anotherBtn = document.getElementById('vaultAnotherBtn'); if (anotherBtn) anotherBtn.style.display = 'none';
         }
         function resetVault() {
-            localStorage.removeItem('titan_vault_played_' + currentActiveGameTitle);
+            store.removeItem('titan_vault_played_' + currentActiveGameTitle);
             document.getElementById('vaultInner').innerHTML = "LOCK IN.";
             vaultCurrentClues = []; vaultRevealedCount = 0; vaultClueValue = 500;
             const anotherBtn = document.getElementById('vaultAnotherBtn'); if (anotherBtn) anotherBtn.style.display = 'none';
@@ -2475,7 +2655,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             document.getElementById('ffTimerDisplay').innerText = ffTimeLeft; document.getElementById('ffTimerDisplay').classList.remove('ff-urgent'); document.getElementById('ffStreakDisplay').innerText = `Streak: ${ffStreak}`;
             document.getElementById('factFictionDisplay').innerText = "PREPARE FOR SPEED RUN..."; document.getElementById('factFictionDisplay').style.color = '#fff';
             document.getElementById('ffFactBtn').style.display = 'none'; document.getElementById('ffFictionBtn').style.display = 'none'; document.getElementById('ffResetBtn').style.display = 'none'; document.getElementById('ffStartBtn').style.display = 'block'; document.getElementById('ffStartBtn').innerText = "Start Speed Run"; currentMiniGameAnswer = "";
-            localStorage.removeItem('titan_ff_played_' + currentActiveGameTitle);
+            store.removeItem('titan_ff_played_' + currentActiveGameTitle);
         }
         function endGameFF() {
             isFFRunning = false; clearInterval(ffTimerInterval); document.getElementById('ffTimerDisplay').classList.remove('ff-urgent');
@@ -2484,15 +2664,15 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         }
 
         // ==================== GAME: JEOPARDY (incl. Daily Double) ====================
-        function getPlayedJeopardyTiles(gameTitle) { return JSON.parse(localStorage.getItem(`titan_jeopardy_played_${gameTitle}`) || '[]'); }
-        function markJeopardyTilePlayed(gameTitle, cat, val) { let played = getPlayedJeopardyTiles(gameTitle); let tileKey = `${cat}_${val}`; if (!played.includes(tileKey)) { played.push(tileKey); localStorage.setItem(`titan_jeopardy_played_${gameTitle}`, JSON.stringify(played)); } }
-        function resetJeopardyBoard() { localStorage.removeItem(`titan_jeopardy_played_${currentActiveGameTitle}`); localStorage.removeItem(`titan_jeopardy_dd_${currentActiveGameTitle}`); renderJeopardyBoard(currentActiveGameTitle); }
+        function getPlayedJeopardyTiles(gameTitle) { return JSON.parse(store.getItem(`titan_jeopardy_played_${gameTitle}`) || '[]'); }
+        function markJeopardyTilePlayed(gameTitle, cat, val) { let played = getPlayedJeopardyTiles(gameTitle); let tileKey = `${cat}_${val}`; if (!played.includes(tileKey)) { played.push(tileKey); store.setItem(`titan_jeopardy_played_${gameTitle}`, JSON.stringify(played)); } }
+        function resetJeopardyBoard() { store.removeItem(`titan_jeopardy_played_${currentActiveGameTitle}`); store.removeItem(`titan_jeopardy_dd_${currentActiveGameTitle}`); renderJeopardyBoard(currentActiveGameTitle); }
         
         function triggerDailyDouble(callback) {
             const overlay = document.getElementById('dailyDoubleOverlay');
             overlay.classList.remove('show'); void overlay.offsetWidth; overlay.classList.add('show');
             playTone(200, 0, 0.2, 0.3, 'sawtooth'); playTone(400, 0.15, 0.2, 0.3, 'sawtooth'); playTone(600, 0.3, 0.2, 0.3, 'sawtooth'); playTone(900, 0.45, 0.6, 0.35);
-            let pColor = localStorage.getItem('titan_setting_primary') || '#5A2B81'; let hoverColor = adjustBrightness(pColor, 15); let mColor = localStorage.getItem('titan_setting_mid') || '#c0c2c9';
+            let pColor = store.getItem('titan_setting_primary') || '#5A2B81'; let hoverColor = adjustBrightness(pColor, 15); let mColor = store.getItem('titan_setting_mid') || '#c0c2c9';
             confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 }, colors: [pColor, hoverColor, mColor, '#ffffff'] });
             setTimeout(() => { overlay.classList.remove('show'); callback(); }, 1900);
         }
@@ -2523,11 +2703,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
             // Daily Double: pick one random tile the first time this deck is played, then keep it fixed until "Reset Board"
             const ddStorageKey = `titan_jeopardy_dd_${gameTitle}`;
-            let dailyDoubleKey = localStorage.getItem(ddStorageKey);
+            let dailyDoubleKey = store.getItem(ddStorageKey);
             if (!dailyDoubleKey) {
                 let candidates = [];
                 values.forEach(val => categories.forEach(cat => { if (jeopardyQuestions.some(q => q.category === cat && normVal(q.value) === val)) candidates.push(`${cat}_${val}`); }));
-                if (candidates.length > 0) { dailyDoubleKey = candidates[Math.floor(Math.random() * candidates.length)]; localStorage.setItem(ddStorageKey, dailyDoubleKey); }
+                if (candidates.length > 0) { dailyDoubleKey = candidates[Math.floor(Math.random() * candidates.length)]; store.setItem(ddStorageKey, dailyDoubleKey); }
             }
 
             values.forEach(val => {
@@ -2558,10 +2738,10 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         }
 
         let notesPushDebounceTimer = null;
-        function saveNotepad() { if (!activeBlockData) return; localStorage.setItem('titan_notepad_' + activeBlockData.id, document.getElementById('slideNotepad').innerHTML); clearTimeout(notesPushDebounceTimer); notesPushDebounceTimer = setTimeout(pushLiveState, 3000); }
-        function loadNotepad() { const notepad = document.getElementById('slideNotepad'); if (activeBlockData) { const saved = localStorage.getItem('titan_notepad_' + activeBlockData.id); notepad.innerHTML = saved !== null ? saved : '<p>Start typing notes here...</p>'; } else { notepad.innerHTML = '<p>Start typing notes here...</p>'; } }
-        function saveTaskNote() { if (!activeBlockData) return; localStorage.setItem('titan_task_' + activeBlockData.id, document.getElementById('currentTaskEditable').innerHTML); }
-        function loadTaskNote() { const el = document.getElementById('currentTaskEditable'); if (!el) return; if (activeBlockData) { const saved = localStorage.getItem('titan_task_' + activeBlockData.id); if (saved !== null) el.innerHTML = saved; } }
+        function saveNotepad() { if (!activeBlockData) return; store.setItem('titan_notepad_' + activeBlockData.id, document.getElementById('slideNotepad').innerHTML); clearTimeout(notesPushDebounceTimer); notesPushDebounceTimer = setTimeout(pushLiveState, 3000); }
+        function loadNotepad() { const notepad = document.getElementById('slideNotepad'); if (activeBlockData) { const saved = store.getItem('titan_notepad_' + activeBlockData.id); notepad.innerHTML = saved !== null ? saved : '<p>Start typing notes here...</p>'; } else { notepad.innerHTML = '<p>Start typing notes here...</p>'; } }
+        function saveTaskNote() { if (!activeBlockData) return; store.setItem('titan_task_' + activeBlockData.id, document.getElementById('currentTaskEditable').innerHTML); }
+        function loadTaskNote() { const el = document.getElementById('currentTaskEditable'); if (!el) return; if (activeBlockData) { const saved = store.getItem('titan_task_' + activeBlockData.id); if (saved !== null) el.innerHTML = saved; } }
         function clearNotepad() { if (confirm("Are you sure you want to clear these notes?")) { document.getElementById('slideNotepad').innerHTML = '<p></p>'; saveNotepad(); } }
 
         // ==================== SLIDE MODE ====================
@@ -2575,7 +2755,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 if (currentSlides.length > 0) {
                     currentSlides.forEach((slide, idx) => {
                         let isActive = (idx === currentSlideIndex); let bg = isActive ? '#ffffff' : 'transparent'; let color = isActive ? 'var(--primary-color)' : 'var(--bg-light)'; let border = isActive ? 'clamp(1.5px, 0.15vw, 2.5px) solid var(--secondary-dark)' : 'clamp(1.5px, 0.15vw, 2.5px) solid #ffffff'; let opacity = isActive ? '1' : '0.7'; let transform = isActive ? 'scale(1.1)' : 'scale(1)';
-                        tabsHTML += `<button onclick="goToSlide(${idx})" title="${slide.name}" style="background:${bg};color:${color};border:${border};opacity:${opacity};width:clamp(22px,1.8vw,34px);height:clamp(22px,1.8vw,34px);border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;font-family:'Poppins',sans-serif;font-weight:700;font-size:clamp(0.8rem,1vw,1.2rem);transition:all 0.2s;box-shadow:0 3px 6px rgba(0,0,0,0.3);flex-shrink:0;transform:${transform};margin:0 4px;">${idx + 1}</button>`;
+                        tabsHTML += `<button onclick="goToSlide(${idx})" title="${escapeHtml(slide.name)}" style="background:${bg};color:${color};border:${border};opacity:${opacity};width:clamp(22px,1.8vw,34px);height:clamp(22px,1.8vw,34px);border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;font-family:'Poppins',sans-serif;font-weight:700;font-size:clamp(0.8rem,1vw,1.2rem);transition:all 0.2s;box-shadow:0 3px 6px rgba(0,0,0,0.3);flex-shrink:0;transform:${transform};margin:0 4px;">${idx + 1}</button>`;
                     });
                 }
                 topTabs.innerHTML = tabsHTML;
@@ -2619,7 +2799,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         }
 
         function triggerColdCall() {
-            if (!activeBlockData || !activeBlockData.roster) return; let absentList = JSON.parse(localStorage.getItem('titan_absent_' + activeBlockData.id) || '[]'); let presentRoster = activeBlockData.roster.filter(s => !absentList.includes(s));
+            if (!activeBlockData || !activeBlockData.roster) return; let absentList = JSON.parse(store.getItem('titan_absent_' + activeBlockData.id) || '[]'); let presentRoster = activeBlockData.roster.filter(s => !absentList.includes(s));
             if(presentRoster.length === 0) { playTone(150, 0, 0.3, 0.2); return; }
             let pick = presentRoster[Math.floor(Math.random() * presentRoster.length)]; let toast = document.getElementById('coldCallToast'); toast.innerText = pick; toast.classList.add('show'); playTone(880, 0, 0.3, 0.1); 
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
@@ -2659,12 +2839,12 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
         // ==================== CONFETTI HELPERS ====================
         function fireBigConfetti() {
-            let pColor = localStorage.getItem('titan_setting_primary') || '#5A2B81'; let mColor = localStorage.getItem('titan_setting_mid') || '#c0c2c9';
+            let pColor = store.getItem('titan_setting_primary') || '#5A2B81'; let mColor = store.getItem('titan_setting_mid') || '#c0c2c9';
             confetti({ particleCount: 150, angle: 60, spread: 80, origin: { x: 0, y: 0.7 }, colors: [pColor, mColor, '#FFFFFF'] });
             confetti({ particleCount: 150, angle: 120, spread: 80, origin: { x: 1, y: 0.7 }, colors: [pColor, mColor, '#FFFFFF'] });
         }
         function fireSmallConfetti() {
-            let pColor = localStorage.getItem('titan_setting_primary') || '#5A2B81'; let mColor = localStorage.getItem('titan_setting_mid') || '#c0c2c9';
+            let pColor = store.getItem('titan_setting_primary') || '#5A2B81'; let mColor = store.getItem('titan_setting_mid') || '#c0c2c9';
             confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 }, colors: [pColor, mColor, '#FFFFFF'] });
         }
 
@@ -2673,13 +2853,13 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function changeGroupSize(change) { targetGroupSize += change; if(targetGroupSize < 2) targetGroupSize = 2; if(activeBlockData && targetGroupSize > activeBlockData.roster.length) targetGroupSize = activeBlockData.roster.length; document.getElementById('groupSizeDisplay').innerText = `Size: ${targetGroupSize}`; }
         function getPairKey(a, b) { return [a, b].sort().join('|'); }
         function scoreShuffle(groups, history) { let score = 0; groups.forEach(group => { for(let i = 0; i < group.length; i++){ for(let j = i + 1; j < group.length; j++){ let key = getPairKey(group[i], group[j]); score += (history[key] || 0); } } }); return score; }
-        function clearGroupHistory() { if (!activeBlockData) return; let historyKey = 'titan_group_history_' + activeBlockData.id; if (confirm("Clear all past grouping memory for this class?")) { localStorage.removeItem(historyKey); alert("History cleared!"); } }
+        function clearGroupHistory() { if (!activeBlockData) return; let historyKey = 'titan_group_history_' + activeBlockData.id; if (confirm("Clear all past grouping memory for this class?")) { store.removeItem(historyKey); alert("History cleared!"); } }
         
         function generateGroups() {
             if (!activeBlockData || activeBlockData.roster.length === 0) { alert("No roster available for this period!"); return; }
-            let absentList = JSON.parse(localStorage.getItem('titan_absent_' + activeBlockData.id) || '[]'); let presentRoster = activeBlockData.roster.filter(s => !absentList.includes(s));
+            let absentList = JSON.parse(store.getItem('titan_absent_' + activeBlockData.id) || '[]'); let presentRoster = activeBlockData.roster.filter(s => !absentList.includes(s));
             if (presentRoster.length === 0) { alert("Everyone is marked absent!"); return; }
-            let historyKey = 'titan_group_history_' + activeBlockData.id; let history = JSON.parse(localStorage.getItem(historyKey) || '{}');
+            let historyKey = 'titan_group_history_' + activeBlockData.id; let history = JSON.parse(store.getItem(historyKey) || '{}');
             let bestGroups = []; let bestScore = Infinity;
             for (let iter = 0; iter < 100; iter++) {
                 let shuffled = [...presentRoster].sort(() => Math.random() - 0.5); let currentGroups = [];
@@ -2688,11 +2868,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 let score = scoreShuffle(currentGroups, history); if (score < bestScore) { bestScore = score; bestGroups = currentGroups; }
             }
             bestGroups.forEach(group => { for(let i = 0; i < group.length; i++){ for(let j = i + 1; j < group.length; j++){ let key = getPairKey(group[i], group[j]); history[key] = (history[key] || 0) + 1; } } });
-            localStorage.setItem(historyKey, JSON.stringify(history));
+            store.setItem(historyKey, JSON.stringify(history));
             const container = document.getElementById('groupsContainer'); container.innerHTML = '';
             bestGroups.forEach((group, index) => {
                 let card = document.createElement('div'); card.className = 'group-card'; card.style.animationDelay = `${index * 0.05}s`;
-                let listHTML = group.map(name => `<li draggable="true" ondragstart="dragStudent(event)" ondragend="dragEndStudent(event)">${name}</li>`).join('');
+                let listHTML = group.map(name => `<li draggable="true" ondragstart="dragStudent(event)" ondragend="dragEndStudent(event)">${escapeHtml(name)}</li>`).join('');
                 card.innerHTML = `<h4>Group ${index + 1}</h4><ul>${listHTML}</ul>`;
                 card.ondragover = allowDrop; card.ondragleave = dragLeave; card.ondrop = dropStudent; container.appendChild(card);
             });
@@ -2703,7 +2883,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function syncGroupsFromDOM() {
             const cards = Array.from(document.querySelectorAll('#groupsContainer .group-card'));
             currentGroups = cards.map(card => Array.from(card.querySelectorAll('li')).map(li => li.textContent.trim()));
-            if (activeBlockData && activeBlockData.id) localStorage.setItem('titan_current_groups_' + activeBlockData.id, JSON.stringify(currentGroups));
+            if (activeBlockData && activeBlockData.id) store.setItem('titan_current_groups_' + activeBlockData.id, JSON.stringify(currentGroups));
             const awardRow = document.getElementById('groupAwardRow'); if (awardRow) awardRow.style.display = currentGroups.length > 0 ? 'flex' : 'none';
             const sel = document.getElementById('awardGroupSelect');
             if (sel) sel.innerHTML = currentGroups.map((g, i) => `<option value="${i}">Group ${i + 1} (${g.length} student${g.length === 1 ? '' : 's'})</option>`).join('');
@@ -2753,7 +2933,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             document.getElementById('qrUrlLabel').innerText = url; document.getElementById('qrUrlLabel').style.display = 'block';
             document.getElementById('qrInputRow').style.display = 'none';
             document.getElementById('qrEditBtn').style.display = 'inline-block';
-            localStorage.setItem('titan_last_qr_url', url);
+            store.setItem('titan_last_qr_url', url);
         }
         function showQREditMode() {
             document.getElementById('qrInputRow').style.display = 'flex';
@@ -2762,14 +2942,20 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             document.getElementById('qrEditBtn').style.display = 'none';
             document.getElementById('qrErrorText').innerText = '';
         }
+        // A dashboard opened from a downloaded file has origin "null" and a path on YOUR disk, so any student
+        // link built from it is useless. Kept as a pure function of the protocol so the audit can test it.
+        function studentLinkProblem(protocol) { return protocol === 'file:' ? 'Student links only work from the hosted copy of the dashboard (its GitHub Pages address). This copy is opened from a file on this computer.' : ''; }
         function buildStudentModeUrl() {
             const sheetUrl = getActiveCsvUrl(); const gamesUrl = getActiveGameUrl();
             const liveUrl = getAutoBackupUrl(); const liveToken = getAutoBackupToken();
-            const base = window.location.origin + window.location.pathname;
+            const base = window.location.href.split(/[?#]/)[0];
             let params = new URLSearchParams(); params.set('mode', 'student');
             if (sheetUrl) params.set('sheet', sheetUrl);
             if (gamesUrl) params.set('games', gamesUrl);
             if (liveUrl && liveToken) { params.set('live', liveUrl); params.set('liveToken', liveToken); }
+            // branding rides along so a student device that has never seen the app shows your mascot and logo, not the neutral defaults
+            const mascot = store.getItem('titan_setting_mascot'); const logo = store.getItem('titan_setting_watermark');
+            if (mascot) params.set('mascot', mascot); if (logo) params.set('logo', logo);
             return base + '?' + params.toString();
         }
         // ==================== STUDENT MODE LIVE SYNC (read-only: Phone Status, timer, notes) ====================
@@ -2818,7 +3004,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function copyStudentLink() {
             document.getElementById('qrErrorText').innerText = ''; document.getElementById('qrCopyConfirm').innerText = '';
             if (!getActiveCsvUrl()) { document.getElementById('qrErrorText').innerText = 'Connect your Google Sheet in Settings first, so the student link has real data to show.'; return; }
+            { const problem = studentLinkProblem(window.location.protocol); if (problem) { document.getElementById('qrErrorText').innerText = problem; return; } }
             const url = buildStudentModeUrl();
+            if (!navigator.clipboard || !navigator.clipboard.writeText) { document.getElementById('qrErrorText').innerText = 'Could not copy automatically. Link: ' + url; return; }
             navigator.clipboard.writeText(url).then(() => {
                 document.getElementById('qrCopyConfirm').innerText = '✓ Copied! Paste it into Canvas, an email, anywhere.';
             }).catch(() => {
@@ -2827,31 +3015,32 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         }
         function loadStudentLinkIntoQR() {
             if (!getActiveCsvUrl()) { document.getElementById('qrErrorText').innerText = 'Connect your Google Sheet in Settings first, so the student link has real data to show.'; return; }
+            { const problem = studentLinkProblem(window.location.protocol); if (problem) { document.getElementById('qrErrorText').innerText = problem; return; } }
             document.getElementById('qrUrlInput').value = buildStudentModeUrl();
             generateQRCode();
         }
         function openQRModal() {
             toggleModal('qrModal');
             if (!document.getElementById('qrModal').classList.contains('active')) return;
-            const savedUrl = localStorage.getItem('titan_last_qr_url');
+            const savedUrl = store.getItem('titan_last_qr_url');
             if (savedUrl) { document.getElementById('qrUrlInput').value = savedUrl; generateQRCode(); } else { showQREditMode(); }
         }
         function getWheelStorageKey() { let periodId = activeBlockData ? activeBlockData.id.toString() : "TESTING"; let mode = isGroupWheelMode ? 'groups' : 'students'; return `titan_wheel_played_${mode}_${periodId}`; }
-        function resetWheelPicks() { localStorage.removeItem(getWheelStorageKey()); const winnerDisplay = document.getElementById('wheelWinnerDisplay'); winnerDisplay.innerText = isGroupWheelMode ? "SPIN THE GROUPS" : "SPIN THE WHEEL"; winnerDisplay.style.color = '#fff'; }
+        function resetWheelPicks() { store.removeItem(getWheelStorageKey()); const winnerDisplay = document.getElementById('wheelWinnerDisplay'); winnerDisplay.innerText = isGroupWheelMode ? "SPIN THE GROUPS" : "SPIN THE WHEEL"; winnerDisplay.style.color = '#fff'; }
         
         function getActiveWheelItems() {
             if (isGroupWheelMode) {
                 let groups = []; const container = document.getElementById('groupsContainer');
                 if (container && container.children.length > 0) { const cards = container.querySelectorAll('.group-card'); cards.forEach((card, index) => { const h4 = card.querySelector('h4'); groups.push(h4 ? h4.textContent.trim() : `Group ${index + 1}`); }); }
                 if (groups.length === 0 && activeBlockData && activeBlockData.roster && activeBlockData.roster.length > 0) {
-                    let absentList = JSON.parse(localStorage.getItem('titan_absent_' + activeBlockData.id) || '[]'); let presentCount = activeBlockData.roster.filter(s => !absentList.includes(s)).length;
+                    let absentList = JSON.parse(store.getItem('titan_absent_' + activeBlockData.id) || '[]'); let presentCount = activeBlockData.roster.filter(s => !absentList.includes(s)).length;
                     let expectedGroupCount = Math.ceil(presentCount / targetGroupSize); if (expectedGroupCount > 1 && (presentCount % targetGroupSize === 1)) expectedGroupCount -= 1;
                     for (let i = 1; i <= expectedGroupCount; i++) groups.push(`Group ${i}`);
                 } 
                 if (groups.length === 0) { let fallbackCount = Math.max(2, targetGroupSize); for (let i = 1; i <= fallbackCount; i++) groups.push(`Group ${i}`); }
                 return groups;
             } else {
-                if (!activeBlockData || !activeBlockData.roster) return []; let absentList = JSON.parse(localStorage.getItem('titan_absent_' + activeBlockData.id) || '[]'); return activeBlockData.roster.filter(s => !absentList.includes(s));
+                if (!activeBlockData || !activeBlockData.roster) return []; let absentList = JSON.parse(store.getItem('titan_absent_' + activeBlockData.id) || '[]'); return activeBlockData.roster.filter(s => !absentList.includes(s));
             }
         }
 
@@ -2880,14 +3069,14 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
         function executeSpin() {
             let items = getActiveWheelItems(); if (items.length === 0) return;
-            const playedKey = getWheelStorageKey(); let playedItems = JSON.parse(localStorage.getItem(playedKey) || '[]'); let availableItems = items.filter(item => !playedItems.includes(item));
+            const playedKey = getWheelStorageKey(); let playedItems = JSON.parse(store.getItem(playedKey) || '[]'); let availableItems = items.filter(item => !playedItems.includes(item));
             const winnerDisplay = document.getElementById('wheelWinnerDisplay'); const wheel = document.getElementById('spinningWheel'); clearTimeout(spinTimeout);
             if (availableItems.length === 0) { winnerDisplay.innerText = "ALL PICKED! HIT RESET."; winnerDisplay.style.color = '#ffffff'; return; }
             winnerDisplay.innerText = "SPINNING..."; winnerDisplay.style.color = 'var(--bg-light)';
             void wheel.offsetWidth; let randomDuration = 3.5 + Math.random() * 2.5; wheel.style.transition = `transform ${randomDuration}s cubic-bezier(0.1, 0.8, 0.1, 1)`;
             let winner = availableItems[Math.floor(Math.random() * availableItems.length)]; let randomIndex = items.indexOf(winner); let sliceDeg = 360 / items.length; let targetAngle = (randomIndex * sliceDeg) + (sliceDeg / 2); let rotationOffset = 360 - targetAngle; let extraSpins = 360 * (4 + Math.floor(Math.random() * 4)); let randomOffset = (Math.random() * (sliceDeg * 0.7)) - (sliceDeg * 0.35);
             currentRotation += extraSpins + rotationOffset - (currentRotation % 360) + randomOffset; wheel.style.transform = `rotate(${currentRotation}deg)`;
-            spinTimeout = setTimeout(() => { winnerDisplay.innerText = winner + "!"; winnerDisplay.style.color = '#ffffff'; playedItems.push(winner); localStorage.setItem(playedKey, JSON.stringify(playedItems)); }, randomDuration * 1000); 
+            spinTimeout = setTimeout(() => { winnerDisplay.innerText = winner + "!"; winnerDisplay.style.color = '#ffffff'; playedItems.push(winner); store.setItem(playedKey, JSON.stringify(playedItems)); }, randomDuration * 1000); 
         }
 
         // ==================== MAIN DASHBOARD RENDER LOOP & COUNTDOWN TIMER ====================
@@ -2943,9 +3132,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             const { jsPDF } = window.jspdf; const doc = new jsPDF({ unit: 'pt', format: 'letter' });
             const marginX = 50; const pageWidth = doc.internal.pageSize.getWidth(); const pageHeight = doc.internal.pageSize.getHeight(); const maxWidth = pageWidth - marginX * 2;
 
-            const primaryHex = localStorage.getItem('titan_setting_primary') || '#5A2B81';
+            const primaryHex = store.getItem('titan_setting_primary') || '#5A2B81';
             const [pr, pg, pb] = hexToRgb(primaryHex).split(',').map(s => parseInt(s.trim(), 10));
-            const teacherName = localStorage.getItem('titan_setting_teacher') || '';
+            const teacherName = store.getItem('titan_setting_teacher') || '';
 
             const headerHeight = 78;
             doc.setFillColor(pr, pg, pb); doc.rect(0, 0, pageWidth, headerHeight, 'F');
@@ -2957,7 +3146,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             doc.setFont(undefined, 'normal'); doc.setFontSize(11);
             doc.text(dateStr, marginX, 66);
 
-            const watermark = localStorage.getItem('titan_setting_watermark') || 'SouthGarner_Titans_Logo1.png';
+            const watermark = store.getItem('titan_setting_watermark') || '';
             const logoImg = await loadImageElement(watermark);
             if (logoImg) {
                 try {
@@ -3006,9 +3195,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 y += 8;
             }
 
-            const notepadText = stripHtmlToText(localStorage.getItem('titan_notepad_' + block.id));
+            const notepadText = stripHtmlToText(store.getItem('titan_notepad_' + block.id));
             if (notepadText) { heading('Class Notepad'); bodyText(notepadText); }
-            const taskText = stripHtmlToText(localStorage.getItem('titan_task_' + block.id));
+            const taskText = stripHtmlToText(store.getItem('titan_task_' + block.id));
             if (taskText) { heading('Current Task'); bodyText(taskText); }
 
             const totalPages = doc.internal.getNumberOfPages();
@@ -3075,10 +3264,10 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     }
                     document.getElementById('warmupText').innerText = activeBlock.warmup || "No Warm-Up provided today."; document.getElementById('warmupModalText').innerText = activeBlock.warmup || "No Warm-Up provided today.";
                     
-                    if(!isMarketTicker) { let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans'; document.getElementById('dailyMessage').innerText = activeBlock.message || `Welcome ${mascot}! Let's make today a great day to learn.`; }
+                    if(!isMarketTicker) { let mascot = store.getItem('titan_setting_mascot') || DEFAULT_MASCOT; document.getElementById('dailyMessage').innerText = activeBlock.message || `Welcome ${mascot}! Let's make today a great day to learn.`; }
                     
-                    let listKey = 'checklist_' + activeBlock.date.getTime() + '_' + activeBlock.id; let checkedItems = JSON.parse(localStorage.getItem(listKey) || '[]'); let agendaHTML = '';
-                    for (let item of activeBlock.agenda) { let isChecked = checkedItems.includes(item) ? 'completed' : ''; let safeItem = item.replace(/'/g, "\\'").replace(/"/g, '&quot;'); agendaHTML += `<li class="${isChecked}" onclick="toggleChecklist(this, '${listKey}', '${safeItem}')">${escapeHtml(item)}</li>`; }
+                    let listKey = 'checklist_' + activeBlock.date.getTime() + '_' + activeBlock.id; let checkedItems = JSON.parse(store.getItem(listKey) || '[]'); let agendaHTML = '';
+                    for (let item of activeBlock.agenda) { let isChecked = checkedItems.includes(item) ? 'completed' : ''; agendaHTML += `<li class="${isChecked}" onclick="toggleChecklist(this, ${jsArg(listKey)}, ${jsArg(item)})">${escapeHtml(item)}</li>`; }
                     document.getElementById('agendaItems').innerHTML = agendaHTML || "<li>No activities listed.</li>";
 
                     currentSlides = [];
@@ -3102,14 +3291,14 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             }
         }
 
-        fetchAgendaData(); fetchGameVaultData(); setInterval(updateDashboard, 1000); setInterval(fetchAgendaData, 60000); 
+        // (initial fetch + dashboard intervals start in boot() at the bottom)
 
         // --- BACKGROUND TIMER LOGIC ---
-        let timerInterval, endTime = 0, totalTimeMs = 0, remainingMs = 0, isRunning = false, warningPlayed = false, donePlayed = false;
+        // (timer state declared in the top block - toggleModal reads totalTimeMs, so it must exist before any init code opens a modal)
 
-        function saveTimerState() { localStorage.setItem('titan_timer', JSON.stringify({ endTime, totalTimeMs, remainingMs, isRunning, warningPlayed, donePlayed })); }
+        function saveTimerState() { store.setItem('titan_timer', JSON.stringify({ endTime, totalTimeMs, remainingMs, isRunning, warningPlayed, donePlayed })); }
         function loadTimerState() {
-            let saved = localStorage.getItem('titan_timer');
+            let saved = store.getItem('titan_timer');
             if (saved) {
                 let state = JSON.parse(saved); totalTimeMs = state.totalTimeMs || 0; isRunning = state.isRunning || false; endTime = state.endTime || 0; remainingMs = state.remainingMs || 0; warningPlayed = state.warningPlayed || false; donePlayed = state.donePlayed || false;
                 if (isRunning) { remainingMs = endTime - Date.now(); if (remainingMs > 0) { document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = "Pause"); timerInterval = setInterval(updateTimerDisplay, 1000); updateTimerDisplay(); } else { clearTimer(); } } 
@@ -3172,7 +3361,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         const MINI_GAME_CONFIGS = {
             hotseat: { vaultType: 'hotseat', containerId: 'hotSeatContainer', displayId: 'hotSeatWordDisplay', storagePrefix: 'titan_hotseat_played_', splitRegex: /,/, readyText: 'READY?', emptyText: 'OUT OF WORDS! PLEASE RESET.', placeholderList: ["NO WORDS LOADED", "CHECK SPREADSHEET", "COLUMN F"], defaultSize: 8 },
             taboo: { vaultType: 'taboo', containerId: 'tabooContainer', displayId: 'tabooWordDisplay', extraDisplayId: 'tabooForbiddenDisplay', storagePrefix: 'titan_taboo_played_', readyText: 'READY?', emptyText: 'OUT OF WORDS! PLEASE RESET.', placeholderList: [{target: "NO WORDS LOADED", forbidden: "CHECK SPREADSHEET"}], defaultSize: 6.5, defaultExtraSize: 2.5 },
-            titansays: { vaultType: 'titansays', containerId: 'titanSaysContainer', displayId: 'titanSaysDisplay', storagePrefix: 'titan_titansays_played_', splitRegex: /[|,]+/, readyText: 'AWAITING COMMAND...', emptyText: 'OUT OF COMMANDS! PLEASE RESET.', placeholderList: ["NO COMMANDS LOADED", "CHECK SPREADSHEET"], defaultSize: 6, format: (selected) => { let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans'; let commandPrefix = mascot.toUpperCase() + " SAYS"; if (!selected.toUpperCase().includes(commandPrefix) && Math.random() < 0.7) { return commandPrefix + ":\n" + selected; } return selected; } },
+            titansays: { vaultType: 'titansays', containerId: 'titanSaysContainer', displayId: 'titanSaysDisplay', storagePrefix: 'titan_titansays_played_', splitRegex: /[|,]+/, readyText: 'AWAITING COMMAND...', emptyText: 'OUT OF COMMANDS! PLEASE RESET.', placeholderList: ["NO COMMANDS LOADED", "CHECK SPREADSHEET"], defaultSize: 6, format: (selected) => { let mascot = store.getItem('titan_setting_mascot') || DEFAULT_MASCOT; let commandPrefix = mascot.toUpperCase() + " SAYS"; if (!selected.toUpperCase().includes(commandPrefix) && Math.random() < 0.7) { return commandPrefix + ":\n" + selected; } return selected; } },
             hivemind: { vaultType: 'hivemind', containerId: 'hivemindContainer', displayId: 'hivemindDisplay', storagePrefix: 'titan_hivemind_played_', splitRegex: /[|,]+/, readyText: 'READY TO SYNCHRONIZE?', emptyText: 'OUT OF PROMPTS! PLEASE RESET.', placeholderList: ["NO PROMPTS LOADED", "CHECK SPREADSHEET"], defaultSize: 5 },
             debate: { vaultType: 'debate', containerId: 'debateContainer', displayId: 'debateDisplay', storagePrefix: 'titan_debate_played_', splitRegex: /[|,]+/, readyText: 'CHOOSE YOUR SIDE...', emptyText: 'OUT OF STATEMENTS! PLEASE RESET.', placeholderList: ["NO STATEMENTS LOADED", "CHECK SPREADSHEET"], defaultSize: 5 },
             factorfiction: { vaultType: 'factorfiction', containerId: 'factFictionContainer', displayId: 'factFictionDisplay', storagePrefix: 'titan_ff_played_', splitRegex: /[|]+/, readyText: 'PREPARE FOR SPEED RUN...', emptyText: 'NO STATEMENTS REMAINING.', placeholderList: ["NO STATEMENTS LOADED"], defaultSize: 5, hasClickReveal: true },
@@ -3185,7 +3374,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             if (gameKey === 'taboo') { document.getElementById(cfg.displayId).innerText = cfg.readyText; document.getElementById(cfg.extraDisplayId).innerHTML = ''; tabooBuzzCount = 0; const counterEl = document.getElementById('tabooBuzzCount'); if (counterEl) counterEl.innerText = '🚨 x0'; } else { document.getElementById(cfg.displayId).innerText = cfg.readyText; }
             if (gameKey === 'titansays') { const indicator = document.getElementById('titanSaysTrapIndicator'); if (indicator) indicator.style.background = 'transparent'; document.getElementById(cfg.displayId).classList.remove('pressure-pulse'); }
             if (gameKey === 'hivemind') { hivemindRoundResults = []; const historyEl = document.getElementById('hivemindHistory'); if (historyEl) historyEl.innerText = ''; const input = document.getElementById('hivemindMatchInput'); if (input) input.value = ''; }
-            if (gameKey === 'hotseat') { clearInterval(hotSeatInterval); hotSeatInterval = null; hotSeatRunning = false; hotSeatCorrectCount = 0; hotSeatBestRound = parseInt(localStorage.getItem('titan_hotseat_best_' + gameTitle) || '0', 10); updateHotSeatStreakDisplay(); hotSeatTimeLeft = getGameTimerSetting('hotseat_time', 45); updateHotSeatTimerDisplay(); const startBtn = document.getElementById('hotSeatStartBtn'); if (startBtn) { startBtn.style.display = 'inline-block'; startBtn.innerText = '▶ Start Round'; } const skipBtn = document.getElementById('hotSeatSkipBtn'); if (skipBtn) skipBtn.style.display = 'none'; const gotItBtn = document.getElementById('hotSeatGotItBtn'); if (gotItBtn) gotItBtn.style.display = 'none'; }
+            if (gameKey === 'hotseat') { clearInterval(hotSeatInterval); hotSeatInterval = null; hotSeatRunning = false; hotSeatCorrectCount = 0; hotSeatBestRound = parseInt(store.getItem('titan_hotseat_best_' + gameTitle) || '0', 10); updateHotSeatStreakDisplay(); hotSeatTimeLeft = getGameTimerSetting('hotseat_time', 45); updateHotSeatTimerDisplay(); const startBtn = document.getElementById('hotSeatStartBtn'); if (startBtn) { startBtn.style.display = 'inline-block'; startBtn.innerText = '▶ Start Round'; } const skipBtn = document.getElementById('hotSeatSkipBtn'); if (skipBtn) skipBtn.style.display = 'none'; const gotItBtn = document.getElementById('hotSeatGotItBtn'); if (gotItBtn) gotItBtn.style.display = 'none'; }
             if (cfg.hasClickReveal) document.getElementById(cfg.displayId).style.color = 'inherit';
             autoFitGameText(gameKey);
             const matchingRows = gameVaultData.filter(g => g.type === cfg.vaultType && g.title.toString().trim() === gameTitle);
@@ -3201,7 +3390,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
         function nextMiniGamePrompt(gameKey) {
             const cfg = MINI_GAME_CONFIGS[gameKey]; const list = miniGameLists[gameKey]; if (!list || list.length === 0) return;
-            const playedKey = cfg.storagePrefix + currentActiveGameTitle; let playedItems = JSON.parse(localStorage.getItem(playedKey) || '[]');
+            const playedKey = cfg.storagePrefix + currentActiveGameTitle; let playedItems = JSON.parse(store.getItem(playedKey) || '[]');
             
             let available = list.map((item, idx) => idx).filter(idx => !playedItems.includes(idx));
 
@@ -3213,7 +3402,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 else {
                     const selectedIdx = available[Math.floor(Math.random() * available.length)];
                     const selected = list[selectedIdx];
-                    playedItems.push(selectedIdx); localStorage.setItem(playedKey, JSON.stringify(playedItems));
+                    playedItems.push(selectedIdx); store.setItem(playedKey, JSON.stringify(playedItems));
                     
                     if (gameKey === 'taboo') {
                         display.innerText = selected.target;
@@ -3225,7 +3414,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                         let formatted = cfg.format ? cfg.format(selected) : selected;
                         display.innerText = formatted;
                         if (gameKey === 'titansays') {
-                            let mascot = localStorage.getItem('titan_setting_mascot') || 'Titans'; let prefix = mascot.toUpperCase() + " SAYS";
+                            let mascot = store.getItem('titan_setting_mascot') || DEFAULT_MASCOT; let prefix = mascot.toUpperCase() + " SAYS";
                             let isTrap = !formatted.toUpperCase().startsWith(prefix);
                             const indicator = document.getElementById('titanSaysTrapIndicator'); if (indicator) indicator.style.background = isTrap ? '#e53935' : '#43a047';
                             display.classList.remove('pressure-pulse'); void display.offsetWidth; display.classList.add('pressure-pulse');
@@ -3273,7 +3462,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
             document.getElementById('reinforcementScoreboardBtn').style.display = (!isStudentMode && getLiveSyncUrl() && getLiveSyncToken()) ? 'inline-block' : 'none';
 
-            const savedLabel = localStorage.getItem('titan_reinforcement_group_label');
+            const savedLabel = store.getItem('titan_reinforcement_group_label');
             if (savedLabel) { document.getElementById('reinforcementGroupWelcome').innerText = `Playing as: ${savedLabel}`; showReinforcementPhase('intro'); }
             else { showReinforcementPhase('label'); }
         }
@@ -3292,7 +3481,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         }
         function saveReinforcementLabel() {
             const val = document.getElementById('reinforcementLabelInput').value.trim(); if (!val) return;
-            localStorage.setItem('titan_reinforcement_group_label', val);
+            store.setItem('titan_reinforcement_group_label', val);
             document.getElementById('reinforcementGroupWelcome').innerText = `Playing as: ${val}`;
             showReinforcementPhase('intro');
         }
@@ -3309,6 +3498,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function startReinforcementRound() {
             reinforcementResponses = 0; reinforcementRewards = 0; reinforcementHistory = []; reinforcementCorrectGuess = false;
             reinforcementTimeLeft = reinforcementRoundDuration;
+            if (!reinforcementSchedule) reinforcementSchedule = parseReinforcementSpec('RANDOM'); // module normally sets this first; never crash the start button over it
             reinforcementState = {
                 type: reinforcementSchedule.type, param: reinforcementSchedule.param, responseCount: 0,
                 nextRatioThreshold: computeReinforcementRatioThreshold(reinforcementSchedule.type, reinforcementSchedule.param),
@@ -3401,7 +3591,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             submitReinforcementScore(finalScore);
         }
         function submitReinforcementScore(finalScore) {
-            const label = localStorage.getItem('titan_reinforcement_group_label'); if (!label) return;
+            const label = store.getItem('titan_reinforcement_group_label'); if (!label) return;
             const url = getLiveSyncUrl(); const token = getLiveSyncToken(); if (!url || !token) return;
             const payload = JSON.stringify({ token: token, action: 'submitScore', data: { game: 'reinforcement', label: label, score: finalScore, schedule: reinforcementSchedule.type + '-' + reinforcementSchedule.param, guessedCorrectly: reinforcementCorrectGuess } });
             fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }).catch(() => { /* silent - same reasoning as the other live-sync pushes */ });
@@ -3495,7 +3685,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         function endHotSeatRound() {
             clearInterval(hotSeatInterval); hotSeatInterval = null; hotSeatRunning = false;
             playTone(150, 0, 0.4, 0.3, 'sawtooth');
-            if (hotSeatCorrectCount > hotSeatBestRound) { hotSeatBestRound = hotSeatCorrectCount; localStorage.setItem('titan_hotseat_best_' + currentActiveGameTitle, hotSeatBestRound); }
+            if (hotSeatCorrectCount > hotSeatBestRound) { hotSeatBestRound = hotSeatCorrectCount; store.setItem('titan_hotseat_best_' + currentActiveGameTitle, hotSeatBestRound); }
             updateHotSeatStreakDisplay();
             document.getElementById('hotSeatWordDisplay').innerText = `TIME'S UP! ${hotSeatCorrectCount} correct this round!`;
             document.getElementById('hotSeatSkipBtn').style.display = 'none';
@@ -3540,7 +3730,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         // ==================== SHARED MINI-GAME RESET ====================
         function resetMiniGame(gameKey) {
             const cfg = MINI_GAME_CONFIGS[gameKey];
-            localStorage.removeItem(cfg.storagePrefix + currentActiveGameTitle);
+            store.removeItem(cfg.storagePrefix + currentActiveGameTitle);
             const display = document.getElementById(cfg.displayId);
             const extraDisplay = cfg.extraDisplayId ? document.getElementById(cfg.extraDisplayId) : null;
             if (gameKey === 'taboo') { tabooBuzzCount = 0; const counterEl = document.getElementById('tabooBuzzCount'); if (counterEl) counterEl.innerText = '🚨 x0'; }
@@ -3555,7 +3745,38 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             }, 150);
         }
 
-        loadTimerState();
+        // ==================== BOOT ====================
+        // The ONLY place startup code runs. It sits after every declaration in this script, so a let/const
+        // added anywhere above can't be read before it exists (the bug that took the whole app down three times).
+        // Keep new startup calls in here rather than as loose top-level statements.
+        // Before neutral defaults existed, an unset mascot meant "Titans" and an unset logo meant the South Garner file.
+        // An install that already has data keeps exactly what it showed before; a brand-new install gets the neutral defaults.
+        function preserveLegacyBranding() {
+            if (isStudentMode || store.getItem('titan_branding_v2')) return; // student devices take branding only from the link
+            let isExistingInstall = store._keys().some(k => k !== '__ns_migrated');
+            if (isExistingInstall) {
+                if (store.getItem('titan_setting_mascot') === null) store.setItem('titan_setting_mascot', 'Titans');
+                if (store.getItem('titan_setting_leaderboard') === null) store.setItem('titan_setting_leaderboard', 'Titan Cup');
+                if (store.getItem('titan_setting_watermark') === null) store.setItem('titan_setting_watermark', 'SouthGarner_Titans_Logo1.png');
+            }
+            store.setItem('titan_branding_v2', '1');
+        }
+        function applyStudentLinkBranding() {
+            if (!isStudentMode) return; const p = new URLSearchParams(window.location.search);
+            try { if (p.get('mascot')) store.setItem('titan_setting_mascot', p.get('mascot')); if (p.get('logo')) store.setItem('titan_setting_watermark', p.get('logo')); }
+            catch (e) { /* storage blocked on this device: neutral defaults, page still works */ }
+        }
+        function boot() {
+            applyStudentLinkBranding();
+            preserveLegacyBranding();
+            loadThemeSettings();
+            if (isStudentMode) { document.getElementById('teacherTopBar').style.display = 'none'; document.getElementById('studentTopBar').style.display = 'flex'; document.body.classList.add('student-mode'); startLiveStatePolling(); }
+            ensureFirstUseTimestamp(); updateBackupReminderUI(); checkFirstRun();
+            setTimeout(sendAutoBackup, 30000); // attempts shortly after load (safe - sendAutoBackup no-ops if not due yet), then re-checked every 15 min
+            fetchAgendaData(); fetchGameVaultData(); setInterval(updateDashboard, 1000); setInterval(fetchAgendaData, 60000);
+            loadTimerState();
+        }
+        boot();
     </script>
 </body>
 </html>
