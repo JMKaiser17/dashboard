@@ -1363,18 +1363,25 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         #openingModeBoard .card-checkin { overflow:hidden; }
         .opening-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-shrink:0; }
         .opening-head h2 { margin-bottom:6px; }
-        .opening-head-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-        .opening-bar { display:flex; align-items:center; flex-wrap:wrap; gap:clamp(8px,1vw,16px); margin:0 0 clamp(10px,1.6vh,22px) 0; padding-bottom:clamp(8px,1.2vh,16px); border-bottom:2px solid rgba(var(--primary-rgb),0.18); flex-shrink:0; }
-        .opening-timer { font-size:clamp(2.4rem,4.6vw,5.8rem); font-weight:800; line-height:1; color:var(--primary-color); font-variant-numeric:tabular-nums; letter-spacing:-1px; }
-        .opening-timer.is-idle { opacity:0.35; }
+        .opening-head-actions { display:flex; gap:8px; flex-wrap:nowrap; justify-content:flex-end; flex-shrink:0; }
+        .opening-bar { display:grid; grid-template-columns:auto minmax(0,1fr); grid-template-rows:auto auto; align-items:center; column-gap:clamp(12px,1.4vw,24px); row-gap:8px; margin:0 0 clamp(10px,1.6vh,22px) 0; padding-bottom:clamp(8px,1.2vh,16px); border-bottom:2px solid rgba(var(--primary-rgb),0.18); flex-shrink:0; }
+        .opening-bar .opening-timer { grid-column:1; grid-row:1 / 3; }
+        .opening-bar .opening-controls { grid-column:2; grid-row:1; }
+        .opening-bar .timer-return-row { grid-column:2; grid-row:2; justify-content:flex-start; margin:0; }
+        .opening-timer { font-size:clamp(2.6rem,5vw,6.4rem); font-weight:800; line-height:1; color:var(--primary-color); font-variant-numeric:tabular-nums; letter-spacing:-1px; }
+        .opening-timer.is-idle { opacity:0.45; }
         .opening-controls { display:flex; gap:8px; flex-wrap:wrap; }
         .opening-controls button, .opening-chip, .timer-return-chip { font-family:'Poppins',sans-serif; font-size:clamp(0.8rem,0.95vw,1.05rem); font-weight:700; color:var(--primary-color); background:var(--bg-light); border:2px solid rgba(var(--primary-rgb),0.35); border-radius:var(--radius-pill); padding:6px 14px; cursor:pointer; }
+        .opening-controls button { font-size:clamp(0.95rem,1.2vw,1.4rem); min-height:44px; padding:8px clamp(12px,1.2vw,20px); }
+        .opening-bar .timer-return-chip { min-height:40px; white-space:nowrap; }
+        .opening-controls button[aria-label] { min-width:44px; }
         .opening-controls button:hover, .opening-chip:hover { background:var(--bg-mid); }
         .opening-controls .opening-primary { background:var(--primary-color); color:var(--white); border-color:var(--primary-color); }
         .opening-controls button:focus-visible, .opening-chip:focus-visible, .timer-return-chip:focus-visible, .checkin-tile:focus-visible { outline:3px solid var(--primary-color); outline-offset:2px; }
-        #openingWarmupText { font-size:clamp(1.9rem,3.3vw,4.6rem); line-height:1.35; }
+        #openingWarmupText { font-size:clamp(1.9rem,3.3vw,4.6rem); line-height:1.3; }
+        .opening-warmup-card h2, .card-checkin h2 { font-size:clamp(1.5rem,2.3vw,3rem); }
         .timer-return-row { display:flex; justify-content:center; margin-top:10px; }
-        .opening-bar .timer-return-row { margin-top:0; margin-left:auto; }
+        
         .timer-return-chip { display:inline-flex; align-items:center; gap:8px; background:transparent; }
         .timer-return-chip .chip-dot { width:0.8em; height:0.8em; border-radius:var(--radius-round); border:2px solid currentColor; flex-shrink:0; }
         .timer-return-chip.is-on { background:var(--primary-color); color:var(--white); border-color:var(--primary-color); }
@@ -1387,9 +1394,9 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         .checkin-count { font-size:clamp(1rem,1.4vw,1.7rem); font-weight:800; color:var(--primary-color); white-space:nowrap; font-variant-numeric:tabular-nums; }
         .card .checkin-hint { font-size:clamp(0.95rem,1.25vw,1.5rem); color:var(--gray-600); margin:0 0 clamp(8px,1.2vh,16px) 0; flex-shrink:0; }
         .checkin-grid { flex:1 1 auto; min-height:0; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(7em,1fr)); grid-auto-rows:minmax(2.6em,auto); gap:clamp(6px,0.7vw,12px); align-content:start; font-size:clamp(0.95rem,1.25vw,1.5rem); padding:2px; }
-        .checkin-tile { font-family:'Poppins',sans-serif; font-size:1em; font-weight:700; text-align:left; color:var(--ink); background:var(--white); border:2px solid rgba(var(--primary-rgb),0.25); border-radius:var(--radius-lg); padding:0.4em 0.6em; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; transition:background-color 0.15s,color 0.15s,border-color 0.15s; }
+        .checkin-tile { font-family:'Poppins',sans-serif; font-size:1em; font-weight:700; text-align:center; line-height:1.15; color:var(--ink); background:var(--white); border:2px solid rgba(var(--primary-rgb),0.25); border-radius:var(--radius-lg); padding:0.4em 0.8em; cursor:pointer; overflow:hidden; white-space:normal; overflow-wrap:normal; word-break:normal; display:flex; align-items:center; justify-content:center; position:relative; transition:background-color 0.15s,color 0.15s,border-color 0.15s; }
         .checkin-tile.is-here { background:var(--primary-color); border-color:var(--primary-color); color:var(--white); }
-        .checkin-mark { margin-right:0.35em; }
+        .checkin-mark { position:absolute; top:0.25em; right:0.4em; font-size:0.75em; line-height:1; display:none; } .checkin-tile.is-here .checkin-mark { display:block; } /* sits in the padding, so tapping never re-wraps a name */
         /* Time's up: a slanted band in the class color crosses the screen, the board swaps underneath, and it exits the far side */
         #timesUpSweep { position:fixed; top:0; bottom:0; left:-20vw; width:140vw; z-index:100000; pointer-events:none; display:none; align-items:center; justify-content:center;
             background:linear-gradient(100deg,var(--board-grad-start) 0%,var(--primary-color) 45%,var(--board-grad-end) 100%); transform:translateX(-110%) skewX(-12deg); }
@@ -1657,7 +1664,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         <div id="openingModeBoard">
             <div class="card card-checkin" id="checkinCard"><div class="checkin-head"><h2>Check In</h2><span class="checkin-count" id="checkinCount"></span></div><p class="checkin-hint">Tap your name when you walk in.</p><div class="checkin-grid" id="checkinGrid"></div></div>
             <div class="card opening-warmup-card">
-                <div class="opening-head"><h2>Warm-Up Activity</h2><div class="opening-head-actions"><button type="button" class="opening-chip" id="checkinToggleBtn" aria-pressed="true" onclick="toggleOpeningCheckin()">Check-in: On</button><button type="button" class="opening-chip" onclick="toggleOpeningMode()" title="Back to the main board (Shift+W)">✕ Main board</button></div></div>
+                <div class="opening-head"><h2>Warm-Up</h2><div class="opening-head-actions"><button type="button" class="opening-chip" id="checkinToggleBtn" aria-pressed="true" onclick="toggleOpeningCheckin()">Check-in: On</button><button type="button" class="opening-chip" onclick="toggleOpeningMode()" title="Back to the main board (Shift+W)">✕ Main board</button></div></div>
                 <div class="opening-bar">
                     <div class="opening-timer sync-timer" id="openingTimer">05:00</div>
                     <div class="opening-controls" id="openingIdleControls"><button type="button" onclick="adjustOpeningLength(-1)" aria-label="One minute shorter">−1</button><button type="button" class="opening-primary" id="openingStartBtn" onclick="openingStartTimer()">▶ Start 5 min</button><button type="button" onclick="adjustOpeningLength(1)" aria-label="One minute longer">+1</button></div>
@@ -3814,8 +3821,8 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             const on = isCheckinOn(); board.classList.toggle('no-checkin', !on);
             const toggleBtn = document.getElementById('checkinToggleBtn');
             if (toggleBtn) { toggleBtn.style.display = openingHasRoster() ? '' : 'none'; toggleBtn.innerText = on ? 'Check-in: On' : 'Check-in: Off'; toggleBtn.setAttribute('aria-pressed', String(on)); }
-            // First check-in of the day for this class: everyone starts not checked in. An existing list for today is left alone.
-            if (on) { let k = absentKeyFor(activeBlockData.id); if (store.getItem(k) === null) store.setItem(k, JSON.stringify(activeBlockData.roster)); }
+            // Nothing is written here: opening the mode early (to preview or test) must not mark a future class absent.
+            // The day's list is created by the first student tap (see checkInTap).
             renderCheckinGrid(true); renderOpeningControls();
             if (activeBoard === 'openingModeBoard') setTimeout(fitOpeningBoard, 30);
         }
@@ -3838,30 +3845,44 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             const timerEl = document.getElementById('openingTimer'); if (timerEl) timerEl.classList.toggle('is-idle', !hasTimer);
             if (!hasTimer && timerEl) timerEl.innerText = String(getOpeningMinutes()).padStart(2, '0') + ':00';
         }
+        // Grow text until it fills its box (up to a cap), then back off until nothing overflows.
+        function growToFit(el, box, maxPx, minPx, step, extraCheck) {
+            if (!el || !box || !box.clientHeight) return; el.style.fontSize = '';
+            let size = parseFloat(window.getComputedStyle(el).fontSize) || 16; const fits = () => box.scrollHeight <= box.clientHeight + 1 && (!extraCheck || extraCheck());
+            for (let i = 0; i < 80 && fits() && size + step <= maxPx; i++) { size += step; el.style.fontSize = size + 'px'; }
+            for (let i = 0; i < 80 && !fits() && size - step >= minPx; i++) { size -= step; el.style.fontSize = size + 'px'; }
+        }
         function fitOpeningBoard() {
-            const el = document.getElementById('openingWarmupText'); const card = el && el.closest('.card');
-            if (el && card) { el.style.fontSize = ''; let size = parseFloat(window.getComputedStyle(el).fontSize) || 24; for (let i = 0; i < 60 && card.scrollHeight > card.clientHeight && size > 14; i++) { size -= 2; el.style.fontSize = size + 'px'; } }
+            const el = document.getElementById('openingWarmupText');
+            growToFit(el, el && el.closest('.card'), Math.min(120, window.innerHeight * 0.11), 14, 2);
             fitCheckinGrid();
         }
         // Check-in grid: names only (no points or hall pass buttons within reach of a line of students).
         function renderCheckinGrid(force) {
             const grid = document.getElementById('checkinGrid'); if (!grid) return;
             if (!isCheckinOn()) { if (force) { grid.innerHTML = ''; checkinSignature = ''; } return; }
-            const roster = activeBlockData.roster; const absent = getAbsentList(activeBlockData.id);
-            const sig = absentKeyFor(activeBlockData.id) + '|' + roster.join('\u0001') + '|' + absent.join('\u0001');
+            const roster = activeBlockData.roster; const started = store.getItem(absentKeyFor(activeBlockData.id)) !== null;
+            const absent = started ? getAbsentList(activeBlockData.id) : roster; // no list yet today = nobody has checked in
+            const sig = absentKeyFor(activeBlockData.id) + '|' + started + '|' + roster.join('\u0001') + '|' + absent.join('\u0001');
             if (!force && sig === checkinSignature) return; checkinSignature = sig;
             grid.innerHTML = roster.map(name => { const here = !absent.includes(name);
-                return `<button type="button" class="checkin-tile${here ? ' is-here' : ''}" aria-pressed="${here}" onclick="checkInTap(${jsArg(name)})">${here ? '<span class="checkin-mark" aria-hidden="true">✓</span>' : ''}${escapeHtml(name)}</button>`; }).join('');
+                return `<button type="button" class="checkin-tile${here ? ' is-here' : ''}" aria-pressed="${here}" onclick="checkInTap(${jsArg(name)})"><span class="checkin-mark" aria-hidden="true">✓</span><span class="checkin-name">${escapeHtml(name)}</span></button>`; }).join('');
             const count = document.getElementById('checkinCount');
             if (count) count.innerText = roster.filter(n => !absent.includes(n)).length + ' of ' + roster.length + ' here';
             fitCheckinGrid();
         }
         function fitCheckinGrid() {
-            const grid = document.getElementById('checkinGrid'); if (!grid || !grid.clientHeight) return; grid.style.fontSize = '';
-            let size = parseFloat(window.getComputedStyle(grid).fontSize) || 16;
-            for (let i = 0; i < 40 && grid.scrollHeight > grid.clientHeight + 2 && size > 11; i++) { size -= 1; grid.style.fontSize = size + 'px'; }
+            const grid = document.getElementById('checkinGrid'); if (!grid || !grid.clientHeight) return;
+            grid.style.fontSize = ''; const base = parseFloat(window.getComputedStyle(grid).fontSize) || 16;
+            growToFit(grid, grid, base * 1.6, 11, 1);
+            // A single long word (Christopher) shrinks only its own tile, instead of shrinking every name on the grid.
+            Array.prototype.forEach.call(grid.children, t => { t.style.fontSize = ''; for (let em = 0.95; em >= 0.65 && t.scrollWidth > t.clientWidth + 1; em -= 0.05) t.style.fontSize = em.toFixed(2) + 'em'; }); // tiles grow into empty space for bigger tap targets, capped so 10 names don't become billboards
         }
-        window.checkInTap = function(student) { if (!activeBlockData) return; window.toggleAbsent(student, activeBlockData.id); renderCheckinGrid(true); };
+        window.checkInTap = function(student) {
+            if (!activeBlockData) return; const k = absentKeyFor(activeBlockData.id);
+            if (store.getItem(k) === null) store.setItem(k, JSON.stringify(activeBlockData.roster)); // first tap of the day starts check-in: everyone else is not here yet
+            window.toggleAbsent(student, activeBlockData.id); renderCheckinGrid(true);
+        };
 
         // (initial fetch + dashboard intervals start in boot() at the bottom)
 
