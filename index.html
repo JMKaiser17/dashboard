@@ -1357,44 +1357,43 @@ html[data-board-style="atoms"] .dashboard-wrapper {
 .ui-box-22{flex-direction:column;align-items:center;gap:14px;text-align:center;max-width:560px;}
 
         /* ---- Opening mode (warm-up + check-in) ---- */
-        #openingModeBoard { display:none; flex-grow:1; min-height:0; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:clamp(10px,1.5vw,24px); }
+        #openingModeBoard { display:none; flex-grow:1; min-height:0; grid-template-columns:minmax(0,1fr) minmax(0,1.5fr); gap:clamp(10px,1.5vw,24px); }
         #openingModeBoard.no-checkin { grid-template-columns:minmax(0,1fr); }
         #openingModeBoard.no-checkin .card-checkin { display:none; }
         #openingModeBoard .card-checkin { overflow:hidden; }
-        .opening-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-shrink:0; }
-        .opening-head h2 { margin-bottom:6px; }
-        .opening-head-actions { display:flex; gap:8px; flex-wrap:nowrap; justify-content:flex-end; flex-shrink:0; }
-        .opening-bar { display:grid; grid-template-columns:auto minmax(0,1fr); grid-template-rows:auto auto; align-items:center; column-gap:clamp(12px,1.4vw,24px); row-gap:8px; margin:0 0 clamp(10px,1.6vh,22px) 0; padding-bottom:clamp(8px,1.2vh,16px); border-bottom:2px solid rgba(var(--primary-rgb),0.18); flex-shrink:0; }
-        .opening-bar .opening-timer { grid-column:1; grid-row:1 / 3; }
-        .opening-bar .opening-controls { grid-column:2; grid-row:1; }
-        .opening-bar .timer-return-row { grid-column:2; grid-row:2; justify-content:flex-start; margin:0; }
-        .opening-timer { font-size:clamp(2.6rem,5vw,6.4rem); font-weight:800; line-height:1; color:var(--primary-color); font-variant-numeric:tabular-nums; letter-spacing:-1px; }
+        .opening-warmup-card h2, .card-checkin h2 { font-size:clamp(1.3rem,1.9vw,2.4rem); margin-bottom:0; }
+        .opening-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0; }
+        .opening-title { cursor:pointer; border-radius:var(--radius-md); }
+        .opening-title:hover { opacity:0.75; }
+        .opening-head-actions { display:flex; gap:8px; flex-shrink:0; }
+        .opening-icon-btn, .timer-return-chip { font-family:'Poppins',sans-serif; font-weight:700; color:var(--primary-color); background:var(--bg-light); border:2px solid rgba(var(--primary-rgb),0.3); border-radius:var(--radius-pill); cursor:pointer; }
+        .opening-icon-btn { min-width:44px; min-height:44px; padding:0 10px; font-size:clamp(1rem,1.2vw,1.35rem); line-height:1; display:inline-flex; align-items:center; justify-content:center; }
+        .opening-text-btn { font-size:clamp(0.85rem,1vw,1.1rem); padding:0 14px; }
+        .opening-icon-btn:hover { background:var(--bg-mid); }
+        .opening-head .timer-return-chip.is-on { background:var(--primary-color); color:var(--white); border-color:var(--primary-color); }
+        .opening-bar { display:flex; align-items:center; gap:clamp(12px,1.4vw,24px); margin:clamp(4px,0.8vh,10px) 0 clamp(10px,1.6vh,22px) 0; padding-bottom:clamp(8px,1.2vh,16px); border-bottom:2px solid rgba(var(--primary-rgb),0.18); flex-shrink:0; }
+        .opening-timer { font-family:'Poppins',sans-serif; font-size:clamp(2.6rem,5vw,6.4rem); font-weight:800; line-height:1; color:var(--primary-color); font-variant-numeric:tabular-nums; letter-spacing:-1px; background:none; border:none; padding:0 4px; cursor:pointer; border-radius:var(--radius-md); }
         .opening-timer.is-idle { opacity:0.45; }
-        .opening-controls { display:flex; gap:8px; flex-wrap:wrap; }
-        .opening-controls button, .opening-chip, .timer-return-chip { font-family:'Poppins',sans-serif; font-size:clamp(0.8rem,0.95vw,1.05rem); font-weight:700; color:var(--primary-color); background:var(--bg-light); border:2px solid rgba(var(--primary-rgb),0.35); border-radius:var(--radius-pill); padding:6px 14px; cursor:pointer; }
-        .opening-controls button { font-size:clamp(0.95rem,1.2vw,1.4rem); min-height:44px; padding:8px clamp(12px,1.2vw,20px); }
-        .opening-bar .timer-return-chip { min-height:40px; white-space:nowrap; }
-        .opening-controls button[aria-label] { min-width:44px; }
-        .opening-controls button:hover, .opening-chip:hover { background:var(--bg-mid); }
-        .opening-controls .opening-primary { background:var(--primary-color); color:var(--white); border-color:var(--primary-color); }
-        .opening-controls button:focus-visible, .opening-chip:focus-visible, .timer-return-chip:focus-visible, .checkin-tile:focus-visible { outline:3px solid var(--primary-color); outline-offset:2px; }
+        .opening-timer.is-paused { opacity:0.6; }
+        .opening-side { display:flex; flex-direction:column; gap:6px; }
+        .opening-controls { display:flex; gap:8px; }
+        .opening-hint { font-size:clamp(0.8rem,0.9vw,1rem); font-weight:600; color:var(--gray-600); }
+        .opening-icon-btn:focus-visible, .opening-timer:focus-visible, .opening-title:focus-visible, .timer-return-chip:focus-visible, .checkin-tile:focus-visible { outline:3px solid var(--primary-color); outline-offset:2px; }
         #openingWarmupText { font-size:clamp(1.9rem,3.3vw,4.6rem); line-height:1.3; }
-        .opening-warmup-card h2, .card-checkin h2 { font-size:clamp(1.5rem,2.3vw,3rem); }
+        /* return chip in the timer pop-up, Focus timer and Bidding War timer */
         .timer-return-row { display:flex; justify-content:center; margin-top:10px; }
-        
-        .timer-return-chip { display:inline-flex; align-items:center; gap:8px; background:transparent; }
+        .timer-return-row .timer-return-chip { display:inline-flex; align-items:center; gap:8px; background:transparent; font-size:clamp(0.8rem,0.95vw,1.05rem); padding:6px 14px; }
         .timer-return-chip .chip-dot { width:0.8em; height:0.8em; border-radius:var(--radius-round); border:2px solid currentColor; flex-shrink:0; }
-        .timer-return-chip.is-on { background:var(--primary-color); color:var(--white); border-color:var(--primary-color); }
+        .timer-return-row .timer-return-chip.is-on { background:var(--primary-color); color:var(--white); border-color:var(--primary-color); }
         .timer-return-chip.is-on .chip-dot { background:currentColor; }
         .zen-timer-core .timer-return-row { width:100%; }
         .game-timer-card .timer-return-chip { color:var(--bg-light); border-color:rgba(255,255,255,0.45); }
-        .game-timer-card .timer-return-chip.is-on { background:var(--bg-light); color:var(--ink); border-color:var(--bg-light); }
-        .checkin-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-shrink:0; }
-        .checkin-head h2 { margin-bottom:4px; }
-        .checkin-count { font-size:clamp(1rem,1.4vw,1.7rem); font-weight:800; color:var(--primary-color); white-space:nowrap; font-variant-numeric:tabular-nums; }
-        .card .checkin-hint { font-size:clamp(0.95rem,1.25vw,1.5rem); color:var(--gray-600); margin:0 0 clamp(8px,1.2vh,16px) 0; flex-shrink:0; }
-        .checkin-grid { flex:1 1 auto; min-height:0; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(7em,1fr)); grid-auto-rows:minmax(2.6em,auto); gap:clamp(6px,0.7vw,12px); align-content:start; font-size:clamp(0.95rem,1.25vw,1.5rem); padding:2px; }
-        .checkin-tile { font-family:'Poppins',sans-serif; font-size:1em; font-weight:700; text-align:center; line-height:1.15; color:var(--ink); background:var(--white); border:2px solid rgba(var(--primary-rgb),0.25); border-radius:var(--radius-lg); padding:0.4em 0.8em; cursor:pointer; overflow:hidden; white-space:normal; overflow-wrap:normal; word-break:normal; display:flex; align-items:center; justify-content:center; position:relative; transition:background-color 0.15s,color 0.15s,border-color 0.15s; }
+        .game-timer-card .timer-return-row .timer-return-chip.is-on { background:var(--bg-light); color:var(--ink); border-color:var(--bg-light); }
+        .checkin-head { display:flex; align-items:center; gap:12px; flex-shrink:0; margin-bottom:clamp(8px,1.2vh,14px); }
+        .checkin-head #checkinHideBtn { margin-left:auto; }
+        .checkin-count { font-size:clamp(0.9rem,1.2vw,1.5rem); font-weight:800; color:var(--primary-color); white-space:nowrap; font-variant-numeric:tabular-nums; }
+        .checkin-grid { flex:1 1 auto; min-height:0; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(5.6em,1fr)); grid-auto-rows:minmax(max(44px,2.6em),auto); gap:clamp(5px,0.55vw,10px); align-content:start; font-size:clamp(0.9rem,1.05vw,1.3rem); padding:2px; }
+        .checkin-tile { font-family:'Poppins',sans-serif; font-size:1em; font-weight:700; text-align:center; line-height:1.15; color:var(--ink); background:var(--white); border:2px solid rgba(var(--primary-rgb),0.25); border-radius:var(--radius-lg); padding:0.35em 0.45em; cursor:pointer; overflow:hidden; white-space:normal; overflow-wrap:normal; word-break:normal; display:flex; align-items:center; justify-content:center; position:relative; transition:background-color 0.15s,color 0.15s,border-color 0.15s; }
         .checkin-tile.is-here { background:var(--primary-color); border-color:var(--primary-color); color:var(--white); }
         .checkin-mark { position:absolute; top:0.25em; right:0.4em; font-size:0.75em; line-height:1; display:none; } .checkin-tile.is-here .checkin-mark { display:block; } /* sits in the padding, so tapping never re-wraps a name */
         /* Time's up: a slanted band in the class color crosses the screen, the board swaps underneath, and it exits the far side */
@@ -1662,14 +1661,25 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         </div>
 
         <div id="openingModeBoard">
-            <div class="card card-checkin" id="checkinCard"><div class="checkin-head"><h2>Check In</h2><span class="checkin-count" id="checkinCount"></span></div><p class="checkin-hint">Tap your name when you walk in.</p><div class="checkin-grid" id="checkinGrid"></div></div>
+            <div class="card card-checkin" id="checkinCard">
+                <div class="checkin-head"><h2>Check In</h2><span class="checkin-count" id="checkinCount"></span><button type="button" class="opening-icon-btn opening-text-btn" id="checkinHideBtn" onclick="toggleOpeningCheckin()" title="Hide check-in for this class">Hide</button></div>
+                <div class="checkin-grid" id="checkinGrid"></div>
+            </div>
             <div class="card opening-warmup-card">
-                <div class="opening-head"><h2>Warm-Up</h2><div class="opening-head-actions"><button type="button" class="opening-chip" id="checkinToggleBtn" aria-pressed="true" onclick="toggleOpeningCheckin()">Check-in: On</button><button type="button" class="opening-chip" onclick="toggleOpeningMode()" title="Back to the main board (Shift+W)">✕ Main board</button></div></div>
+                <div class="opening-head">
+                    <h2 class="opening-title" role="button" tabindex="0" onclick="toggleOpeningMode()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleOpeningMode();}" title="Back to the main board (Shift+W)">Warm-Up</h2>
+                    <div class="opening-head-actions">
+                        <button type="button" class="opening-icon-btn" id="checkinShowBtn" onclick="toggleOpeningCheckin()" title="Show check-in" aria-label="Show check-in">👥</button>
+                        <button type="button" class="timer-return-chip opening-icon-btn" aria-pressed="false" onclick="toggleTimerReturn()" title="When the timer ends, go back to the main board" aria-label="Back to the main board when the timer ends">↩</button>
+                    </div>
+                </div>
                 <div class="opening-bar">
-                    <div class="opening-timer sync-timer" id="openingTimer">05:00</div>
-                    <div class="opening-controls" id="openingIdleControls"><button type="button" onclick="adjustOpeningLength(-1)" aria-label="One minute shorter">−1</button><button type="button" class="opening-primary" id="openingStartBtn" onclick="openingStartTimer()">▶ Start 5 min</button><button type="button" onclick="adjustOpeningLength(1)" aria-label="One minute longer">+1</button></div>
-                    <div class="opening-controls" id="openingLiveControls" style="display:none;"><button type="button" class="opening-primary sync-btn-start" onclick="toggleTimer()">Pause</button><button type="button" onclick="addTime(1)">+1 min</button><button type="button" onclick="clearTimer()">Clear</button></div>
-                    <div class="timer-return-row"><button type="button" class="timer-return-chip" aria-pressed="false" onclick="toggleTimerReturn()" title="When this timer ends, go back to the main board"><span class="chip-dot" aria-hidden="true"></span>↩ Back to main when done</button></div>
+                    <button type="button" class="opening-timer sync-timer" id="openingTimer" onclick="openingTimerTap()" aria-label="Start or pause the warm-up timer">05:00</button>
+                    <div class="opening-side">
+                        <div class="opening-controls" id="openingIdleControls"><button type="button" class="opening-icon-btn" onclick="adjustOpeningLength(-1)" aria-label="One minute shorter" title="One minute shorter">−</button><button type="button" class="opening-icon-btn" onclick="adjustOpeningLength(1)" aria-label="One minute longer" title="One minute longer">+</button></div>
+                        <div class="opening-controls" id="openingLiveControls" style="display:none;"><button type="button" class="opening-icon-btn opening-text-btn" onclick="addTime(1)" aria-label="Add one minute" title="Add one minute">+1</button><button type="button" class="opening-icon-btn" onclick="clearTimer()" aria-label="Clear the timer" title="Clear the timer">✕</button></div>
+                        <div class="opening-hint" id="openingHint">tap to start</div>
+                    </div>
                 </div>
                 <p id="openingWarmupText" style="white-space:pre-wrap;"></p>
             </div>
@@ -3819,8 +3829,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             const text = document.getElementById('openingWarmupText');
             if (text) text.innerText = activeBlockData ? (activeBlockData.warmup || 'No Warm-Up provided today.') : 'Have a great day!';
             const on = isCheckinOn(); board.classList.toggle('no-checkin', !on);
-            const toggleBtn = document.getElementById('checkinToggleBtn');
-            if (toggleBtn) { toggleBtn.style.display = openingHasRoster() ? '' : 'none'; toggleBtn.innerText = on ? 'Check-in: On' : 'Check-in: Off'; toggleBtn.setAttribute('aria-pressed', String(on)); }
+            const showBtn = document.getElementById('checkinShowBtn'); if (showBtn) showBtn.style.display = (openingHasRoster() && !on) ? '' : 'none';
             // Nothing is written here: opening the mode early (to preview or test) must not mark a future class absent.
             // The day's list is created by the first student tap (see checkInTap).
             renderCheckinGrid(true); renderOpeningControls();
@@ -3837,12 +3846,14 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function openingStartTimer() {
             if (timerExists()) return; initAudio(); addTime(getOpeningMinutes()); toggleTimer();
         }
+        // The big timer is the button: tap to start the warm-up, then tap to pause or resume.
+        function openingTimerTap() { if (timerExists()) toggleTimer(); else openingStartTimer(); }
         function renderOpeningControls() {
             const idle = document.getElementById('openingIdleControls'); const live = document.getElementById('openingLiveControls'); if (!idle || !live) return;
             const hasTimer = timerExists(); idle.style.display = hasTimer ? 'none' : ''; live.style.display = hasTimer ? '' : 'none';
-            const startBtn = document.getElementById('openingStartBtn'); const label = '▶ Start ' + getOpeningMinutes() + ' min';
-            if (startBtn && startBtn.innerText !== label) startBtn.innerText = label;
-            const timerEl = document.getElementById('openingTimer'); if (timerEl) timerEl.classList.toggle('is-idle', !hasTimer);
+            const hint = document.getElementById('openingHint'); const hintText = !hasTimer ? 'tap to start' : (isRunning ? 'tap to pause' : 'paused · tap to resume');
+            if (hint && hint.innerText !== hintText) hint.innerText = hintText;
+            const timerEl = document.getElementById('openingTimer'); if (timerEl) { timerEl.classList.toggle('is-idle', !hasTimer); timerEl.classList.toggle('is-paused', hasTimer && !isRunning); }
             if (!hasTimer && timerEl) timerEl.innerText = String(getOpeningMinutes()).padStart(2, '0') + ':00';
         }
         // Grow text until it fills its box (up to a cap), then back off until nothing overflows.
@@ -3874,7 +3885,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function fitCheckinGrid() {
             const grid = document.getElementById('checkinGrid'); if (!grid || !grid.clientHeight) return;
             grid.style.fontSize = ''; const base = parseFloat(window.getComputedStyle(grid).fontSize) || 16;
-            growToFit(grid, grid, base * 1.6, 11, 1);
+            growToFit(grid, grid, base, 11, 1); // shrink only: growing the font would also widen the em-based columns and drop a column
             // A single long word (Christopher) shrinks only its own tile, instead of shrinking every name on the grid.
             Array.prototype.forEach.call(grid.children, t => { t.style.fontSize = ''; for (let em = 0.95; em >= 0.65 && t.scrollWidth > t.clientWidth + 1; em -= 0.05) t.style.fontSize = em.toFixed(2) + 'em'; }); // tiles grow into empty space for bigger tap targets, capped so 10 names don't become billboards
         }
