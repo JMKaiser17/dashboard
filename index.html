@@ -1502,6 +1502,38 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         .phone-row button { font-family:'Poppins',sans-serif; font-weight:700; font-size:clamp(0.75rem,0.85vw,0.95rem); padding:4px 12px; border-radius:var(--radius-pill); border:1.5px solid rgba(var(--primary-rgb),0.3); background:transparent; color:var(--gray-700); cursor:pointer; }
         .phone-row button.is-on { background:var(--phone-color, var(--gray-700)); border-color:var(--phone-color, var(--gray-700)); color:var(--white); }
         .phone-row button:focus-visible { outline:3px solid var(--primary-color); outline-offset:2px; }
+        /* ---- Team scoreboard ---- */
+        :root { --score-h:clamp(58px,8.5vh,88px); }
+        .score-strip { display:none; position:fixed; left:0; right:0; bottom:0; height:var(--score-h); z-index:10060; box-sizing:border-box; padding:6px clamp(8px,1vw,16px); gap:clamp(8px,1vw,16px); align-items:center; background:var(--secondary-dark); border-top:3px solid var(--primary-color); box-shadow:0 -6px 24px rgba(0,0,0,0.35); font-family:'Poppins',sans-serif; }
+        body.score-on .score-strip { display:flex; }
+        body.score-on #activeGameContainer { height:calc(100vh - var(--score-h)); }
+        body.score-on .modal { bottom:var(--score-h); height:auto; max-height:calc(100vh - var(--score-h)); } /* pop-ups (Jeopardy clues etc.) stop above the scoreboard */
+        body.score-on.game-mode-active .dashboard-wrapper { padding-bottom:calc(var(--score-h) + 6px); box-sizing:border-box; }
+        body.score-on #appToast { bottom:calc(var(--score-h) + 70px); }
+        .score-teams { display:flex; gap:clamp(6px,0.8vw,12px); flex:1 1 auto; min-width:0; height:100%; }
+        .score-team { flex:1 1 0; min-width:0; display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.06); border-radius:var(--radius-md); border-left:6px solid var(--team); padding:0 6px; }
+        .score-team-main { flex:1 1 auto; min-width:0; text-align:center; line-height:1.05; }
+        .score-team-name { color:var(--bg-light); font-weight:700; font-size:clamp(0.75rem,0.95vw,1.1rem); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:text; border-radius:4px; outline:none; }
+        .score-team-name[contenteditable="true"] { background:var(--white); color:var(--ink); padding:0 4px; text-overflow:clip; }
+        .score-team-score { color:var(--white); font-weight:900; font-size:clamp(1.3rem,2.3vw,2.6rem); font-variant-numeric:tabular-nums; }
+        .score-btn { flex-shrink:0; width:clamp(32px,2.6vw,44px); height:clamp(32px,2.6vw,44px); border-radius:var(--radius-round); border:none; background:var(--team); color:#111; font-weight:900; font-size:clamp(1rem,1.4vw,1.6rem); cursor:pointer; line-height:1; }
+        .score-tools { display:flex; gap:6px; flex-shrink:0; }
+        .score-tools button { font-family:'Poppins',sans-serif; font-weight:700; font-size:clamp(0.75rem,0.85vw,0.95rem); padding:6px 10px; border-radius:var(--radius-pill); border:1.5px solid rgba(255,255,255,0.3); background:transparent; color:var(--bg-light); cursor:pointer; white-space:nowrap; }
+        .score-tools button:hover { background:rgba(255,255,255,0.1); }
+        /* While an award is waiting, it takes over the scoreboard's own row (never covers the game): tap the team that earned it. */
+        .score-award-bar { display:none; position:fixed; left:0; right:0; bottom:0; height:var(--score-h); z-index:10061; box-sizing:border-box; align-items:center; gap:clamp(6px,0.8vw,12px); padding:6px clamp(8px,1vw,16px); background:var(--secondary-dark); border-top:3px solid var(--white); font-family:'Poppins',sans-serif; animation:scoreAwardIn 0.2s ease-out; }
+        .score-award-bar.show { display:flex; }
+        .score-award-label { flex-shrink:0; max-width:26%; color:var(--white); font-size:clamp(0.85rem,1.1vw,1.3rem); line-height:1.15; overflow:hidden; }
+        .score-award-label b { display:block; font-size:1.35em; color:#ffd166; }
+        .score-award-bar button { flex:1 1 0; min-width:0; height:100%; font-family:'Poppins',sans-serif; font-weight:900; font-size:clamp(0.95rem,1.4vw,1.7rem); border-radius:var(--radius-md); border:none; background:var(--team, #555); color:#111; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 8px; }
+        .score-award-bar button:hover { filter:brightness(1.1); }
+        .score-award-bar .score-award-skip { flex:0 0 auto; background:transparent; color:var(--bg-light); border:1.5px solid rgba(255,255,255,0.35); font-weight:700; font-size:clamp(0.8rem,0.95vw,1.05rem); padding:0 16px; }
+        .score-strip button:focus-visible, .score-award-bar button:focus-visible { outline:3px solid var(--white); outline-offset:2px; }
+        .hub-score-row { grid-column:1 / -1; display:flex; justify-content:flex-end; }
+        .hub-score-start { font-family:'Poppins',sans-serif; font-weight:800; font-size:clamp(0.9rem,1.1vw,1.2rem); padding:8px 18px; border-radius:var(--radius-pill); border:2px solid var(--bg-light); background:transparent; color:var(--bg-light); cursor:pointer; }
+        .hub-score-start:hover { background:rgba(255,255,255,0.1); }
+        @keyframes scoreAwardIn { from { opacity:0; } to { opacity:1; } }
+        @media (prefers-reduced-motion: reduce) { .score-award-bar { animation:none; } }
         /* Time's up: a slanted band in the class color crosses the screen, the board swaps underneath, and it exits the far side */
         #timesUpSweep { position:fixed; top:0; bottom:0; left:-20vw; width:140vw; z-index:100000; pointer-events:none; display:none; align-items:center; justify-content:center;
             background:linear-gradient(100deg,var(--board-grad-start) 0%,var(--primary-color) 45%,var(--board-grad-end) 100%); transform:translateX(-110%) skewX(-12deg); }
@@ -1512,6 +1544,8 @@ html[data-board-style="atoms"] .dashboard-wrapper {
 </style>
 </head>
 <body>
+    <div id="scoreStrip" class="score-strip" aria-label="Team scores"></div>
+    <div id="scoreAwardBar" class="score-award-bar" role="group" aria-label="Award points"></div>
     <div id="timesUpSweep" aria-hidden="true"><span>Time's up</span></div>
     <div id="appToast" role="status" aria-live="polite"><span id="appToastText"></span><button type="button" id="appToastUndo" onclick="appToastUndo()" style="display:none;">Undo</button></div>
 <div id="floatingTimer" class="sync-timer" onclick="toggleModal('timerModal')" title="Open Timer">00:00</div>
@@ -2141,6 +2175,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         let timerReturnChoice = null; // chip flipped while no timer exists: true/false overrides the default for the next timer
         let checkinSignature = ''; // last rendered check-in grid, so it only rebuilds when something changed
         let wakeLockSentinel = null; let wakeLockWanted = false; // keeps the board's screen on during the school day
+        let scoreUndoStack = []; let scorePendingAward = null; let jeopardyAwardInfo = null; // shared team scoreboard
         let gameVaultIssues = []; // Game Vault problems, shown only inside the Game Hub (never in the top-bar pill)
         let appToastTimer = null; let appToastUndoFn = null; // the fading message that replaces browser alert/confirm boxes
         let liveStatePollTimer = null; // declared here (not near its usage below) - referenced by code that runs immediately during init
@@ -3036,6 +3071,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         }
 
         function buildDynamicGameMenu() {
+            setTimeout(renderScoreboard, 0);
             const menu = document.getElementById('gameHubMenu'); menu.innerHTML = '';
             if (gameVaultData.length === 0) { menu.innerHTML = '<h3 style="color:var(--bg-mid); text-align:center; width:100%;">No active games found.</h3>' + (isStudentMode ? '' : hubHiddenNoteHTML()); return; }
             let hasGame = { jeopardy: false, biddingwar: false, hotseat: false, taboo: false, titansays: false, hivemind: false, debate: false, vault: false, factorfiction: false, survey: false, gridlock: false, bullmarket: false, gauntlet: false, reinforcement: false };
@@ -3058,6 +3094,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             if (hasGame.gauntlet) menu.innerHTML += gameCartridgeHTML('gauntlet', `handlePackSelection('gauntlet', 'The Fiscal Gauntlet')`, 'The Fiscal Gauntlet', 'Select a Deck');
             if (hasGame.reinforcement) menu.innerHTML += gameCartridgeHTML('reinforcement', `handlePackSelection('reinforcement', 'The Reinforcement Lab')`, 'The Reinforcement Lab', 'Select a Deck');
             if (!isStudentMode) menu.innerHTML += hubHiddenNoteHTML();
+            if (!isStudentMode) menu.insertAdjacentHTML('afterbegin', '<div class="hub-score-row"><button type="button" id="scoreStartBtn" class="hub-score-start" onclick="startScoreboard()">🏆 Keep score</button></div>');
         }
 
         let currentActiveGameTitle = ''; 
@@ -3109,7 +3146,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function checkAndAnnounceGridlockWin() {
             if (gridlockWinAnnounced) return;
             const win = checkGridlockWin(); if (!win) return;
-            gridlockWinAnnounced = true;
+            gridlockWinAnnounced = true; offerAward('add', 500, `Gridlock: Team ${win.team} got three in a row`);
             const cells = Array.from(document.querySelectorAll('#gridlockGrid .gridlock-cell'));
             win.cellsIdx.forEach(i => cells[i].classList.add('win-line'));
             const banner = document.getElementById('gridlockWinBanner'); banner.innerText = `TEAM ${win.team} WINS!`; banner.classList.remove('show'); void banner.offsetWidth; banner.classList.add('show');
@@ -3146,7 +3183,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         }
         function revealBullTile(cell) {
             if (parseInt(cell.dataset.state) !== 0) return;
-            cell.innerHTML = cell.dataset.reward; cell.dataset.state = 1;
+            cell.innerHTML = cell.dataset.reward; cell.dataset.state = 1; offerBullAward(cell.dataset.reward);
             if (cell.dataset.reward.includes('CRASH')) {
                 cell.classList.add('crash'); playTone(150, 0, 0.4, 0.3, 'sawtooth'); playTone(90, 0.15, 0.5, 0.35, 'sawtooth');
                 const flash = document.getElementById('bullCrashFlash'); if (flash) { flash.classList.remove('flash'); void flash.offsetWidth; flash.classList.add('flash'); }
@@ -3210,6 +3247,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             ordered.forEach(({ idx, text, points }) => {
                 let card = document.createElement('div'); card.className = 'survey-card'; card.innerHTML = `<span>${idx + 1}</span>`;
                 card.onclick = function() {
+                    if (!this.classList.contains('revealed')) offerAward('add', parseInt(points, 10) || 0, 'Survey: ' + text);
                     this.classList.add('revealed'); this.innerHTML = `<span>${escapeHtml(text)}</span><span>${escapeHtml(points)}</span>`;
                     // Higher-ranked answers (lower idx, e.g. the #1 answer) get a more dramatic, higher-pitched reveal tone
                     let freq = 500 + (answers.length - idx) * 140;
@@ -3307,7 +3345,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function revealVaultAnswer() {
             if (vaultTapBlocked()) return;
             if (!vaultCurrentClues.length || vaultAnswerShown) return;
-            vaultAnswerShown = true; renderVault('answer');
+            vaultAnswerShown = true; renderVault('answer'); offerAward('add', vaultClueValue, 'The Vault');
         }
         function resetVault() {
             vaultTapGuardUntil = 0;
@@ -3386,7 +3424,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             setTimeout(() => { overlay.classList.remove('show'); callback(); }, 1900);
         }
         function openJeopardyPrompt(cardElement, category, value, prompt, answer, gameTitle, isDailyDouble) {
-            cardElement.classList.add('played'); markJeopardyTilePlayed(gameTitle, category, value);
+            cardElement.classList.add('played'); markJeopardyTilePlayed(gameTitle, category, value); jeopardyAwardInfo = { value: parseInt(value, 10) || 0, label: category + ' ' + value + (isDailyDouble ? ' (Daily Double)' : '') };
             const showClue = () => {
                 const modalCard = document.getElementById('jeopardyModalCard'); if (modalCard) modalCard.classList.toggle('daily-double-active', !!isDailyDouble);
                 document.getElementById('jeopardyModalHeader').innerText = isDailyDouble ? `${category} - DAILY DOUBLE!` : `${category} - ${value}`;
@@ -3396,7 +3434,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             };
             if (isDailyDouble) { triggerDailyDouble(showClue); } else { showClue(); }
         }
-        function revealJeopardyAnswer() { const ansEl = document.getElementById('jeopardyModalAnswer'); ansEl.style.display = 'block'; ansEl.classList.remove('reveal-anim'); void ansEl.offsetWidth; ansEl.classList.add('reveal-anim'); document.getElementById('jeopardyRevealBtn').style.display = 'none'; document.getElementById('jeopardyCloseBtn').style.display = 'block'; }
+        function revealJeopardyAnswer() { const ansEl = document.getElementById('jeopardyModalAnswer'); ansEl.style.display = 'block'; ansEl.classList.remove('reveal-anim'); void ansEl.offsetWidth; ansEl.classList.add('reveal-anim'); document.getElementById('jeopardyRevealBtn').style.display = 'none'; document.getElementById('jeopardyCloseBtn').style.display = 'block'; if (jeopardyAwardInfo) offerAward('add', jeopardyAwardInfo.value, jeopardyAwardInfo.label); }
         function closeJeopardyPrompt() { document.getElementById('jeopardyModal').classList.remove('active'); }
         
         function renderJeopardyBoard(gameTitle) {
@@ -3441,9 +3479,9 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             let targetBoard = 'mainBento'; if (isSlideMode) targetBoard = 'slideModeBoard'; else if (isFocusMode) targetBoard = 'focusModeBoard'; else if (isGameStage) targetBoard = 'gameModeBoard'; else if (isOpeningMode) targetBoard = 'openingModeBoard';
             if (targetBoard === activeBoard) return; const oldBoard = document.getElementById(activeBoard); const newBoard = document.getElementById(targetBoard); const topTabs = document.getElementById('topSourceTabs');
             if (targetBoard === 'slideModeBoard') { topTabs.style.display = 'flex'; renderSlide(); } else { topTabs.style.display = 'none'; }
-            if (targetBoard === 'slideModeBoard' || activeBoard === 'slideModeBoard') { oldBoard.style.display = 'none'; oldBoard.style.animation = ''; newBoard.style.display = (targetBoard === 'slideModeBoard') ? 'flex' : 'grid'; newBoard.style.animation = ''; activeBoard = targetBoard; isTransitioning = false; if (targetBoard === 'mainBento') setTimeout(autoFitCardText, 50); renderReturnChips(); checkFloatingTimer(); return; }
+            if (targetBoard === 'slideModeBoard' || activeBoard === 'slideModeBoard') { oldBoard.style.display = 'none'; oldBoard.style.animation = ''; newBoard.style.display = (targetBoard === 'slideModeBoard') ? 'flex' : 'grid'; newBoard.style.animation = ''; activeBoard = targetBoard; isTransitioning = false; if (targetBoard === 'mainBento') setTimeout(autoFitCardText, 50); renderReturnChips(); checkFloatingTimer(); renderScoreboard(); return; }
             isTransitioning = true; oldBoard.style.animation = 'boardFadeOut 0.3s ease forwards';
-            setTimeout(() => { oldBoard.style.display = 'none'; oldBoard.style.animation = ''; newBoard.style.display = (targetBoard === 'gameModeBoard') ? 'flex' : 'grid'; newBoard.style.animation = 'boardFadeIn 0.5s ease forwards'; activeBoard = targetBoard; if (targetBoard !== 'gameModeBoard') closeGameModule(); if (targetBoard === 'mainBento') setTimeout(autoFitCardText, 50); if (targetBoard === 'openingModeBoard') { setTimeout(fitOpeningBoard, 50); if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (activeBoard === 'openingModeBoard') fitOpeningBoard(); }); } isTransitioning = false; renderReturnChips(); renderOpeningControls(); checkFloatingTimer(); }, 300); 
+            setTimeout(() => { oldBoard.style.display = 'none'; oldBoard.style.animation = ''; newBoard.style.display = (targetBoard === 'gameModeBoard') ? 'flex' : 'grid'; newBoard.style.animation = 'boardFadeIn 0.5s ease forwards'; activeBoard = targetBoard; if (targetBoard !== 'gameModeBoard') closeGameModule(); if (targetBoard === 'mainBento') setTimeout(autoFitCardText, 50); if (targetBoard === 'openingModeBoard') { setTimeout(fitOpeningBoard, 50); if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (activeBoard === 'openingModeBoard') fitOpeningBoard(); }); } isTransitioning = false; renderReturnChips(); renderOpeningControls(); checkFloatingTimer(); renderScoreboard(); }, 300); 
         }
 
         let notesPushDebounceTimer = null;
@@ -4034,6 +4072,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                 }
                 lastActiveBlockId = currentActiveId;
                 if (isOpeningMode) renderOpeningBoard();
+                scoreUndoStack = []; scorePendingAward = null; renderScoreboard();
             }
             if (activeBoard === 'openingModeBoard') { try { renderCheckinGrid(false); } catch (e) { console.error('Check-in grid error', e); } }
             if (now.getSeconds() === 0 || !wakeLockSentinel && wakeLockWanted !== schoolDayActive(nowMs)) updateWakeLock(nowMs);
@@ -4061,6 +4100,79 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             }
         }
         document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') updateWakeLock(Date.now()); });
+
+        // ==================== TEAM SCOREBOARD (Game Hub) ====================
+        // One set of team totals per class per day, shown along the bottom of every game screen. Hidden until "Keep score".
+        // Games that produce points (Jeopardy, The Vault, Bull Market, Survey Showdown, Gridlock) offer them in an award bar:
+        // tap the team that earned them. Every change can be undone.
+        const SCORE_TEAM_COLORS = ['#e76f51', '#2a9d8f', '#e9c46a', '#4d96ff', '#b15cff', '#ff6fb5'];
+        function scoreKey() { const id = activeBlockData ? activeBlockData.id : 'none'; const d = activeBlockData && activeBlockData.date ? activeBlockData.date : new Date(); return 'titan_scores_' + id + '_' + dayStamp(d); }
+        function loadScores() { try { const v = JSON.parse(store.getItem(scoreKey()) || 'null'); return v && Array.isArray(v.teams) && v.teams.length ? v : null; } catch (e) { return null; } }
+        function saveScores(state) {
+            const before = store.getItem(scoreKey()); scoreUndoStack.push({ key: scoreKey(), value: before }); if (scoreUndoStack.length > 30) scoreUndoStack.shift();
+            if (state) store.setItem(scoreKey(), JSON.stringify(state)); else store.removeItem(scoreKey());
+            renderScoreboard();
+        }
+        function startScoreboard() { if (isStudentMode) return; saveScores({ teams: [{ name: 'Team 1', score: 0 }, { name: 'Team 2', score: 0 }], step: 100 }); }
+        function addScoreTeam() { const st = loadScores(); if (!st || st.teams.length >= 6) return; st.teams.push({ name: 'Team ' + (st.teams.length + 1), score: 0 }); saveScores(st); }
+        function changeTeamScore(i, dir) { const st = loadScores(); if (!st || !st.teams[i]) return; st.teams[i].score += dir * (st.step || 100); saveScores(st); }
+        function cycleScoreStep() { const st = loadScores(); if (!st) return; st.step = st.step === 100 ? 10 : st.step === 10 ? 1 : 100; saveScores(st); }
+        function undoScore() {
+            const last = scoreUndoStack.pop(); if (!last) { showToast('Nothing to undo.'); return; }
+            if (last.value === null) store.removeItem(last.key); else store.setItem(last.key, last.value);
+            renderScoreboard();
+        }
+        function endScoreboard() {
+            const key = scoreKey(); const undo = snapshotKeys([key]); scorePendingAward = null;
+            store.removeItem(key); renderScoreboard();
+            showToast('Scoreboard cleared.', { undo: () => { undo(); renderScoreboard(); } });
+        }
+        function renameScoreTeam(i, el) {
+            el.contentEditable = 'true'; el.focus(); const range = document.createRange(); range.selectNodeContents(el); const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+            const finish = () => { el.contentEditable = 'false'; el.removeEventListener('blur', finish); el.removeEventListener('keydown', onKey);
+                const st = loadScores(); if (!st || !st.teams[i]) return; const name = el.textContent.replace(/\s+/g, ' ').trim().slice(0, 24);
+                if (name && name !== st.teams[i].name) { st.teams[i].name = name; saveScores(st); } else renderScoreboard(); };
+            const onKey = (e) => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } else if (e.key === 'Escape') { el.textContent = ''; el.blur(); } e.stopPropagation(); };
+            el.addEventListener('blur', finish); el.addEventListener('keydown', onKey);
+        }
+        // kind: 'add' (amount can be negative), 'double', 'halve'
+        function offerAward(kind, amount, label) {
+            if (isStudentMode || !loadScores()) return;
+            scorePendingAward = { kind: kind, amount: amount || 0, label: label || '' }; renderScoreboard();
+        }
+        function applyAward(i) {
+            const award = scorePendingAward; const st = loadScores(); scorePendingAward = null;
+            if (!award || !st || !st.teams[i]) { renderScoreboard(); return; }
+            const t = st.teams[i];
+            if (award.kind === 'double') t.score = t.score * 2; else if (award.kind === 'halve') t.score = Math.floor(t.score / 2); else t.score += award.amount;
+            saveScores(st);
+        }
+        function skipAward() { scorePendingAward = null; renderScoreboard(); }
+        function awardDescription(a) { return a.kind === 'double' ? '2× score' : a.kind === 'halve' ? 'Market crash: score cut in half' : (a.amount >= 0 ? '+' : '−') + Math.abs(a.amount); }
+        function renderScoreboard() {
+            const strip = document.getElementById('scoreStrip'); const bar = document.getElementById('scoreAwardBar'); if (!strip || !bar) return;
+            const st = isStudentMode ? null : loadScores(); const inGames = activeBoard === 'gameModeBoard';
+            const on = !!(st && inGames); document.body.classList.toggle('score-on', on);
+            const keepBtn = document.getElementById('scoreStartBtn'); if (keepBtn) keepBtn.style.display = (!st && inGames && !isStudentMode) ? '' : 'none';
+            if (!on) { strip.innerHTML = ''; bar.innerHTML = ''; bar.classList.remove('show'); return; }
+            const top = Math.max(...st.teams.map(t => t.score)); const leaders = st.teams.filter(t => t.score === top).length;
+            strip.innerHTML = `<div class="score-teams">${st.teams.map((t, i) => `<div class="score-team" style="--team:${SCORE_TEAM_COLORS[i % 6]}">
+                    <button type="button" class="score-btn" onclick="changeTeamScore(${i}, -1)" aria-label="Minus ${st.step} for ${escapeHtml(t.name)}">−</button>
+                    <div class="score-team-main"><div class="score-team-name" onclick="renameScoreTeam(${i}, this)" title="Tap to rename">${top > 0 && t.score === top && leaders === 1 ? '👑 ' : ''}${escapeHtml(t.name)}</div><div class="score-team-score">${t.score}</div></div>
+                    <button type="button" class="score-btn" onclick="changeTeamScore(${i}, 1)" aria-label="Plus ${st.step} for ${escapeHtml(t.name)}">+</button></div>`).join('')}</div>
+                <div class="score-tools"><button type="button" onclick="cycleScoreStep()" title="How much − and + change a score">±${st.step}</button>${st.teams.length < 6 ? '<button type="button" onclick="addScoreTeam()" title="Add a team">+ Team</button>' : ''}<button type="button" onclick="undoScore()" title="Undo the last change">↶ Undo</button><button type="button" onclick="endScoreboard()" title="Clear today\'s scores for this class">End</button></div>`;
+            if (scorePendingAward) {
+                const a = scorePendingAward;
+                bar.innerHTML = `<span class="score-award-label"><b>🏆 ${escapeHtml(awardDescription(a))}</b>${a.label ? escapeHtml(a.label) : ''}</span>${st.teams.map((t, i) => `<button type="button" style="--team:${SCORE_TEAM_COLORS[i % 6]}" onclick="applyAward(${i})">${escapeHtml(t.name)}</button>`).join('')}<button type="button" class="score-award-skip" onclick="skipAward()">Skip</button>`;
+                bar.classList.add('show');
+            } else { bar.innerHTML = ''; bar.classList.remove('show'); }
+        }
+        function offerBullAward(reward) {
+            const r = String(reward); const m = r.match(/\+\s*(\d+)/);
+            if (m) offerAward('add', parseInt(m[1], 10), 'Bull Market');
+            else if (/2X/i.test(r)) offerAward('double', 0, 'Bull Market multiplier');
+            else if (/CRASH/i.test(r)) offerAward('halve', 0, 'Bull Market');
+        }
 
         // ==================== FADING MESSAGE (replaces browser alert / confirm boxes) ====================
         // The browser's built-in warning and confirmation boxes freeze the page until someone clicks OK. This never blocks anything.
