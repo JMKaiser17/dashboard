@@ -1420,6 +1420,49 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         .deck-issue-tag:hover { background:#ffe9b3; }
         .deck-issue-tag:focus-visible { outline:3px solid var(--white); outline-offset:2px; }
         .hub-hidden-note { grid-column:1 / -1; margin:6px 0 0 0; font-size:clamp(0.8rem,0.9vw,1rem); color:var(--bg-mid); opacity:0.85; text-align:center; }
+        /* ---- The Vault ---- */
+        .vault-stage { width:100%; max-width:1200px; margin:auto; display:flex; flex-direction:column; align-items:center; gap:clamp(12px,2.2vh,28px); color:var(--white); font-family:'Poppins',sans-serif; }
+        .vault-intro { text-align:center; max-width:760px; }
+        .vault-intro-icon { font-size:clamp(3rem,6vw,5.5rem); line-height:1; margin-bottom:10px; }
+        .vault-intro h3 { font-size:clamp(2rem,4vw,4.2rem); font-weight:900; margin:0 0 12px 0; letter-spacing:-1px; }
+        .vault-intro p { font-size:clamp(1.05rem,1.6vw,1.7rem); color:var(--gray-300,#d4d4d4); line-height:1.5; margin:0; }
+        .vault-intro b { color:var(--white); }
+        .vault-intro-count { margin-top:18px; display:inline-block; padding:6px 16px; border-radius:var(--radius-pill); background:rgba(255,255,255,0.08); font-weight:700; font-size:clamp(0.9rem,1.1vw,1.2rem); }
+        .vault-head { display:flex; align-items:center; justify-content:center; gap:clamp(16px,2.5vw,40px); }
+        .vault-value { font-size:clamp(3rem,7vw,7rem); font-weight:900; line-height:1; letter-spacing:-2px; color:#ffd166; text-shadow:0 4px 24px rgba(255,209,102,0.25); font-variant-numeric:tabular-nums; }
+        .vault-value.is-won { color:#7ee2a8; text-shadow:0 4px 24px rgba(126,226,168,0.25); }
+        .vault-meta { font-size:clamp(1.1rem,1.8vw,2rem); font-weight:800; color:var(--bg-light); }
+        .vault-pips { display:flex; gap:8px; margin-top:8px; }
+        .vault-pip { width:clamp(12px,1.2vw,18px); height:clamp(12px,1.2vw,18px); border-radius:var(--radius-round); border:2px solid var(--bg-mid); }
+        .vault-pip.on { background:var(--bg-mid); }
+        .vault-grid { display:grid; gap:clamp(10px,1.4vw,20px); width:100%; }
+        .vault-clue { position:relative; min-height:clamp(70px,13vh,140px); display:flex; align-items:center; justify-content:center; text-align:center; padding:clamp(12px,1.6vw,24px) clamp(18px,2.2vw,36px); border-radius:var(--radius-lg); background:rgba(255,255,255,0.08); border:2px solid rgba(255,255,255,0.14); font-size:clamp(1.4rem,2.8vw,3.2rem); font-weight:800; line-height:1.15; overflow-wrap:anywhere; }
+        .vault-clue.is-new { border-color:var(--primary-hover); animation:vaultSpin 0.45s ease-out; }
+        .vault-clue.is-locked { background:repeating-linear-gradient(135deg,rgba(255,255,255,0.03) 0 12px,rgba(255,255,255,0.06) 12px 24px); border-style:dashed; color:rgba(255,255,255,0.35); font-size:clamp(1.6rem,3vw,3rem); }
+        .vault-clue.was-hidden { opacity:0.55; border-style:dashed; }
+        .vault-clue-num { position:absolute; top:8px; left:12px; font-size:clamp(0.75rem,0.9vw,1rem); font-weight:800; color:rgba(255,255,255,0.45); }
+        .vault-grid.is-answered .vault-clue { min-height:clamp(50px,8vh,90px); font-size:clamp(1.1rem,2vw,2.2rem); }
+        .vault-answer { text-align:center; font-size:clamp(2rem,4.6vw,5rem); font-weight:900; text-transform:uppercase; line-height:1.05; color:var(--white); letter-spacing:-1px; }
+        .vault-answer span { display:block; font-size:clamp(0.85rem,1.1vw,1.2rem); letter-spacing:2px; color:#7ee2a8; margin-bottom:6px; }
+        .vault-controls { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 20px; flex-shrink:0; flex-wrap:wrap; width:100%; }
+        .vault-controls-main { display:flex; gap:14px; flex-wrap:wrap; justify-content:flex-end; margin-left:auto; }
+        .vault-btn { font-family:'Poppins',sans-serif; font-weight:800; font-size:clamp(1rem,1.3vw,1.4rem); border-radius:var(--radius-pill); padding:12px 26px; min-height:48px; cursor:pointer; border:2px solid transparent; }
+        .vault-btn-clue { background:#ffd166; color:#3a2a00; }
+        .vault-btn-clue span { opacity:0.7; margin-left:4px; }
+        .vault-btn-reveal { background:var(--bg-light); color:var(--ink); }
+        .vault-btn-next { background:var(--primary-color); color:var(--white); border-color:var(--primary-hover); }
+        .vault-btn:hover { filter:brightness(1.08); }
+        .vault-btn:focus-visible, .vault-link-btn:focus-visible { outline:3px solid var(--white); outline-offset:2px; }
+        .vault-link-btn { background:none; border:none; color:var(--gray-400,#a3a3a3); font-family:'Poppins',sans-serif; font-weight:600; font-size:clamp(0.85rem,1vw,1.05rem); cursor:pointer; padding:8px 4px; }
+        .vault-link-btn:hover { color:var(--white); }
+        @media (prefers-reduced-motion: reduce) { .vault-clue.is-new { animation:none; } }
+
+        /* ---- Tracker: names get the room left over and wrap to a second line instead of running under the score ---- */
+        .tracker-name-wrap { width:100%; }
+        .tracker-name { max-width:100%; white-space:normal; overflow-wrap:anywhere; line-height:1.15; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+        .tracker-row .tracker-score-display { margin-left:6px; }
+        .checkin-tile.wraps { white-space:normal; line-height:1.1; }
+        .checkin-tile.wraps .checkin-name { white-space:normal; text-overflow:clip; overflow-wrap:normal; }
         /* Time's up: a slanted band in the class color crosses the screen, the board swaps underneath, and it exits the far side */
         #timesUpSweep { position:fixed; top:0; bottom:0; left:-20vw; width:140vw; z-index:100000; pointer-events:none; display:none; align-items:center; justify-content:center;
             background:linear-gradient(100deg,var(--board-grad-start) 0%,var(--primary-color) 45%,var(--board-grad-end) 100%); transform:translateX(-110%) skewX(-12deg); }
@@ -1831,13 +1874,15 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                         <button onclick="closeGameModule()" class="action-btn ui-btn-5" style="background:var(--bg-light);border:none;border-radius:var(--radius-lg);font-weight:bold;font-size:1.1rem;color:var(--ink);">Back to Hub</button>
                     </div>
                     <div id="vaultDisplay" style="flex-grow:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;width:100%;padding:20px;overflow-y:auto;">
-                        <div id="vaultInner" style="margin:auto 0;font-size:clamp(1.8rem,3vw,4rem);font-weight:900;text-align:center;width:100%;">LOCK IN.</div>
+                        <div id="vaultInner" class="vault-stage"></div>
                     </div>
-                    <div style="display:flex;gap:20px;padding:20px;justify-content:center;flex-shrink:0;flex-wrap:wrap;">
-                        <button onclick="resetVault()" class="ui-btn-9" style="background:transparent;color:var(--primary-hover);border-radius:var(--radius-pill);font-weight:bold;font-size:1rem;border:2px solid var(--primary-color);">Reset</button>
-                        <button id="vaultAnotherBtn" onclick="giveAnotherVaultClue()" class="ui-btn-9" style="display:none;background:var(--gray-800);color:var(--primary-hover);border-radius:var(--radius-pill);font-weight:bold;font-size:1rem;border:2px solid var(--primary-color);">🔓 Another Clue (-$100)</button>
-                        <button onclick="revealVaultAnswer()" class="ui-btn-9" style="background:var(--gray-800);color:var(--white);border-radius:var(--radius-pill);font-weight:bold;font-size:1.2rem;border:none;">Reveal Answer</button>
-                        <button onclick="nextVaultClue()" class="ui-btn-11" style="background:var(--primary-color);color:var(--white);border-radius:var(--radius-pill);font-weight:bold;font-size:1.4rem;border:none;">Next Vault</button>
+                    <div class="vault-controls">
+                        <button type="button" class="vault-link-btn" id="vaultResetBtn" onclick="resetVault()" title="Put every entry in this deck back in play">↺ Start deck over</button>
+                        <div class="vault-controls-main">
+                            <button type="button" class="vault-btn vault-btn-clue" id="vaultAnotherBtn" onclick="giveAnotherVaultClue()" style="display:none;">🔓 Another clue <span>−$100</span></button>
+                            <button type="button" class="vault-btn vault-btn-reveal" id="vaultRevealBtn" onclick="revealVaultAnswer()" style="display:none;">Reveal answer</button>
+                            <button type="button" class="vault-btn vault-btn-next" id="vaultNextBtn" onclick="nextVaultClue()">Open the vault</button>
+                        </div>
                     </div>
                 </div>
 
@@ -3193,44 +3238,67 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             document.getElementById('gauntletHint').innerText = `Safety Net Peek: Next tier is worth $${escapeHtml(nextVal)}`;
         }
 
-        let vaultCurrentClues = []; let vaultRevealedCount = 0; let vaultClueValue = 500;
+        let vaultCurrentClues = []; let vaultRevealedCount = 0; let vaultClueValue = 500; let vaultAnswerShown = false;
         // ==================== GAME: THE VAULT ====================
         function loadVaultModule(gameTitle) { document.getElementById('vaultContainer').style.display = 'flex'; let items = gameVaultData.filter(g => g.type === 'vault' && g.title.toString().trim() === gameTitle); miniGameLists['vault'] = items.length > 0 ? items : [{prompt:"NO CLUES LOADED", answer:""}]; resetVault(); }
+        // ==================== GAME: THE VAULT ====================
+        // One entry = clues separated by | in Prompt, the connection in Answer. It opens worth $500; each extra clue costs $100.
+        function vaultPlayedKey() { return 'titan_vault_played_' + currentActiveGameTitle; }
+        function vaultRemaining() { const played = JSON.parse(store.getItem(vaultPlayedKey()) || '[]'); return miniGameLists['vault'].filter((item, idx) => !played.includes(idx) && item.answer !== undefined && item.prompt !== 'NO CLUES LOADED').length; }
         function nextVaultClue() {
-            let display = document.getElementById('vaultInner'); let playedKey = 'titan_vault_played_' + currentActiveGameTitle; let played = JSON.parse(store.getItem(playedKey) || '[]');
-            let available = miniGameLists['vault'].map((item, idx) => idx).filter(idx => !played.includes(idx));
-            if (available.length === 0) { display.innerText = "VAULT DEPLETED."; return; }
-            let selectedIdx = available[Math.floor(Math.random() * available.length)]; let selected = miniGameLists['vault'][selectedIdx]; played.push(selectedIdx); store.setItem(playedKey, JSON.stringify(played));
-            vaultCurrentClues = selected.prompt.split('|').map(c => c.trim()); vaultCurrentClues.answer = selected.answer;
-            vaultRevealedCount = 1; vaultClueValue = 500;
-            renderVaultClues();
-        }
-        function renderVaultClues() {
-            let display = document.getElementById('vaultInner');
-            let shown = vaultCurrentClues.slice(0, vaultRevealedCount);
-            let cluesHTML = shown.map(c => `<div style="background:rgba(255,255,255,0.1); padding:15px 30px; border-radius:var(--radius-md); margin:10px; border-left:5px solid var(--primary-color); width:calc(50% - 40px); display:inline-block; box-sizing:border-box;">${escapeHtml(c)}</div>`).join('');
-            display.innerHTML = `<div style="font-size:1rem;color:var(--primary-hover);font-weight:700;margin-bottom:10px;">Worth: $${vaultClueValue}</div><div style="display:flex; flex-wrap:wrap; justify-content:center; font-size:0.7em; text-align:left; color:#eee; width:100%; max-width:1000px;">${cluesHTML}</div>`;
-            display.classList.remove('vault-spin'); void display.offsetWidth; display.classList.add('vault-spin');
-            const anotherBtn = document.getElementById('vaultAnotherBtn'); if (anotherBtn) anotherBtn.style.display = (vaultRevealedCount < vaultCurrentClues.length) ? 'inline-block' : 'none';
+            let played = JSON.parse(store.getItem(vaultPlayedKey()) || '[]');
+            let available = miniGameLists['vault'].map((item, idx) => idx).filter(idx => !played.includes(idx) && miniGameLists['vault'][idx].prompt !== 'NO CLUES LOADED');
+            if (available.length === 0) { vaultCurrentClues = []; renderVault('empty'); return; }
+            let selectedIdx = available[Math.floor(Math.random() * available.length)]; let selected = miniGameLists['vault'][selectedIdx];
+            played.push(selectedIdx); store.setItem(vaultPlayedKey(), JSON.stringify(played));
+            vaultCurrentClues = String(selected.prompt).split('|').map(c => c.trim()).filter(Boolean); vaultCurrentClues.answer = selected.answer;
+            vaultRevealedCount = 1; vaultClueValue = 500; vaultAnswerShown = false;
+            renderVault('play');
         }
         function giveAnotherVaultClue() {
-            if (vaultRevealedCount >= vaultCurrentClues.length) return;
+            if (vaultAnswerShown || vaultRevealedCount >= vaultCurrentClues.length) return;
             vaultRevealedCount++; vaultClueValue = Math.max(100, vaultClueValue - 100);
             playTone(400, 0, 0.15, 0.12);
-            renderVaultClues();
+            renderVault('play');
         }
         function revealVaultAnswer() {
-            if (!vaultCurrentClues.answer) return; let display = document.getElementById('vaultInner');
-            let cluesHTML = vaultCurrentClues.map(c => `<div style="background:rgba(255,255,255,0.05); padding:10px 20px; border-radius:var(--radius-sm); margin:5px; border-left:5px solid var(--gray-600); width:calc(50% - 20px); display:inline-block; box-sizing:border-box;">${escapeHtml(c)}</div>`).join('');
-            display.innerHTML = `<div style="display:flex; flex-wrap:wrap; justify-content:center; font-size:0.5em; text-align:left; color:var(--gray-400); width:100%; max-width:1000px;">${cluesHTML}</div><hr style="width:50%; border-color:var(--gray-700); margin:20px auto;"><div style="color:var(--primary-hover); text-transform:uppercase; font-size:1.2em;">${escapeHtml(vaultCurrentClues.answer)} — Worth $${vaultClueValue}</div>`;
-            display.classList.remove('reveal-anim'); void display.offsetWidth; display.classList.add('reveal-anim');
-            const anotherBtn = document.getElementById('vaultAnotherBtn'); if (anotherBtn) anotherBtn.style.display = 'none';
+            if (!vaultCurrentClues.length || vaultAnswerShown) return;
+            vaultAnswerShown = true; renderVault('answer');
         }
         function resetVault() {
-            store.removeItem('titan_vault_played_' + currentActiveGameTitle);
-            document.getElementById('vaultInner').innerHTML = "LOCK IN.";
-            vaultCurrentClues = []; vaultRevealedCount = 0; vaultClueValue = 500;
-            const anotherBtn = document.getElementById('vaultAnotherBtn'); if (anotherBtn) anotherBtn.style.display = 'none';
+            store.removeItem(vaultPlayedKey());
+            vaultCurrentClues = []; vaultRevealedCount = 0; vaultClueValue = 500; vaultAnswerShown = false;
+            renderVault('start');
+        }
+        function renderVault(state) {
+            const stage = document.getElementById('vaultInner'); if (!stage) return;
+            const show = (id, on, label) => { const b = document.getElementById(id); if (!b) return; b.style.display = on ? '' : 'none'; if (label) b.innerText = label; };
+            const total = miniGameLists['vault'].filter(i => i.prompt !== 'NO CLUES LOADED').length; const left = vaultRemaining();
+            if (state === 'start' || state === 'empty') {
+                const empty = state === 'empty' || total === 0;
+                stage.innerHTML = empty
+                    ? `<div class="vault-intro"><div class="vault-intro-icon" aria-hidden="true">🔒</div><h3>${total ? 'The vault is empty' : 'No vault entries yet'}</h3><p>${total ? 'Every entry in this deck has been played. Start the deck over to play them again.' : 'Add rows with clues separated by | in Prompt and the answer in Answer.'}</p></div>`
+                    : `<div class="vault-intro"><div class="vault-intro-icon" aria-hidden="true">🔒</div><h3>Crack the vault</h3><p>Clues come out one at a time. Figure out what connects them.<br>It starts at <b>$500</b> and drops <b>$100</b> with every extra clue.</p><div class="vault-intro-count">${left} vault${left === 1 ? '' : 's'} ready in this deck</div></div>`;
+                show('vaultAnotherBtn', false); show('vaultRevealBtn', false); show('vaultNextBtn', !empty, 'Open the vault');
+                return;
+            }
+            const n = vaultCurrentClues.length; const cols = n <= 4 ? Math.min(2, n) : 3;
+            const pips = vaultCurrentClues.map((c, i) => `<span class="vault-pip${i < vaultRevealedCount ? ' on' : ''}"></span>`).join('');
+            const cards = vaultCurrentClues.map((c, i) => {
+                const open = i < vaultRevealedCount;
+                if (state === 'answer') return `<div class="vault-clue${open ? '' : ' was-hidden'}"><span class="vault-clue-num">${i + 1}</span>${escapeHtml(c)}</div>`;
+                return open ? `<div class="vault-clue${i === vaultRevealedCount - 1 ? ' is-new' : ''}"><span class="vault-clue-num">${i + 1}</span>${escapeHtml(c)}</div>`
+                            : `<div class="vault-clue is-locked" aria-label="Locked clue"><span aria-hidden="true">🔒</span></div>`;
+            }).join('');
+            const head = state === 'answer'
+                ? `<div class="vault-head"><div class="vault-value is-won">$${vaultClueValue}</div><div class="vault-meta">Solved with ${vaultRevealedCount} of ${n} clue${n === 1 ? '' : 's'}</div></div>`
+                : `<div class="vault-head"><div class="vault-value">$${vaultClueValue}</div><div class="vault-meta">Clue ${vaultRevealedCount} of ${n}<div class="vault-pips">${pips}</div></div></div>`;
+            const answer = state === 'answer' ? `<div class="vault-answer"><span>The connection</span>${escapeHtml(vaultCurrentClues.answer || '(no answer in the sheet)')}</div>` : '';
+            stage.innerHTML = `${head}<div class="vault-grid${state === 'answer' ? ' is-answered' : ''}" style="grid-template-columns:repeat(${cols}, minmax(0, 1fr));">${cards}</div>${answer}`;
+            if (state === 'answer') { stage.classList.remove('reveal-anim'); void stage.offsetWidth; stage.classList.add('reveal-anim'); }
+            show('vaultAnotherBtn', state === 'play' && vaultRevealedCount < n);
+            show('vaultRevealBtn', state === 'play');
+            show('vaultNextBtn', true, left > 0 ? 'Next vault' : 'Finish deck');
         }
 
         // ==================== GAME: FACT OR FICTION ====================
@@ -3351,7 +3419,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             if (activeBoard === 'slideModeBoard') {
                 topTabs.style.display = 'flex'; let tabsHTML = '';
                 let isNotepadActive = (currentSlideIndex === -1); let nBg = isNotepadActive ? '#ffffff' : 'transparent'; let nColor = isNotepadActive ? 'var(--primary-color)' : 'var(--bg-light)'; let nBorder = isNotepadActive ? 'clamp(1.5px, 0.15vw, 2.5px) solid var(--secondary-dark)' : 'clamp(1.5px, 0.15vw, 2.5px) solid #ffffff'; let nOpacity = isNotepadActive ? '1' : '0.7'; let nTransform = isNotepadActive ? 'scale(1.1)' : 'scale(1)';
-                tabsHTML += `<button type="button" class="source-tab${isNotepadActive ? ' is-active' : ''}" onclick="goToSlide(-1)" title="Class notepad"><span aria-hidden="true">📝</span><span class="source-tab-label">Notes</span></button>`;
+                tabsHTML += `<button type="button" class="source-tab${isNotepadActive ? ' is-active' : ''}" onclick="goToSlide(-1)" title="Class notepad"><span aria-hidden="true">📝</span><span class="source-tab-label">Notepad</span></button>`;
                 if (currentSlides.length > 0) {
                     currentSlides.forEach((slide, idx) => {
                         let isActive = (idx === currentSlideIndex); let bg = isActive ? '#ffffff' : 'transparent'; let color = isActive ? 'var(--primary-color)' : 'var(--bg-light)'; let border = isActive ? 'clamp(1.5px, 0.15vw, 2.5px) solid var(--secondary-dark)' : 'clamp(1.5px, 0.15vw, 2.5px) solid #ffffff'; let opacity = isActive ? '1' : '0.7'; let transform = isActive ? 'scale(1.1)' : 'scale(1)';
@@ -4030,7 +4098,10 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             const range = document.createRange();
             // Measure the text's real width with a Range: scrollWidth rounds to whole pixels and can miss a sub-pixel overflow that still draws "…".
             const overflows = (t, n) => { const cs = window.getComputedStyle(t); const room = t.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight); range.selectNodeContents(n); return range.getBoundingClientRect().width > room - 0.5; };
-            Array.prototype.forEach.call(grid.children, t => { const n = t.querySelector('.checkin-name') || t; t.style.fontSize = ''; for (let em = 0.95; em >= 0.6 && overflows(t, n); em -= 0.05) t.style.fontSize = em.toFixed(2) + 'em'; }); // tiles grow into empty space for bigger tap targets, capped so 10 names don't become billboards
+            // Shrink a long name a little; if it still doesn't fit (fonts render differently across browsers), let it wrap to two lines.
+            Array.prototype.forEach.call(grid.children, t => { const n = t.querySelector('.checkin-name') || t; t.style.fontSize = ''; t.classList.remove('wraps');
+                for (let em = 0.95; em >= 0.75 && overflows(t, n); em -= 0.05) t.style.fontSize = em.toFixed(2) + 'em';
+                if (overflows(t, n)) { t.classList.add('wraps'); t.style.fontSize = '0.85em'; } }); // tiles grow into empty space for bigger tap targets, capped so 10 names don't become billboards
         }
         window.checkInTap = function(student) {
             if (!activeBlockData) return; const k = absentKeyFor(activeBlockData.id);
