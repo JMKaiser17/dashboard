@@ -1497,6 +1497,11 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         #qrModal .leaderboard-wrapper { padding:clamp(14px,2.2vh,28px) clamp(16px,2vw,32px) !important; }
         #qrModal h1 { font-size:clamp(1.8rem,3.2vw,3.2rem) !important; margin:0 0 10px 0 !important; }
         #qrModal .leaderboard-wrapper > div:last-child { margin-top:10px !important; }
+        .phone-row { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:12px; flex-wrap:wrap; }
+        .phone-row-label { font-family:'Poppins',sans-serif; font-weight:700; font-size:clamp(0.8rem,0.9vw,1rem); color:var(--gray-600); margin-right:4px; }
+        .phone-row button { font-family:'Poppins',sans-serif; font-weight:700; font-size:clamp(0.75rem,0.85vw,0.95rem); padding:4px 12px; border-radius:var(--radius-pill); border:1.5px solid rgba(var(--primary-rgb),0.3); background:transparent; color:var(--gray-700); cursor:pointer; }
+        .phone-row button.is-on { background:var(--phone-color, var(--gray-700)); border-color:var(--phone-color, var(--gray-700)); color:var(--white); }
+        .phone-row button:focus-visible { outline:3px solid var(--primary-color); outline-offset:2px; }
         /* Time's up: a slanted band in the class color crosses the screen, the board swaps underneath, and it exits the far side */
         #timesUpSweep { position:fixed; top:0; bottom:0; left:-20vw; width:140vw; z-index:100000; pointer-events:none; display:none; align-items:center; justify-content:center;
             background:linear-gradient(100deg,var(--board-grad-start) 0%,var(--primary-color) 45%,var(--board-grad-end) 100%); transform:translateX(-110%) skewX(-12deg); }
@@ -1646,7 +1651,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         </div>
     </div>
 
-    <div class="modal" id="timerModal"><div class="leaderboard-wrapper ui-box-8" style="max-width:650px;"><h1 class="lb-header">⏱️ Class Timer</h1><div class="timer-display sync-timer" style="font-size:clamp(4.5rem,8vw,8.5rem);margin:20px 0;color:var(--secondary-dark);">00:00</div><div class="progress-bar-container" style="height:20px;margin-bottom:25px;background-color:var(--bg-mid);"><div class="progress-bar sync-progress" style="background-color:var(--primary-color);"></div></div><div class="timer-controls" style="display:flex;gap:12px;margin-bottom:10px;width:100%;"><button onclick="addTime(0.5)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">+30s</button><button onclick="addTime(1)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">+1m</button><button onclick="addTime(5)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">+5m</button><button onclick="toggleTimer()" class="action-btn sync-btn-start" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">Start</button><button onclick="clearTimer()" class="stop-btn" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">Clear</button></div><div class="timer-return-row"><button type="button" class="timer-return-chip" aria-pressed="false" onclick="toggleTimerReturn()" title="When this timer ends, go back to the main board"><span class="chip-dot" aria-hidden="true"></span>↩ Back to main when done</button></div><button class="close-btn" onclick="toggleModal('timerModal')" style="margin-top:15px;">Run in Background</button></div></div>
+    <div class="modal" id="timerModal"><div class="leaderboard-wrapper ui-box-8" style="max-width:650px;"><h1 class="lb-header">⏱️ Class Timer</h1><div class="timer-display sync-timer" style="font-size:clamp(4.5rem,8vw,8.5rem);margin:20px 0;color:var(--secondary-dark);">00:00</div><div class="progress-bar-container" style="height:20px;margin-bottom:25px;background-color:var(--bg-mid);"><div class="progress-bar sync-progress" style="background-color:var(--primary-color);"></div></div><div class="timer-controls" style="display:flex;gap:12px;margin-bottom:10px;width:100%;"><button onclick="addTime(0.5)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">+30s</button><button onclick="addTime(1)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">+1m</button><button onclick="addTime(5)" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">+5m</button><button onclick="toggleTimer()" class="action-btn sync-btn-start" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">Start</button><button onclick="clearTimer()" class="stop-btn" style="flex-grow:1;padding:15px;font-size:1.3rem;border-radius:var(--radius-md);">Clear</button></div><div class="timer-return-row"><button type="button" class="timer-return-chip" aria-pressed="false" onclick="toggleTimerReturn()" title="When this timer ends, go back to the main board"><span class="chip-dot" aria-hidden="true"></span>↩ Back to main when done</button></div><div class="phone-row" id="phoneRow" role="group" aria-label="Phone light"><span class="phone-row-label">📵 Phones</span><button type="button" onclick="setStatusLight(0)">Away</button><button type="button" onclick="setStatusLight(1)">Reference</button><button type="button" onclick="setStatusLight(2)">Allowed</button><button type="button" onclick="setStatusLight(-1)">Off</button></div><button class="close-btn" onclick="toggleModal('timerModal')" style="margin-top:15px;">Run in Background</button></div></div>
     <div class="modal" id="pointsModal"><div class="leaderboard-wrapper"><h1 class="lb-header" id="dynamicLeaderboardTitle">🏆 Class Cup Leaderboard</h1><div class="lb-current-class" id="pointsControlSection"><div class="lb-current-info" style="min-width:0;flex:1;"><h2>Active Period</h2><h3 id="currentClassPointsTitle">Loading...</h3></div><div style="display:flex;align-items:center;gap:12px;flex-shrink:0;"><div class="lb-score-display" id="classPointsDisplay">0</div><div class="lb-controls"><button class="btn-sub" onclick="updatePoints(-1)">-</button><button class="btn-add" onclick="updatePoints(1)">+</button></div></div></div><div class="lb-chart" id="leaderboardContainer"></div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;"><div class="ui-box-9" style="display:flex;"><button onclick="resetAllPoints()" class="ui-btn-5" style="background:transparent;color:var(--secondary-dark);border:2px solid var(--secondary-dark);font-size:1.1rem;border-radius:var(--radius-lg);font-weight:bold;">Reset Scores</button><button id="pointsUndoBtn" onclick="undoLastPointsChange()" class="ui-btn-5" style="display:none;background:transparent;color:var(--primary-color);border:2px solid var(--primary-color);font-size:1.1rem;border-radius:var(--radius-lg);font-weight:bold;">↩️ Undo</button></div><button class="close-btn" onclick="togglePointsModal()" style="margin:0;padding:10px 25px;font-size:1.2rem;">Close</button></div></div></div>
     <div class="modal" id="wheelModal"><h1 id="wheelWinnerDisplay" class="ui-box-8 wheel-title" style="font-size:clamp(2.5rem,4vw,4.5rem);margin:0 0 20px 0;width:100%;">SPIN THE WHEEL</h1><div class="wheel-container" onclick="executeSpin()"><div class="wheel-pointer">▼</div><div class="wheel" id="spinningWheel"></div></div><div style="display:flex;gap:15px;margin-top:clamp(15px,2vh,25px);justify-content:center;flex-wrap:wrap;"><button type="button" class="wheel-spin-btn" onclick="executeSpin()">🎲 Spin</button><button id="wheelToggleBtn" onclick="toggleWheelMode()" class="ui-btn-6" style="background:var(--primary-color);color:var(--white);border:2px solid var(--white);font-size:clamp(1.1rem,1.5vw,1.8rem);border-radius:var(--radius-pill);font-weight:bold;box-shadow:var(--shadow-md);">Mode: Students</button><button onclick="resetWheelPicks()" class="ui-btn-6" style="background:var(--secondary-dark);color:var(--bg-light);border:2px solid var(--primary-color);font-size:clamp(1.1rem,1.5vw,1.8rem);border-radius:var(--radius-pill);font-weight:bold;box-shadow:var(--shadow-md);">Reset Picks</button><button class="close-btn" onclick="closeWheelModal()" style="margin-top:0;">Close</button></div></div>
     <div class="modal" id="qrModal"><div class="leaderboard-wrapper ui-box-8" style="max-width:700px;">
@@ -2135,6 +2140,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         let timerReturnBoard = ''; // board to leave for the main board when the current timer ends ('' = stay put); saved with the timer
         let timerReturnChoice = null; // chip flipped while no timer exists: true/false overrides the default for the next timer
         let checkinSignature = ''; // last rendered check-in grid, so it only rebuilds when something changed
+        let wakeLockSentinel = null; let wakeLockWanted = false; // keeps the board's screen on during the school day
         let gameVaultIssues = []; // Game Vault problems, shown only inside the Game Hub (never in the top-bar pill)
         let appToastTimer = null; let appToastUndoFn = null; // the fading message that replaces browser alert/confirm boxes
         let liveStatePollTimer = null; // declared here (not near its usage below) - referenced by code that runs immediately during init
@@ -3441,9 +3447,9 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         }
 
         let notesPushDebounceTimer = null;
-        function saveNotepad() { if (!activeBlockData) return; store.setItem('titan_notepad_' + activeBlockData.id, document.getElementById('slideNotepad').innerHTML); clearTimeout(notesPushDebounceTimer); notesPushDebounceTimer = setTimeout(pushLiveState, 3000); }
+        function saveNotepad() { if (!activeBlockData) return; store.setItem('titan_notepad_' + activeBlockData.id, document.getElementById('slideNotepad').innerHTML); store.setItem('titan_notepad_edited_' + activeBlockData.id, dayStamp(activeBlockData.date)); /* recap only includes notes edited on that class's day */ clearTimeout(notesPushDebounceTimer); notesPushDebounceTimer = setTimeout(pushLiveState, 3000); }
         function loadNotepad() { const notepad = document.getElementById('slideNotepad'); if (activeBlockData) { const saved = store.getItem('titan_notepad_' + activeBlockData.id); notepad.innerHTML = saved !== null ? saved : '<p>Start typing notes here...</p>'; } else { notepad.innerHTML = '<p>Start typing notes here...</p>'; } }
-        function saveTaskNote() { if (!activeBlockData) return; store.setItem('titan_task_' + activeBlockData.id, document.getElementById('currentTaskEditable').innerHTML); }
+        function saveTaskNote() { if (!activeBlockData) return; store.setItem('titan_task_' + activeBlockData.id, document.getElementById('currentTaskEditable').innerHTML); store.setItem('titan_task_edited_' + activeBlockData.id, dayStamp(activeBlockData.date)); }
         function loadTaskNote() { const el = document.getElementById('currentTaskEditable'); if (!el) return; if (activeBlockData) { const saved = store.getItem('titan_task_' + activeBlockData.id); if (saved !== null) el.innerHTML = saved; } }
         function clearNotepad() {
             if (!activeBlockData) return; const undo = snapshotKeys(['titan_notepad_' + activeBlockData.id]);
@@ -3479,7 +3485,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             const badge = document.getElementById('statusLightBadge');
             if (badge.style.display === 'flex') { badge.style.display = 'none'; } else { badge.style.display = 'flex'; renderStatusLight(); }
             document.body.classList.toggle('status-light-on', badge.style.display === 'flex');
-            pushLiveState();
+            renderPhoneRow(); pushLiveState();
         }
         function renderStatusLight() {
             const state = STATUS_LIGHT_STATES[statusLightState];
@@ -3490,9 +3496,23 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             const bannerText = document.getElementById('statusBannerText'); if (bannerText) bannerText.innerText = state.text;
         }
 
+        // Set the light directly (0-2 = a state, -1 = off). Used by the Phones row in the Countdown pop-up.
+        function setStatusLight(index) {
+            const badge = document.getElementById('statusLightBadge'); const isOn = badge.style.display === 'flex';
+            if (index < 0) { if (isOn) toggleStatusLight(); renderPhoneRow(); return; }
+            statusLightState = index; renderStatusLight();
+            if (!isOn) toggleStatusLight(); else pushLiveState();
+            renderPhoneRow();
+        }
+        function renderPhoneRow() {
+            const row = document.getElementById('phoneRow'); if (!row) return;
+            const isOn = document.getElementById('statusLightBadge').style.display === 'flex';
+            row.querySelectorAll('button').forEach((b, i) => { const on = i === 3 ? !isOn : (isOn && i === statusLightState); b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', String(on)); });
+            if (isOn) row.style.setProperty('--phone-color', STATUS_LIGHT_STATES[statusLightState].color); else row.style.removeProperty('--phone-color');
+        }
         function cycleStatusLightState() {
             statusLightState = (statusLightState + 1) % STATUS_LIGHT_STATES.length;
-            renderStatusLight(); playTone(500 + statusLightState * 150, 0, 0.1, 0.1);
+            renderStatusLight(); renderPhoneRow(); playTone(500 + statusLightState * 150, 0, 0.1, 0.1);
             pushLiveState();
         }
         function cycleNoiseLevel() {
@@ -3508,7 +3528,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             if (activeModals.length > 0) isBlockingView = !document.getElementById('timerModal').classList.contains('active');
             else if (activeBoard === 'slideModeBoard') isBlockingView = true; // presenting: the top-bar pill is small, so the timer floats over the slide instead
             floatingTimer.style.display = (hasTime && isBlockingView) ? 'block' : 'none';
-            renderReturnChips(); renderOpeningControls();
+            renderReturnChips(); renderOpeningControls(); renderPhoneRow();
         }
 
         function triggerColdCall() {
@@ -3905,7 +3925,6 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             if (block.eq) { heading('Essential Question'); bodyText(block.eq); }
             if (block.standards) { heading('Standards'); bodyText(block.standards); }
             if (block.reminders && block.reminders.length > 0) { heading('Reminders'); block.reminders.forEach(item => bodyText('•  ' + item)); }
-            if (block.ticker && !looksLikeMarketTickerData(block.ticker)) { heading('Note'); bodyText(block.ticker); }
 
             const links = parseResourceLinks(block.resources);
             if (links.length > 0) {
@@ -3918,9 +3937,12 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                 y += 8;
             }
 
-            const notepadText = stripHtmlToText(store.getItem('titan_notepad_' + block.id));
+            // The notepad and Focus task carry over on screen from day to day, but a recap only includes them if they
+            // were edited on this class's day, so Monday's notes don't repeat on every recap after.
+            const classDay = block.date instanceof Date ? dayStamp(block.date) : '';
+            const notepadText = store.getItem('titan_notepad_edited_' + block.id) === classDay ? stripHtmlToText(store.getItem('titan_notepad_' + block.id)) : '';
             if (notepadText) { heading('Class Notepad'); bodyText(notepadText); }
-            const taskText = stripHtmlToText(store.getItem('titan_task_' + block.id));
+            const taskText = store.getItem('titan_task_edited_' + block.id) === classDay ? stripHtmlToText(store.getItem('titan_task_' + block.id)) : '';
             if (taskText) { heading('Current Task'); bodyText(taskText); }
 
             const totalPages = doc.internal.getNumberOfPages();
@@ -4014,7 +4036,31 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                 if (isOpeningMode) renderOpeningBoard();
             }
             if (activeBoard === 'openingModeBoard') { try { renderCheckinGrid(false); } catch (e) { console.error('Check-in grid error', e); } }
+            if (now.getSeconds() === 0 || !wakeLockSentinel && wakeLockWanted !== schoolDayActive(nowMs)) updateWakeLock(nowMs);
         }
+
+        // ==================== KEEP THE SCREEN ON DURING THE SCHOOL DAY ====================
+        // Asks the browser for a screen wake lock from an hour before today's first class until 15 minutes after the last,
+        // so the board doesn't sleep (and demand a login) over lunch. Browsers drop the lock whenever the tab is hidden,
+        // so it's re-requested when the dashboard comes back into view. Does nothing where unsupported or in Student Mode.
+        function schoolDayActive(nowMs) {
+            const today = new Date(nowMs); today.setHours(0, 0, 0, 0); const dayMs = today.getTime();
+            const todays = schedule.filter(b => b.date && b.date.getTime() === dayMs && b.end > b.start);
+            if (!todays.length) return false;
+            const first = Math.min(...todays.map(b => b.start)), last = Math.max(...todays.map(b => b.end));
+            return nowMs >= dayMs + (first - 60) * 60000 && nowMs <= dayMs + (last + 15) * 60000;
+        }
+        async function updateWakeLock(nowMs) {
+            if (isStudentMode || !('wakeLock' in navigator)) return;
+            wakeLockWanted = schoolDayActive(nowMs);
+            if (wakeLockWanted && !wakeLockSentinel && document.visibilityState === 'visible') {
+                try { wakeLockSentinel = await navigator.wakeLock.request('screen'); wakeLockSentinel.addEventListener('release', () => { wakeLockSentinel = null; }); }
+                catch (e) { wakeLockSentinel = null; /* e.g. battery saver: try again next minute */ }
+            } else if (!wakeLockWanted && wakeLockSentinel) {
+                const s = wakeLockSentinel; wakeLockSentinel = null; try { await s.release(); } catch (e) {}
+            }
+        }
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') updateWakeLock(Date.now()); });
 
         // ==================== FADING MESSAGE (replaces browser alert / confirm boxes) ====================
         // The browser's built-in warning and confirmation boxes freeze the page until someone clicks OK. This never blocks anything.
