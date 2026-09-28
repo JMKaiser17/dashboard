@@ -1511,7 +1511,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         body.score-on.game-mode-active .dashboard-wrapper { padding-bottom:calc(var(--score-h) + 6px); box-sizing:border-box; }
         body.score-on #appToast { bottom:calc(var(--score-h) + 70px); }
         .score-teams { display:flex; gap:clamp(6px,0.8vw,12px); flex:1 1 auto; min-width:0; height:100%; }
-        .score-team { flex:1 1 0; min-width:0; display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.06); border-radius:var(--radius-md); border-left:6px solid var(--team); padding:0 6px; }
+        .score-team { flex:1 1 0; min-width:0; display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.08); background:color-mix(in srgb, var(--team) 24%, var(--secondary-dark)); border:2px solid var(--team); border-radius:var(--radius-lg); padding:0 6px; box-sizing:border-box; } /* tinted card per team; the first background is the fallback for older browsers */
         .score-team-main { flex:1 1 auto; min-width:0; text-align:center; line-height:1.05; }
         .score-team-name { color:var(--bg-light); font-weight:700; font-size:clamp(0.75rem,0.95vw,1.1rem); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:text; border-radius:4px; outline:none; }
         .score-team-name[contenteditable="true"] { background:var(--white); color:var(--ink); padding:0 4px; text-overflow:clip; }
