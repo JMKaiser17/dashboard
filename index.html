@@ -1464,29 +1464,39 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         .checkin-tile.wraps .checkin-name { white-space:normal; text-overflow:clip; overflow-wrap:normal; }
         /* Phone light: a big badge plus a colored glow around the whole board */
         body.status-light-on .dashboard-wrapper { box-shadow:0 0 0 clamp(4px,0.5vw,8px) var(--status-color, #e53935), 0 0 clamp(30px,4vw,70px) var(--status-color, #e53935); transition:box-shadow 0.3s; }
-        .status-light-hide { margin-left:6px; background:rgba(255,255,255,0.12); color:var(--bg-light); border:none; border-radius:var(--radius-round); width:1.8em; height:1.8em; font-size:clamp(0.6rem,0.8vw,0.95rem); cursor:pointer; line-height:1; }
-        .status-light-hide:hover { background:rgba(255,255,255,0.25); }
-        .status-banner { display:none; align-items:center; justify-content:center; gap:clamp(10px,1.2vw,18px); width:100%; box-sizing:border-box; border-radius:var(--radius-md); padding:clamp(6px,1vh,12px) 16px; background:var(--secondary-dark); border:clamp(3px,0.35vw,5px) solid var(--status-color, #e53935); box-shadow:inset 0 0 30px color-mix(in srgb, var(--status-color, #e53935) 35%, transparent); cursor:pointer; color:var(--white); font-family:'Poppins',sans-serif; font-weight:900; font-size:clamp(1.3rem,2.2vw,2.8rem); letter-spacing:1px; text-transform:uppercase; line-height:1.1; }
+        /* The banner covers the message bar's own box, so turning the light on moves nothing on the page. */
+        .status-banner { display:none; position:absolute; inset:0; z-index:3; align-items:center; justify-content:center; gap:clamp(10px,1.2vw,18px); box-sizing:border-box; border-radius:inherit; background:var(--secondary-dark); border:clamp(2px,0.3vw,4px) solid var(--status-color, #e53935); box-shadow:inset 0 0 30px color-mix(in srgb, var(--status-color, #e53935) 35%, transparent); cursor:pointer; color:var(--white); font-family:'Poppins',sans-serif; font-weight:900; font-size:clamp(1.1rem,1.6vw,2.2rem); letter-spacing:1px; text-transform:uppercase; line-height:1; }
         .status-banner-dot { width:0.75em; height:0.75em; border-radius:var(--radius-round); background:var(--status-color, #e53935); box-shadow:0 0 14px var(--status-color, #e53935); flex-shrink:0; }
-        .status-banner .status-light-hide { font-size:clamp(0.8rem,1vw,1.1rem); text-transform:none; }
         body.status-light-on:not(.slide-mode-active):not(.game-mode-active) .status-banner { display:flex; }
-        body.status-light-on:not(.slide-mode-active):not(.game-mode-active) .ticker-wrap { display:none; }
         body.status-light-on:not(.slide-mode-active):not(.game-mode-active) #statusLightBadge { display:none !important; }
         /* Spin */
         .wheel-title { color:var(--white) !important; text-shadow:0 3px 18px rgba(0,0,0,0.6); }
         .wheel-spin-btn { font-family:'Poppins',sans-serif; background:var(--bg-light); color:var(--primary-color); border:2px solid var(--white); font-size:clamp(1.1rem,1.5vw,1.8rem); font-weight:900; border-radius:var(--radius-pill); padding:0.45em 1.4em; cursor:pointer; box-shadow:var(--shadow-md); }
         .wheel-spin-btn:focus-visible { outline:3px solid var(--white); outline-offset:2px; }
         /* Groups */
-        .group-modal-card { position:relative; background:rgba(20,10,35,0.92); border:3px solid var(--primary-color); border-radius:var(--radius-xl, 24px); padding:clamp(20px,3vh,36px) clamp(20px,3vw,44px); width:min(1300px,94vw); max-height:92vh; overflow-y:auto; box-shadow:var(--shadow-lg-deep); box-sizing:border-box; }
+        .group-modal-card { position:relative; background:var(--secondary-dark); border:3px solid var(--primary-color); border-radius:var(--radius-xl, 24px); padding:clamp(16px,2.4vh,32px) clamp(18px,2.4vw,40px); width:min(1800px,97vw); max-height:95vh; display:flex; flex-direction:column; align-items:center; box-shadow:var(--shadow-lg-deep); box-sizing:border-box; }
+        .group-modal-card > * { flex-shrink:0; }
+        .group-modal-card .groups-grid { flex:1 1 auto; min-height:0; max-height:none; width:100%; max-width:100%; display:grid; grid-template-columns:repeat(auto-fill,minmax(clamp(170px,13vw,260px),1fr)); align-content:start; gap:clamp(6px,0.8vw,12px); overflow-y:auto; font-size:clamp(1rem,1.45vw,1.8rem); margin-top:clamp(8px,1.4vh,16px); }
+        .group-modal-card .group-card { width:auto; }
+        .group-modal-card .group-card h4 { font-size:0.85em; }
+        .group-modal-card .group-card li { font-size:1em; }
         .group-modal-card .group-controls { font-size:clamp(1.1rem,1.5vw,1.8rem); }
         .group-modal-card .group-controls button { width:clamp(36px,2.8vw,48px); height:clamp(36px,2.8vw,48px); font-size:1.1em; }
         .group-modal-card .btn-generate { font-size:clamp(1rem,1.3vw,1.5rem); padding:0.6em 1.4em; }
         /* QR fits the screen */
         #qrModal .leaderboard-wrapper { max-height:94vh; overflow-y:auto; box-sizing:border-box; }
-        #qrCodeDisplay svg { width:min(44vh, 420px); height:auto; display:block; }
+        #qrCodeDisplay svg { width:min(42vh, 420px); height:auto; display:block; }
         /* Focus mode noise level: readable on black */
         #noiseText { text-shadow:0 0 1px rgba(255,255,255,0.3); }
         .source-tab-notepad { flex-shrink:0; max-width:none; }
+        #qrCopyConfirm:empty, #qrErrorText:empty { min-height:0 !important; margin:0 !important; }
+        #qrUrlLabel { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+        #qrCodeDisplay { margin:8px auto !important; }
+        /* Focus mode noise level: a light tint of the theme color, readable on black */
+        .noise-text { color:#cdb4ff; color:color-mix(in srgb, var(--primary-color) 35%, white); }
+        #qrModal .leaderboard-wrapper { padding:clamp(14px,2.2vh,28px) clamp(16px,2vw,32px) !important; }
+        #qrModal h1 { font-size:clamp(1.8rem,3.2vw,3.2rem) !important; margin:0 0 10px 0 !important; }
+        #qrModal .leaderboard-wrapper > div:last-child { margin-top:10px !important; }
         /* Time's up: a slanted band in the class color crosses the screen, the board swaps underneath, and it exits the far side */
         #timesUpSweep { position:fixed; top:0; bottom:0; left:-20vw; width:140vw; z-index:100000; pointer-events:none; display:none; align-items:center; justify-content:center;
             background:linear-gradient(100deg,var(--board-grad-start) 0%,var(--primary-color) 45%,var(--board-grad-end) 100%); transform:translateX(-110%) skewX(-12deg); }
@@ -1653,8 +1663,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         <p id="qrErrorText" style="color:var(--red-700);font-weight:bold;min-height:1.4em;margin:5px 0;"></p>
         <div id="qrCodeDisplay" style="display:none;margin:15px auto;padding:16px;background:var(--white);border-radius:var(--radius-md);"></div>
         <p id="qrUrlLabel" style="color:var(--gray-500);font-size:0.95rem;word-break:break-all;margin:10px 0 0 0;display:none;"></p>
-        <button id="qrEditBtn" onclick="showQREditMode()" style="display:none;background:var(--bg-light);color:var(--ink);border:2px solid var(--bg-mid);padding:8px 20px;border-radius:var(--radius-lg);font-weight:bold;cursor:pointer;font-size:0.95rem;margin-top:10px;">✏️ Edit Link</button>
-        <div style="margin-top:20px;"><button class="close-btn" onclick="toggleModal('qrModal')" style="margin-top:0;">Close</button></div>
+        <div style="margin-top:20px;display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;"><button id="qrEditBtn" onclick="showQREditMode()" style="display:none;background:var(--bg-light);color:var(--ink);border:2px solid var(--bg-mid);padding:8px 20px;border-radius:var(--radius-lg);font-weight:bold;cursor:pointer;font-size:0.95rem;margin-top:0;">✏️ Edit Link</button><button class="close-btn" onclick="toggleModal('qrModal')" style="margin-top:0;">Close</button></div>
     </div></div>
     <div class="modal" id="recapPromptModal"><div class="leaderboard-wrapper ui-box-8" style="max-width:550px;">
         <h1 style="color:var(--primary-color);margin:0 0 15px 0;">📄 Class Just Ended</h1>
@@ -1677,8 +1686,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
 
     <!-- MAIN DASHBOARD -->
     <div class="dashboard-wrapper">
-        <div class="ticker-wrap" onclick="toggleTickerMode()"><div class="ticker-move"><div class="ticker-item" id="dailyMessage">Loading daily message...</div></div></div>
-        <div id="statusBanner" class="status-banner" onclick="cycleStatusLightState()" title="Click to change: Phones Away / Reference Only / Phones Allowed"><span class="status-banner-dot" aria-hidden="true"></span><span id="statusBannerText">Phones Away</span><button type="button" class="status-light-hide" onclick="hideStatusLight(event)" title="Turn the phone light off (Shift+L)" aria-label="Turn the phone light off">✕</button></div>
+        <div class="ticker-wrap" onclick="toggleTickerMode()"><div id="statusBanner" class="status-banner" onclick="event.stopPropagation(); cycleStatusLightState()" title="Click to change: Phones Away / Reference Only / Phones Allowed. Shift+L turns it off."><span class="status-banner-dot" aria-hidden="true"></span><span id="statusBannerText">Phones Away</span></div><div class="ticker-move"><div class="ticker-item" id="dailyMessage">Loading daily message...</div></div></div>
         <div class="top-bar" id="teacherTopBar">
             <div class="pill class-pill" onclick="toggleTrackerModal()"><div class="pill-subtitle" id="classPillSubtitle">Today's Schedule</div><div class="current-class" id="classTitle">Loading...</div></div>
             <div id="demoModeBadge" class="pill action-pill" onclick="openSettingsModal()" title="Click to connect your own Google Sheet" style="display:none;background:linear-gradient(145deg,#fff3cd,#ffe69c);border-color:var(--amber-900);">
@@ -1696,7 +1704,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             <div id="topSourceTabs"></div>
             <div id="statusLightBadge" class="status-light-badge" onclick="cycleStatusLightState()" title="Click to cycle: Phones Away / Reference Only / Phones Allowed" style="display:none;background:var(--secondary-dark);border:clamp(1px,0.25vw,2px) solid var(--red-600);padding:clamp(4px,0.7vh,7px) clamp(8px,1vw,11px);border-radius:var(--radius-pill);z-index:50;box-shadow:var(--shadow-md-deep);cursor:pointer;align-items:center;gap:6px;transition:transform 0.2s;flex-shrink:0;">
                 <div id="statusLightDot" style="width:9px;height:9px;border-radius:var(--radius-round);background:var(--red-600);flex-shrink:0;box-shadow:0 0 6px var(--red-600);"></div>
-                <span id="statusLightText" class="ui-text-4" style="color:var(--bg-light);font-weight:900;font-size:clamp(0.55rem,0.7vw,0.7rem);">Phones Away</span><button type="button" class="status-light-hide" onclick="hideStatusLight(event)" title="Turn the phone light off (Shift+L)" aria-label="Turn the phone light off">✕</button>
+                <span id="statusLightText" class="ui-text-4" style="color:var(--bg-light);font-weight:900;font-size:clamp(0.55rem,0.7vw,0.7rem);">Phones Away</span>
             </div>
             <div class="right-pills">
                 <div class="pill action-pill countdown-pill" onclick="toggleModal('timerModal')"><div class="pill-subtitle">Countdown</div><div class="widget-text sync-timer" style="color:var(--primary-color);">00:00</div></div>
@@ -3481,7 +3489,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             document.body.style.setProperty('--status-color', state.color); // drives the banner and the glow around the whole board
             const bannerText = document.getElementById('statusBannerText'); if (bannerText) bannerText.innerText = state.text;
         }
-        function hideStatusLight(event) { if (event) event.stopPropagation(); const badge = document.getElementById('statusLightBadge'); if (badge && badge.style.display === 'flex') toggleStatusLight(); }
+
         function cycleStatusLightState() {
             statusLightState = (statusLightState + 1) % STATUS_LIGHT_STATES.length;
             renderStatusLight(); playTone(500 + statusLightState * 150, 0, 0.1, 0.1);
@@ -3489,7 +3497,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         }
         function cycleNoiseLevel() {
             noiseState = (noiseState + 1) % 3; const widget = document.getElementById('noiseLevelWidget'); const icon = document.getElementById('noiseIcon'); const text = document.getElementById('noiseText');
-            if(noiseState === 0) { widget.style.borderColor = 'var(--primary-color)'; icon.innerText = '🤫'; icon.style.filter = 'drop-shadow(0 0 12px rgba(var(--primary-rgb), 0.5))'; text.innerText = 'Level 0: Silent'; text.style.color = '#cdb4ff'; } 
+            if(noiseState === 0) { widget.style.borderColor = 'var(--primary-color)'; icon.innerText = '🤫'; icon.style.filter = 'drop-shadow(0 0 12px rgba(var(--primary-rgb), 0.5))'; text.innerText = 'Level 0: Silent'; text.style.color = ''; } 
             else if(noiseState === 1) { widget.style.borderColor = 'var(--bg-mid)'; icon.innerText = '🗣️'; icon.style.filter = 'drop-shadow(0 0 12px rgba(var(--bg-mid-rgb), 0.5))'; text.innerText = 'Level 1: Whisper'; text.style.color = 'var(--bg-mid)'; } 
             else { widget.style.borderColor = '#ffffff'; icon.innerText = '👥'; icon.style.filter = 'drop-shadow(0 0 12px rgba(255, 255, 255, 0.5))'; text.innerText = 'Level 2: Group'; text.style.color = '#ffffff'; }
         }
@@ -3583,7 +3591,14 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             });
             if (isGroupWheelMode) drawWheel(getActiveWheelItems());
             document.getElementById('clearHistoryBtn').style.display = 'block';
+            fitGroupsGrid(); setTimeout(fitGroupsGrid, 500 + bestGroups.length * 50); // again once the pop-in animation settles
             syncGroupsFromDOM();
+        }
+        // Shrink group text just enough that every group fits on screen without scrolling (big classes, small groups).
+        function fitGroupsGrid() {
+            const grid = document.getElementById('groupsContainer'); if (!grid || !grid.clientHeight) return;
+            grid.style.fontSize = ''; const base = parseFloat(window.getComputedStyle(grid).fontSize) || 20;
+            growToFit(grid, grid, base, 11, 1);
         }
         function syncGroupsFromDOM() {
             const cards = Array.from(document.querySelectorAll('#groupsContainer .group-card'));
