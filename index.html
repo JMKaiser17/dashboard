@@ -2480,6 +2480,40 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         }
         function studentTokenFor(secret) { return secret ? sha256Hex('student:' + secret).slice(0, 32) : ''; }
         function getAutoBackupToken() { return store.getItem('titan_autobackup_token') || ""; }
+        // ==================== DIRECT SHEET READS (Apps Script only) ====================
+        // When the dashboard is served by the same script it syncs with, the teacher board asks that script for the
+        // schedule and Game Vault directly: edits show on the next refresh, with no "publish to web" delay. The script
+        // hands back the same CSV text the published link would, so the parsing below is unchanged. Any failure falls
+        // back to the published CSV, so this can only add freshness, never take the board down.
+        function scriptIdOf(url) { const m = String(url || '').match(/\/s\/([^/?#]+)\/(?:exec|dev)/); return m ? m[1] : ''; }
+        function directReadAvailable() {
+            if (!HOST || isStudentMode || !getAutoBackupToken()) return false;
+            if (!(window.google && google.script && google.script.run)) return false;
+            const mine = scriptIdOf(HOST.appUrl); return !!mine && mine === scriptIdOf(getAutoBackupUrl()); // same script = same sheet
+        }
+        function serverCall(fn, args, timeoutMs) {
+            return new Promise((resolve, reject) => {
+                const timer = setTimeout(() => reject(new Error(fn + ' timed out')), timeoutMs || 15000);
+                try {
+                    const runner = google.script.run.withSuccessHandler(v => { clearTimeout(timer); resolve(v); }).withFailureHandler(e => { clearTimeout(timer); reject(e); });
+                    runner[fn].apply(runner, args || []);
+                } catch (e) { clearTimeout(timer); reject(e); }
+            });
+        }
+        async function readTabDirect(kind) {
+            const r = await serverCall('dashReadTab', [getAutoBackupToken(), kind]);
+            if (!r || !r.ok || typeof r.csv !== 'string') throw new Error((r && r.error) || 'direct read failed');
+            return r.csv;
+        }
+        let directReadStatus = 'off'; // 'off' | 'on' | 'fallback' - shown by Test Connection
+        async function readSheetText(kind, url) {
+            if (directReadAvailable()) {
+                try { const csv = await readTabDirect(kind); directReadStatus = 'on'; return csv; }
+                catch (e) { directReadStatus = 'fallback'; console.warn('Direct sheet read failed (' + kind + '), using the published CSV:', e && e.message ? e.message : e); }
+            }
+            const response = await fetch(url + (url.includes('?') ? '&' : '?') + "t=" + new Date().getTime()); if (!response.ok) throw new Error("Network error");
+            return response.text();
+        }
         function pushLiveState() {
             const url = getAutoBackupUrl(); const token = getAutoBackupToken();
             if (!url || !token) return; // live sync isn't configured - silently does nothing, same spirit as auto-backup
@@ -2571,7 +2605,12 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             fetch(url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(token) + '&action=liveState')
                 .then(res => res.json())
                 .then(json => {
-                    if (json && json.ok) { statusEl.style.color = 'var(--green-700)'; statusEl.innerText = 'Connected! Live Sync is ready.'; }
+                    if (json && json.ok) { statusEl.style.color = 'var(--green-700)'; statusEl.innerText = 'Connected! Live Sync is ready.';
+                        if (HOST && !isStudentMode) {
+                            if (scriptIdOf(HOST.appUrl) !== scriptIdOf(url)) statusEl.innerText += ' Direct sheet reads: off (this page comes from a different script than Live Sync).';
+                            else serverCall('dashPing', [token]).then(r => { statusEl.innerText += r && r.ok ? ' Direct sheet reads: on.' : ' Direct sheet reads: the secret was refused.'; })
+                                .catch(() => { statusEl.innerText += " Direct sheet reads: couldn't reach the script from this page."; });
+                        } }
                     else { const err = json && json.error ? String(json.error) : 'unknown error'; statusEl.style.color = 'var(--red-700)';
                         statusEl.innerText = /^setup/.test(err) ? 'The script still has the placeholder secret. Set BACKUP_SECRET in Code.gs, then redeploy.' : err === 'unauthorized' ? "The secret doesn't match BACKUP_SECRET in Code.gs." : 'Reached the script, but it reported: ' + err; }
                 })
@@ -2636,8 +2675,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         async function fetchAgendaData() {
             const currentUrl = getActiveCsvUrl(); if (!currentUrl) { loadSandboxData(); setStaleDataBadge(false); return; }
             try {
-                const response = await fetch(currentUrl + (currentUrl.includes('?') ? '&' : '?') + "t=" + new Date().getTime()); if (!response.ok) throw new Error("Network error");
-                const csvText = await response.text();
+                const csvText = await readSheetText('schedule', currentUrl);
                 // Process FIRST, cache only after it worked - otherwise a bad response overwrites the good fallback.
                 if (!processCsvData(csvText)) throw new Error("Sheet returned no usable rows");
                 store.setItem('titan_last_good_csv', csvText); store.setItem('titan_last_good_csv_url', currentUrl); store.setItem('titan_last_sync_success_at', Date.now().toString());
@@ -2653,8 +2691,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         async function fetchGameVaultData() {
             const gameUrl = getActiveGameUrl(); if (!gameUrl) return;
             try {
-                const response = await fetch(gameUrl + (gameUrl.includes('?') ? '&' : '?') + "t=" + new Date().getTime()); if (!response.ok) throw new Error("Network error");
-                const csvText = await response.text();
+                const csvText = await readSheetText('games', gameUrl);
                 // A real vault has Status and Type headers; an unpublished/permission-error response is an HTML page.
                 const header = (csvText.split(/\r?\n/)[0] || '').toLowerCase();
                 if (!header.includes('status') || !header.includes('type')) throw new Error("Not a Game Vault CSV");
