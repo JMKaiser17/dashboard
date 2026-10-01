@@ -1152,10 +1152,12 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         .quick-edit-btn { display:none; border:none; background:transparent; color:var(--primary-color); font-size:0.8em; line-height:1; padding:4px 10px; border-radius:var(--radius-pill); cursor:pointer; opacity:0.55; }
         .quick-edit-btn:hover, .quick-edit-btn:focus-visible { opacity:1; background:var(--bg-light); }
         body.can-edit .quick-edit-btn { display:inline-flex; }
-        .qe-label { display:block; font-weight:bold; color:var(--secondary-dark); margin:12px 0 4px 0; font-size:1.05rem; }
+        .qe-label { display:block; font-weight:bold; color:var(--secondary-dark); margin:10px 0 4px 0; font-size:1.05rem; }
+        .qe-actions { display:flex; gap:12px; justify-content:flex-end; margin-top:6px; }
         .qe-hint { font-weight:normal; color:var(--gray-500); font-size:0.85rem; }
-        .qe-field { width:100%; box-sizing:border-box; border:2px solid var(--bg-mid); border-radius:var(--radius-sm); padding:10px 12px; font:inherit; font-size:1.1rem; resize:vertical; background:var(--white); color:var(--secondary-dark); }
+        .qe-field { flex:0 0 auto; width:100%; box-sizing:border-box; border:2px solid var(--bg-mid); border-radius:var(--radius-sm); padding:10px 12px; font:inherit; font-size:1.1rem; resize:vertical; background:var(--white); color:var(--secondary-dark); }
         .qe-field:focus { outline:none; border-color:var(--primary-color); }
+        #qeWarmup { min-height:3.4em; } #qeAgenda { min-height:4.4em; } #qeLinks { min-height:3.2em; } /* the modal is a flex column: without these the boxes squash to one line on a short screen */
         .modal { display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(var(--secondary-rgb),0.95); z-index:100; justify-content:center; align-items:center; flex-direction:column; text-align:center; opacity:0; visibility:hidden; pointer-events:none; padding:clamp(10px,2vh,30px) clamp(10px,2vw,30px); transition:opacity 0.3s ease,visibility 0.3s ease; } .modal.active { opacity:1; visibility:visible; pointer-events:auto; } .modal h1 { color:var(--primary-color); font-size:clamp(2.2rem,3.5vw,4.5rem); margin:0 0 clamp(10px,1.5vh,20px) 0; font-weight:700; } .modal button.close-btn { background-color:var(--bg-light); color:var(--secondary-dark); border:none; padding:clamp(10px,1.5vh,16px) clamp(24px,2.5vw,40px); font-size:clamp(1.1rem,1.5vw,1.8rem); border-radius:var(--radius-pill); font-weight:bold; cursor:pointer; margin-top:clamp(15px,2vh,25px); box-shadow:var(--shadow-md); flex-shrink:0; } .modal button.close-btn:hover { background-color:var(--bg-mid); }
         .leaderboard-wrapper { background:linear-gradient(145deg,var(--white),var(--bg-light)); border-radius:var(--radius-lg); padding:clamp(16px,2.5vw,32px); width:95%; max-width:1750px; max-height:88vh; box-shadow:var(--shadow-lg-deep); border:clamp(4px,0.5vw,6px) solid var(--primary-color); display:flex; flex-direction:column; gap:clamp(12px,1.8vh,20px); overflow-y:auto; } .warmup-card h1 { display:flex; align-items:center; gap:clamp(10px,1.2vw,18px); padding-bottom:clamp(10px,1.5vh,18px); border-bottom:3px dashed rgba(var(--primary-rgb),0.25); } .warmup-card h1::before { content:"⚡"; font-size:0.7em; filter:drop-shadow(0 2px 3px rgba(var(--primary-rgb),0.4)); } .warmup-text-panel { position:relative; overflow:hidden; background:linear-gradient(145deg,#f8f6fb,#ecebf3); border-radius:var(--radius-lg); border:1px solid rgba(var(--primary-rgb),0.15); box-shadow:inset 0 2px 10px rgba(var(--primary-rgb),0.08),inset 0 -2px 4px rgba(255,255,255,0.7); } .warmup-text-panel::before { content:""; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:55%; height:55%; background-image:var(--mascot-url); background-size:contain; background-position:center; background-repeat:no-repeat; opacity:0.07; z-index:0; pointer-events:none; } .warmup-text-panel > * { position:relative; z-index:1; }
         .jeopardy-modal-card { padding:0; overflow:hidden; background:linear-gradient(145deg,var(--primary-color) 0%,var(--jeopardy-grad-end) 55%,var(--secondary-dark) 100%); border:clamp(3px,0.4vw,5px) solid var(--primary-color); box-shadow:var(--shadow-lg-deep),0 0 30px rgba(var(--primary-rgb),0.3); }
@@ -1585,17 +1587,16 @@ html[data-board-style="atoms"] .dashboard-wrapper {
 
     <!-- Settings Menu -->
     <div class="modal" id="quickEditModal">
-        <div class="leaderboard-wrapper ui-box-3" style="max-width:900px;width:95%;max-height:92vh;overflow-y:auto;text-align:left;">
-            <h1 class="lb-header" style="text-align:left;margin:0 0 4px 0;">✎ Edit today</h1>
-            <p id="qeWho" style="margin:0 0 14px 0;color:var(--gray-500);font-weight:bold;"></p>
+        <div class="leaderboard-wrapper ui-box-3" style="max-width:900px;width:95%;max-height:94vh;overflow-y:auto;text-align:left;padding:clamp(14px,2.4vh,30px) clamp(18px,2.6vw,40px);">
+            <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;"><h1 class="lb-header" style="text-align:left;margin:0;font-size:clamp(1.3rem,2.2vw,1.9rem);">✎ Edit today</h1><p id="qeWho" style="margin:0;color:var(--gray-500);font-weight:bold;"></p></div>
             <label class="qe-label" for="qeWarmup">Warm-Up</label>
-            <textarea id="qeWarmup" class="qe-field" rows="3"></textarea>
+            <textarea id="qeWarmup" class="qe-field" rows="2"></textarea>
             <label class="qe-label" for="qeAgenda">Agenda <span class="qe-hint">one item per line</span></label>
-            <textarea id="qeAgenda" class="qe-field" rows="5"></textarea>
+            <textarea id="qeAgenda" class="qe-field" rows="3"></textarea>
             <label class="qe-label" for="qeLinks">Slides &amp; links <span class="qe-hint">one per line, like Notes = https://docs.google.com/...</span></label>
-            <textarea id="qeLinks" class="qe-field" rows="3" style="font-family:monospace;font-size:0.95rem;"></textarea>
-            <p id="qeStatus" role="status" aria-live="polite" style="min-height:1.4em;margin:10px 0 0 0;font-weight:bold;"></p>
-            <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
+            <textarea id="qeLinks" class="qe-field" rows="2" style="font-family:monospace;font-size:0.95rem;"></textarea>
+            <p id="qeStatus" role="status" aria-live="polite" style="min-height:1.2em;margin:6px 0 0 0;font-weight:bold;"></p>
+            <div class="qe-actions">
                 <button type="button" onclick="toggleModal('quickEditModal')" class="close-btn" style="margin-top:0;padding:12px 30px;font-size:1.2rem;">Cancel</button>
                 <button type="button" id="qeSave" onclick="saveQuickEdit()" style="background:var(--primary-color);color:var(--white);border:none;padding:12px 30px;border-radius:var(--radius-lg);font-weight:bold;cursor:pointer;font-size:1.2rem;box-shadow:var(--shadow-md);">Save to sheet</button>
             </div>
@@ -2680,6 +2681,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }).catch(() => { /* silent - same reasoning as auto-backup's fetch */ });
         }
         function saveSettings() {
+            setTimeout(pushStudentConfig, 1500); // short student links pick up a new sheet link or logo
             let inputUrl = document.getElementById('customSheetUrlInput').value.trim(); let gameUrl = document.getElementById('gameVaultUrlInput').value.trim();
             if(inputUrl) store.setItem('titan_sheet_url', inputUrl); if(gameUrl) store.setItem('titan_game_url', gameUrl);
             store.setItem('titan_autobackup_url', document.getElementById('autoBackupUrlInput').value.trim());
@@ -3977,11 +3979,27 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             document.getElementById('studentTimerText').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
         }
         if (isStudentMode) setInterval(renderStudentTimer, 1000); // ticks locally between syncs - no network call each second
-        function copyStudentLink() {
+        // On Apps Script the script itself can hand Student Mode the schedule, Game Vault, Live Sync and branding, so the
+        // shared link shrinks to ".../exec?mode=student" and the QR code gets big, easy-to-scan squares. If the script
+        // can't be reached, the full link (everything in the URL, as before) is used instead, so sharing never fails.
+        function studentConfigPayload() {
+            return { sheet: getActiveCsvUrl() || '', games: getActiveGameUrl() || '', live: getAutoBackupUrl() || '',
+                     mascot: store.getItem('titan_setting_mascot') || '', logo: store.getItem('titan_setting_watermark') || '' };
+        }
+        async function pushStudentConfig() {
+            if (!directReadAvailable() || !getActiveCsvUrl()) return false;
+            try { const r = await serverCall('dashSetStudentConfig', [getAutoBackupToken(), studentConfigPayload()], 15000); return !!(r && r.ok); }
+            catch (e) { console.warn('Student settings not sent to the script:', e && e.message ? e.message : e); return false; }
+        }
+        async function studentLinkForSharing() {
+            if (HOST && HOST.appUrl && await pushStudentConfig()) return HOST.appUrl + '?mode=student';
+            return buildStudentModeUrl();
+        }
+        async function copyStudentLink() {
             document.getElementById('qrErrorText').innerText = ''; document.getElementById('qrCopyConfirm').innerText = '';
             if (!getActiveCsvUrl()) { document.getElementById('qrErrorText').innerText = 'Connect your Google Sheet in Settings first, so the student link has real data to show.'; return; }
             { const problem = studentLinkProblem(window.location.protocol); if (problem) { document.getElementById('qrErrorText').innerText = problem; return; } }
-            const url = buildStudentModeUrl();
+            const url = await studentLinkForSharing();
             if (!navigator.clipboard || !navigator.clipboard.writeText) { document.getElementById('qrErrorText').innerText = 'Could not copy automatically. Link: ' + url; return; }
             navigator.clipboard.writeText(url).then(() => {
                 document.getElementById('qrCopyConfirm').innerText = '✓ Copied! Paste it into Canvas, an email, anywhere.';
@@ -3989,10 +4007,10 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                 document.getElementById('qrErrorText').innerText = 'Could not copy automatically. Link: ' + url;
             });
         }
-        function loadStudentLinkIntoQR() {
+        async function loadStudentLinkIntoQR() {
             if (!getActiveCsvUrl()) { document.getElementById('qrErrorText').innerText = 'Connect your Google Sheet in Settings first, so the student link has real data to show.'; return; }
             { const problem = studentLinkProblem(window.location.protocol); if (problem) { document.getElementById('qrErrorText').innerText = problem; return; } }
-            document.getElementById('qrUrlInput').value = buildStudentModeUrl();
+            document.getElementById('qrUrlInput').value = await studentLinkForSharing();
             generateQRCode();
         }
         function openQRModal() {
@@ -5007,7 +5025,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function syncThenBoot() {
             if (!HOST || isStudentMode || !directReadAvailable()) { boot(); return; }
             let started = false;
-            const start = () => { if (started) return; started = true; boot(); scheduleSyncFlush(1500); };
+            const start = () => { if (started) return; started = true; boot(); scheduleSyncFlush(1500); setTimeout(pushStudentConfig, 4000); };
             const cap = setTimeout(start, 5000);
             serverCall('dashDataLoad', [getAutoBackupToken()], 8000)
                 .then(r => { if (!started && r && r.ok) { const n = applyRemoteData(r.items); if (n) console.info('Restored ' + n + ' saved item(s) from the sheet'); } })
