@@ -2160,10 +2160,77 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                 key: i => (Array.from(m.keys())[i] === undefined ? null : Array.from(m.keys())[i]), get length() { return m.size; } };
         })();
         if (!STORE_PERSISTENT) console.warn('Browser storage unavailable - dashboard data will not be saved after this session.');
+        // ==================== SHEET SYNC (Apps Script only) ====================
+        // Classroom records (attendance, participation, groups, notes, game progress, settings) are copied to a hidden
+        // "Dashboard Data" tab in your sheet, so they survive a cleared browser and follow you to another computer.
+        // Browser storage stays the fast working copy: every save lands here instantly and is sent to the sheet a few
+        // seconds later. Unsent changes are kept here too, so a dropped connection just means "send it later".
+        // Never synced: the Live Sync secret, the links that bootstrap the board, and per-screen preferences.
+        const SYNC_SKIP = new Set(['titan_autobackup_token', 'titan_autobackup_url', 'titan_sheet_url', 'titan_game_url', 'titan_onboarding_seen',
+            'titan_timer', 'titan_first_used_at', 'titan_setting_muted', 'titan_setting_dark', 'titan_setting_light']);
+        const SYNC_PENDING = '__sync_pending', SYNC_META = '__sync_meta'; // unsent changes {key:{v,t}}; last-known change time per key {key:t}
+        function syncableKey(k) {
+            k = String(k);
+            if (SYNC_SKIP.has(k) || k.startsWith('titan_last_') || k.startsWith('__')) return false;
+            return k.startsWith('titan_') || k.startsWith('classPoints_') || k.startsWith('checklist_');
+        }
+        function syncRead(name) { try { return JSON.parse(storeBacking.getItem(STORE_NS + name) || '{}') || {}; } catch (e) { return {}; } }
+        function syncWrite(name, obj) { try { storeBacking.setItem(STORE_NS + name, JSON.stringify(obj)); } catch (e) { console.warn('Sync bookkeeping not saved', e); } }
+        let syncFlushTimer = null, syncFlushing = false;
+        function syncNote(k, v) { // called by every store write; never throws
+            try {
+                if (!HOST || isStudentMode || !syncableKey(k)) return;
+                const t = Date.now(), pending = syncRead(SYNC_PENDING), meta = syncRead(SYNC_META);
+                pending[k] = { v: v === null ? null : String(v), t: t }; meta[k] = t;
+                syncWrite(SYNC_PENDING, pending); syncWrite(SYNC_META, meta);
+                scheduleSyncFlush(3000);
+            } catch (e) { console.warn('Sync note skipped', e); }
+        }
+        function scheduleSyncFlush(ms) { clearTimeout(syncFlushTimer); syncFlushTimer = setTimeout(flushSync, ms); }
+        async function flushSync() {
+            if (syncFlushing) return scheduleSyncFlush(2000);
+            const pending = syncRead(SYNC_PENDING), entries = Object.keys(pending).map(k => ({ k: k, v: pending[k].v, t: pending[k].t }));
+            if (!entries.length || !directReadAvailable()) return;
+            syncFlushing = true;
+            try {
+                const r = await serverCall('dashDataSave', [getAutoBackupToken(), entries], 30000);
+                if (!r || !r.ok) throw new Error((r && r.error) || 'save refused');
+                const now = syncRead(SYNC_PENDING); // only clear what was sent and hasn't changed since
+                entries.forEach(e => { if (now[e.k] && now[e.k].t === e.t) delete now[e.k]; });
+                syncWrite(SYNC_PENDING, now);
+                if (Object.keys(now).length) scheduleSyncFlush(1000);
+            } catch (e) {
+                console.warn('Sheet sync will retry:', e && e.message ? e.message : e);
+                scheduleSyncFlush(30000);
+            } finally { syncFlushing = false; }
+        }
+        // Merge the sheet's copy into this browser before the board draws. Newer change wins, key by key.
+        function applyRemoteData(items) {
+            const pending = syncRead(SYNC_PENDING), meta = syncRead(SYNC_META), seen = new Set();
+            let pulled = 0;
+            (items || []).forEach(it => {
+                if (!it || !syncableKey(it.k)) return;
+                seen.add(it.k);
+                if (pending[it.k] && pending[it.k].t >= it.t) return; // ours is newer and on its way
+                if ((meta[it.k] || 0) >= it.t) return;                // already have this version
+                if (it.v === null) storeBacking.removeItem(STORE_NS + it.k); else storeBacking.setItem(STORE_NS + it.k, it.v);
+                meta[it.k] = it.t; delete pending[it.k]; pulled++;
+            });
+            // First run on this sheet: upload what this browser has that the sheet doesn't.
+            for (let i = 0; i < storeBacking.length; i++) {
+                const raw = storeBacking.key(i);
+                if (raw === null || (STORE_NS ? !raw.startsWith(STORE_NS) : raw.startsWith('ns:'))) continue;
+                const k = STORE_NS ? raw.slice(STORE_NS.length) : raw;
+                if (!syncableKey(k) || seen.has(k) || pending[k]) continue;
+                const t = meta[k] || 1; pending[k] = { v: storeBacking.getItem(raw), t: t }; meta[k] = t;
+            }
+            syncWrite(SYNC_PENDING, pending); syncWrite(SYNC_META, meta);
+            return pulled;
+        }
         const store = {
             getItem(k) { return storeBacking.getItem(STORE_NS + k); },
-            setItem(k, v) { storeBacking.setItem(STORE_NS + k, v); },
-            removeItem(k) { storeBacking.removeItem(STORE_NS + k); },
+            setItem(k, v) { storeBacking.setItem(STORE_NS + k, v); syncNote(k, v); },
+            removeItem(k) { storeBacking.removeItem(STORE_NS + k); syncNote(k, null); },
             _keys() { let out = []; for (let i = 0; i < storeBacking.length; i++) { let k = storeBacking.key(i); if (k === null) continue; if (STORE_NS ? k.startsWith(STORE_NS) : !k.startsWith('ns:')) out.push(STORE_NS ? k.slice(STORE_NS.length) : k); } return out; },
             get length() { return this._keys().length; },
             key(i) { let ks = this._keys(); return i >= 0 && i < ks.length ? ks[i] : null; }
@@ -4851,7 +4918,19 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             fetchAgendaData(); fetchGameVaultData(); setInterval(updateDashboard, 1000); setInterval(fetchAgendaData, 60000);
             loadTimerState(); renderReturnChips();
         }
-        boot();
+        // On Apps Script, pull the sheet's saved data first (capped at 5 seconds), then draw the board.
+        // Anywhere else, or if the sheet can't be reached, the board starts from this browser's copy as before.
+        function syncThenBoot() {
+            if (!HOST || isStudentMode || !directReadAvailable()) { boot(); return; }
+            let started = false;
+            const start = () => { if (started) return; started = true; boot(); scheduleSyncFlush(1500); };
+            const cap = setTimeout(start, 5000);
+            serverCall('dashDataLoad', [getAutoBackupToken()], 8000)
+                .then(r => { if (!started && r && r.ok) { const n = applyRemoteData(r.items); if (n) console.info('Restored ' + n + ' saved item(s) from the sheet'); } })
+                .catch(e => console.warn('Saved data not loaded from the sheet; using this browser\'s copy:', e && e.message ? e.message : e))
+                .finally(() => { clearTimeout(cap); start(); });
+        }
+        syncThenBoot();
     </script>
 </body>
 </html>
