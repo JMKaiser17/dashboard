@@ -2665,17 +2665,24 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             }
             btn.disabled = false;
         }
+        // Students see the notes saved for the class happening now, but only notes written today (same rule as the
+        // class recap). Read from saved notes, not the screen: the notepad is only on screen in Presentation mode, so a
+        // timer or phone-light push from the main board used to send blank notes and wipe them from student devices.
+        function liveNotesText() {
+            if (!activeBlockData || !activeBlockData.id || !(activeBlockData.date instanceof Date)) return '';
+            if (store.getItem('titan_notepad_edited_' + activeBlockData.id) !== dayStamp(activeBlockData.date)) return '';
+            return stripHtmlToText(store.getItem('titan_notepad_' + activeBlockData.id) || '');
+        }
         function pushLiveState() {
             const url = getAutoBackupUrl(); const token = getAutoBackupToken();
             if (!url || !token) return; // live sync isn't configured - silently does nothing, same spirit as auto-backup
             const badge = document.getElementById('statusLightBadge');
             const lightActive = !!(badge && badge.style.display === 'flex');
             const timerActive = isRunning || remainingMs > 0;
-            const notepad = document.getElementById('slideNotepad');
             const state = {
                 statusLight: { active: lightActive, state: lightActive ? statusLightState : null },
                 timer: { active: timerActive, running: isRunning, endTime: isRunning ? endTime : null, remainingMs: remainingMs },
-                notes: notepad ? stripHtmlToText(notepad.innerHTML) : '',
+                notes: liveNotesText(),
             };
             const payload = JSON.stringify({ token: token, action: 'liveState', data: state });
             fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }).catch(() => { /* silent - same reasoning as auto-backup's fetch */ });
@@ -3299,8 +3306,22 @@ html[data-board-style="atoms"] .dashboard-wrapper {
 
         let currentActiveGameTitle = ''; 
 
+        // A phone's back gesture or the browser Back button used to leave the dashboard entirely. Opening a game now adds
+        // one history step, so Back returns to the game menu (or closes a pop-up inside the game first).
+        let gameHistoryStep = false;
+        function pushGameHistory() {
+            if (gameHistoryStep) return;
+            try { history.pushState({ dashGame: true }, ''); gameHistoryStep = true; } catch (e) { /* history unavailable: Back to Hub still works */ }
+        }
+        window.addEventListener('popstate', () => {
+            if (!gameHistoryStep) return;
+            gameHistoryStep = false;
+            const openModals = document.querySelectorAll('.modal.active');
+            if (openModals.length) { openModals.forEach(m => m.classList.remove('active')); checkFloatingTimer(); pushGameHistory(); return; } // still in the game
+            if (document.getElementById('activeGameContainer').style.display !== 'none') closeGameModule(true);
+        });
         function openGameModule(gameType, gameTitle) {
-            hideToast();
+            hideToast(); pushGameHistory();
             currentActiveGameTitle = gameTitle; 
             document.getElementById('gameHubMenu').style.display = 'none'; document.getElementById('activeGameContainer').style.display = 'flex';
             
@@ -3318,7 +3339,8 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             else if (MINI_GAME_CONFIGS[gameType]) { loadMiniGamePrompts(gameType, gameTitle); }
         }
 
-        function closeGameModule() { 
+        function closeGameModule(fromBack) { 
+            if (!fromBack && gameHistoryStep) { gameHistoryStep = false; try { history.back(); } catch (e) {} } // undo our step so Back doesn't need two presses later
             document.getElementById('activeGameContainer').style.display = 'none'; 
             document.getElementById('gameHubMenu').style.display = 'grid'; 
             buildDynamicGameMenu(); 
@@ -3780,6 +3802,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             const target = event.target; const isTyping = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
             if (isTyping) return; 
 
+            if (event.key === 'Escape' && !document.querySelector('.modal.active') && isGameStage && document.getElementById('activeGameContainer').style.display === 'flex') { closeGameModule(); return; }
             if (event.key === 'Escape') { const activeModals = document.querySelectorAll('.modal.active'); activeModals.forEach(modal => { if (modal.id === 'wheelModal') closeWheelModal(); else modal.classList.remove('active'); }); checkFloatingTimer(); return; }
             if (isStudentMode) return; // no teacher shortcuts in student mode
             
@@ -4236,7 +4259,9 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             let nowMs = now.getTime(); let activeBlock = null; let forcedBlock = schedule.find(b => b.forced); let isGenuinelyInSession = false;
             if (forcedBlock) { activeBlock = forcedBlock; isGenuinelyInSession = true; } 
             else { for (let block of schedule) { let startMs = block.date.getTime() + (block.start * 60000); let endMs = block.date.getTime() + (block.end * 60000); if (nowMs >= startMs && nowMs < endMs) { activeBlock = block; isGenuinelyInSession = true; break; } } if (!activeBlock) { activeBlock = schedule.find(b => { let endMs = b.date.getTime() + (b.end * 60000); return endMs > nowMs; }); } }
-            activeBlockData = activeBlock; 
+            { const prevId = activeBlockData ? activeBlockData.id : undefined; activeBlockData = activeBlock;
+              const nowId = activeBlock ? activeBlock.id : undefined;
+              if (!isStudentMode && prevId !== undefined && prevId !== nowId) pushLiveState(); } // new period: students get its notes 
 
             if (isGenuinelyInSession && activeBlock) { lastGenuinelyActiveBlock = activeBlock; }
             else if (lastGenuinelyActiveBlock) { maybeOfferRecapPrompt(lastGenuinelyActiveBlock); lastGenuinelyActiveBlock = null; }
