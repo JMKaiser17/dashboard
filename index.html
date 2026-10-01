@@ -1148,6 +1148,14 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
         #slideModeBoard { display:none; flex-grow:1; background-color:var(--bg-light); border-radius:var(--radius-fluid); box-shadow:var(--shadow-md),var(--highlight-top); border-left:clamp(4px,0.5vw,8px) solid var(--secondary-dark); position:relative; overflow:hidden; flex-direction:column; min-height:0; } .slide-frame-container { width:100%; height:100%; display:flex; justify-content:center; align-items:center; overflow:hidden; } .slide-frame-container iframe { aspect-ratio:16 / 9; width:100%; height:auto; max-height:100%; max-width:100%; border:none; border-radius:var(--radius-md); } .clear-notepad-btn { background:var(--bg-light); color:var(--ink); border:2px solid var(--bg-mid); border-radius:var(--radius-sm); padding:clamp(6px,1vh,10px) clamp(12px,1.5vw,20px); font-weight:bold; cursor:pointer; box-shadow:var(--shadow-sm); font-size:clamp(0.9rem,1.2vw,1.1rem); transition:all 0.2s; } .clear-notepad-btn:hover { background:var(--white); border-color:var(--primary-color); transform:translateY(-1px); }
 
+        .quick-edit-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+        .quick-edit-btn { display:none; border:none; background:transparent; color:var(--primary-color); font-size:0.8em; line-height:1; padding:4px 10px; border-radius:var(--radius-pill); cursor:pointer; opacity:0.55; }
+        .quick-edit-btn:hover, .quick-edit-btn:focus-visible { opacity:1; background:var(--bg-light); }
+        body.can-edit .quick-edit-btn { display:inline-flex; }
+        .qe-label { display:block; font-weight:bold; color:var(--secondary-dark); margin:12px 0 4px 0; font-size:1.05rem; }
+        .qe-hint { font-weight:normal; color:var(--gray-500); font-size:0.85rem; }
+        .qe-field { width:100%; box-sizing:border-box; border:2px solid var(--bg-mid); border-radius:var(--radius-sm); padding:10px 12px; font:inherit; font-size:1.1rem; resize:vertical; background:var(--white); color:var(--secondary-dark); }
+        .qe-field:focus { outline:none; border-color:var(--primary-color); }
         .modal { display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(var(--secondary-rgb),0.95); z-index:100; justify-content:center; align-items:center; flex-direction:column; text-align:center; opacity:0; visibility:hidden; pointer-events:none; padding:clamp(10px,2vh,30px) clamp(10px,2vw,30px); transition:opacity 0.3s ease,visibility 0.3s ease; } .modal.active { opacity:1; visibility:visible; pointer-events:auto; } .modal h1 { color:var(--primary-color); font-size:clamp(2.2rem,3.5vw,4.5rem); margin:0 0 clamp(10px,1.5vh,20px) 0; font-weight:700; } .modal button.close-btn { background-color:var(--bg-light); color:var(--secondary-dark); border:none; padding:clamp(10px,1.5vh,16px) clamp(24px,2.5vw,40px); font-size:clamp(1.1rem,1.5vw,1.8rem); border-radius:var(--radius-pill); font-weight:bold; cursor:pointer; margin-top:clamp(15px,2vh,25px); box-shadow:var(--shadow-md); flex-shrink:0; } .modal button.close-btn:hover { background-color:var(--bg-mid); }
         .leaderboard-wrapper { background:linear-gradient(145deg,var(--white),var(--bg-light)); border-radius:var(--radius-lg); padding:clamp(16px,2.5vw,32px); width:95%; max-width:1750px; max-height:88vh; box-shadow:var(--shadow-lg-deep); border:clamp(4px,0.5vw,6px) solid var(--primary-color); display:flex; flex-direction:column; gap:clamp(12px,1.8vh,20px); overflow-y:auto; } .warmup-card h1 { display:flex; align-items:center; gap:clamp(10px,1.2vw,18px); padding-bottom:clamp(10px,1.5vh,18px); border-bottom:3px dashed rgba(var(--primary-rgb),0.25); } .warmup-card h1::before { content:"⚡"; font-size:0.7em; filter:drop-shadow(0 2px 3px rgba(var(--primary-rgb),0.4)); } .warmup-text-panel { position:relative; overflow:hidden; background:linear-gradient(145deg,#f8f6fb,#ecebf3); border-radius:var(--radius-lg); border:1px solid rgba(var(--primary-rgb),0.15); box-shadow:inset 0 2px 10px rgba(var(--primary-rgb),0.08),inset 0 -2px 4px rgba(255,255,255,0.7); } .warmup-text-panel::before { content:""; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:55%; height:55%; background-image:var(--mascot-url); background-size:contain; background-position:center; background-repeat:no-repeat; opacity:0.07; z-index:0; pointer-events:none; } .warmup-text-panel > * { position:relative; z-index:1; }
         .jeopardy-modal-card { padding:0; overflow:hidden; background:linear-gradient(145deg,var(--primary-color) 0%,var(--jeopardy-grad-end) 55%,var(--secondary-dark) 100%); border:clamp(3px,0.4vw,5px) solid var(--primary-color); box-shadow:var(--shadow-lg-deep),0 0 30px rgba(var(--primary-rgb),0.3); }
@@ -1576,6 +1584,23 @@ html[data-board-style="atoms"] .dashboard-wrapper {
     </div>
 
     <!-- Settings Menu -->
+    <div class="modal" id="quickEditModal">
+        <div class="leaderboard-wrapper ui-box-3" style="max-width:900px;width:95%;max-height:92vh;overflow-y:auto;text-align:left;">
+            <h1 class="lb-header" style="text-align:left;margin:0 0 4px 0;">✎ Edit today</h1>
+            <p id="qeWho" style="margin:0 0 14px 0;color:var(--gray-500);font-weight:bold;"></p>
+            <label class="qe-label" for="qeWarmup">Warm-Up</label>
+            <textarea id="qeWarmup" class="qe-field" rows="3"></textarea>
+            <label class="qe-label" for="qeAgenda">Agenda <span class="qe-hint">one item per line</span></label>
+            <textarea id="qeAgenda" class="qe-field" rows="5"></textarea>
+            <label class="qe-label" for="qeLinks">Slides &amp; links <span class="qe-hint">one per line, like Notes = https://docs.google.com/...</span></label>
+            <textarea id="qeLinks" class="qe-field" rows="3" style="font-family:monospace;font-size:0.95rem;"></textarea>
+            <p id="qeStatus" role="status" aria-live="polite" style="min-height:1.4em;margin:10px 0 0 0;font-weight:bold;"></p>
+            <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
+                <button type="button" onclick="toggleModal('quickEditModal')" class="close-btn" style="margin-top:0;padding:12px 30px;font-size:1.2rem;">Cancel</button>
+                <button type="button" id="qeSave" onclick="saveQuickEdit()" style="background:var(--primary-color);color:var(--white);border:none;padding:12px 30px;border-radius:var(--radius-lg);font-weight:bold;cursor:pointer;font-size:1.2rem;box-shadow:var(--shadow-md);">Save to sheet</button>
+            </div>
+        </div>
+    </div>
     <div class="modal" id="settingsModal">
         <div class="leaderboard-wrapper ui-box-3" style="max-width:900px;max-height:90vh;overflow-y:auto;">
             <div class="ui-box-4" style="display:flex;">
@@ -1775,8 +1800,8 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         </div>
         
         <div class="bento-grid" id="mainBento">
-            <div class="card card-agenda"><h2>Today's Agenda</h2><ul id="agendaItems"><li>Loading data...</li></ul></div>
-            <div class="card card-warmup"><h2 class="expandable-title" onclick="expandWarmup()"><span>Warm-Up Activity</span><span class="expand-badge">⛶ Expand</span></h2><p id="warmupText" style="white-space:pre-wrap;">Loading data...</p></div>
+            <div class="card card-agenda"><h2 class="quick-edit-head"><span>Today's Agenda</span><button type="button" class="quick-edit-btn" onclick="openQuickEdit('agenda')" title="Edit today's agenda" aria-label="Edit today's agenda">✎</button></h2><ul id="agendaItems"><li>Loading data...</li></ul></div>
+            <div class="card card-warmup"><h2 class="expandable-title" onclick="expandWarmup()"><span>Warm-Up Activity</span><span class="quick-edit-head"><button type="button" class="quick-edit-btn" onclick="event.stopPropagation();openQuickEdit('warmup')" title="Edit today's warm-up" aria-label="Edit today's warm-up">✎</button><span class="expand-badge">⛶ Expand</span></span></h2><p id="warmupText" style="white-space:pre-wrap;">Loading data...</p></div>
             <div class="card-bottom-split">
                 <div class="sub-card"><h3>Essential Question</h3><p id="eqText">Loading data...</p></div>
                 <div class="sub-card"><h3>Standards</h3><p id="standardsText">Loading data...</p></div>
@@ -2575,11 +2600,69 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         let directReadStatus = 'off'; // 'off' | 'on' | 'fallback' - shown by Test Connection
         async function readSheetText(kind, url) {
             if (directReadAvailable()) {
-                try { const csv = await readTabDirect(kind); directReadStatus = 'on'; return csv; }
-                catch (e) { directReadStatus = 'fallback'; console.warn('Direct sheet read failed (' + kind + '), using the published CSV:', e && e.message ? e.message : e); }
+                try { const csv = await readTabDirect(kind); directReadStatus = 'on'; refreshQuickEdit(); return csv; }
+                catch (e) { directReadStatus = 'fallback'; refreshQuickEdit(); console.warn('Direct sheet read failed (' + kind + '), using the published CSV:', e && e.message ? e.message : e); }
             }
             const response = await fetch(url + (url.includes('?') ? '&' : '?') + "t=" + new Date().getTime()); if (!response.ok) throw new Error("Network error");
             return response.text();
+        }
+        // ==================== QUICK EDIT (Apps Script only) ====================
+        // Fix today's warm-up, agenda, or slides link from the board; it writes straight into that day's row in Current
+        // Week. Before writing, the script checks each cell still holds what the board last read, so a tablet edit made
+        // in the meantime is never silently overwritten. Pencils show only when this board just read the sheet directly.
+        function refreshQuickEdit() { document.body.classList.toggle('can-edit', directReadStatus === 'on' && !isStudentMode); }
+        let quickEditTarget = null;
+        function ymdLocal(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+        function agendaToLines(raw) { return splitSheetList(raw).join('\n'); }
+        function linesToAgenda(text) { return String(text).split(/\r?\n/).map(x => x.replace(/^\s*-+\s*/, '').trim()).filter(Boolean).join(' - '); }
+        function resourcesToLines(raw) { return String(raw || '').split('|').map(x => x.trim()).filter(Boolean).map(x => { const i = x.indexOf('='); return (i > 0 && !x.startsWith('http')) ? x.slice(0, i).trim() + ' = ' + x.slice(i + 1).trim() : x; }).join('\n'); }
+        function linesToResources(text) { return String(text).split(/\r?\n/).map(x => x.trim()).filter(Boolean).map(x => { const i = x.indexOf('='); return (i > 0 && !x.startsWith('http')) ? x.slice(0, i).trim() + '=' + x.slice(i + 1).trim() : x; }).join(' | '); }
+        function openQuickEdit(focus) {
+            const block = activeBlockData;
+            if (!block || !block.id) { showToast('There is no class to edit right now.'); return; }
+            const dayMs = new Date(block.date.getTime()).setHours(0, 0, 0, 0);
+            const entry = scheduleEntries.find(e => String(e.id) === String(block.id) && e.date.getTime() === dayMs);
+            if (!entry) { showToast("This class has no row for this day in Current Week, so add it in the sheet first."); return; }
+            const raw = { Warmup: entry.cells.Warmup || '', Agenda: entry.cells.Agenda || '', Resources: entry.cells.Resources || '' };
+            quickEditTarget = { date: ymdLocal(entry.date), id: String(entry.id), raw: raw, shownLinks: resourcesToLines(block.resources) };
+            document.getElementById('qeWho').innerText = (block.title || 'Class') + ' · ' + entry.date.toLocaleDateString(undefined, { weekday: 'long', month: 'numeric', day: 'numeric' });
+            document.getElementById('qeWarmup').value = raw.Warmup;
+            document.getElementById('qeAgenda').value = agendaToLines(raw.Agenda);
+            document.getElementById('qeLinks').value = quickEditTarget.shownLinks; // what the board shows, even when it carries over from an earlier day
+            document.getElementById('qeStatus').innerText = ''; document.getElementById('qeSave').disabled = false;
+            document.getElementById('quickEditModal').classList.add('active'); checkFloatingTimer();
+            const field = document.getElementById(focus === 'agenda' ? 'qeAgenda' : focus === 'links' ? 'qeLinks' : 'qeWarmup');
+            setTimeout(() => { field.focus(); field.setSelectionRange(field.value.length, field.value.length); }, 60);
+        }
+        async function saveQuickEdit() {
+            const t = quickEditTarget; if (!t) return;
+            const status = document.getElementById('qeStatus'), btn = document.getElementById('qeSave');
+            const warm = document.getElementById('qeWarmup').value.trim();
+            const agenda = linesToAgenda(document.getElementById('qeAgenda').value);
+            const links = linesToResources(document.getElementById('qeLinks').value);
+            const changes = {};
+            if (warm !== t.raw.Warmup.trim()) changes.Warmup = { from: t.raw.Warmup, to: warm };
+            if (agenda !== linesToAgenda(agendaToLines(t.raw.Agenda))) changes.Agenda = { from: t.raw.Agenda, to: agenda };
+            if (links !== linesToResources(t.shownLinks)) changes.Resources = { from: t.raw.Resources, to: links || (t.shownLinks ? 'none' : '') }; // blank would mean "keep the last links"; none clears them
+            if (!Object.keys(changes).length) { toggleModal('quickEditModal'); return; }
+            btn.disabled = true; status.style.color = 'var(--secondary-dark)'; status.innerText = 'Saving to the sheet…';
+            try {
+                const r = await serverCall('dashEditCells', [getAutoBackupToken(), { date: t.date, id: t.id, changes: changes }], 20000);
+                if (r && r.ok) {
+                    quickEditTarget = null; toggleModal('quickEditModal'); showToast('Saved to the sheet.');
+                    fetchAgendaData();
+                    return;
+                }
+                status.style.color = 'var(--red-600, #c53030)';
+                if (r && r.conflict) {
+                    status.innerText = 'The sheet was changed since the board loaded it, so nothing was saved. Your text is still here: copy anything you need, then close and reopen to see the latest version.';
+                    fetchAgendaData();
+                } else status.innerText = 'Not saved: ' + ((r && r.error) || 'the sheet refused the change') + '.';
+            } catch (e) {
+                status.style.color = 'var(--red-600, #c53030)';
+                status.innerText = "Not saved: couldn't reach the sheet (" + (e && e.message ? e.message : e) + '). Your text is still here; try again in a moment.';
+            }
+            btn.disabled = false;
         }
         function pushLiveState() {
             const url = getAutoBackupUrl(); const token = getAutoBackupToken();
@@ -2710,6 +2793,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         }
 
         let schedule = [];
+        let scheduleEntries = []; // the rows behind the schedule, as read (quick edit needs each cell's own value)
         let lastRenderedEQ = null; let lastRenderedStandards = null;
         function setStaleDataBadge(isStale) {
             const badge = document.getElementById('staleDataBadge'); if (!badge) return;
@@ -2994,7 +3078,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             let issues = []; let entries = readScheduleEntries(csvText, issues);
             if (entries.length === 0) return false; // nothing usable (unpublished sheet returns an HTML page, renamed Date column, etc.) - caller falls back to cache
             let demoBadge = document.getElementById('demoModeBadge'); if (demoBadge) demoBadge.style.display = 'none';
-            checkScheduleEntries(entries, issues); sheetIssues.schedule = issues; renderSheetIssuesBadge();
+            checkScheduleEntries(entries, issues); sheetIssues.schedule = issues; renderSheetIssuesBadge(); scheduleEntries = entries;
             schedule = pickScheduleDay(entries, new Date()); needsDataRender = true; updateDashboard();
             return true;
         }
