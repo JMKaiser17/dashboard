@@ -2134,7 +2134,17 @@ html[data-board-style="atoms"] .dashboard-wrapper {
 
     <script>
         // Must be declared first - referenced very early in the init sequence below.
-        const isStudentMode = new URLSearchParams(window.location.search).get('mode') === 'student';
+        // Hosting: the Apps Script shell (Host.gs) sets window.__DASHBOARD_HOST__ before any script on the page runs.
+        // Inside Google's sandbox frame, location.search/href describe that frame, not the link the person opened, so URL
+        // parameters and the shareable address come from the shell instead. Absent on GitHub Pages or a local file: nothing changes.
+        const HOST = (function () { const h = window.__DASHBOARD_HOST__; return (h && h.platform === 'appsscript') ? h : null; })();
+        const pageParams = HOST ? new URLSearchParams(HOST.params || {}) : new URLSearchParams(window.location.search);
+        // Reload the whole dashboard. In Apps Script, reloading the inner frame can come back blank, so reopen the real link instead.
+        function reloadDashboard() {
+            if (HOST && HOST.openedUrl) { try { if (window.open(HOST.openedUrl, '_top')) return; } catch (e) { /* blocked: fall through */ } }
+            location.reload();
+        }
+        const isStudentMode = pageParams.get('mode') === 'student';
         const DEFAULT_MASCOT = 'Class'; const DEFAULT_LEADERBOARD = 'Class Cup'; // neutral for colleagues; your own install keeps its saved values (see preserveLegacyBranding)
         // Storage namespace: every GitHub Pages site you own shares one origin (you.github.io), so a test copy at
         // /dashboard-test/ would otherwise read and write the live copy's data. Keys are prefixed with the page's
@@ -2438,10 +2448,10 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         setInterval(() => { if(isMarketTicker) updateTickerDisplay(); }, 4000);
 
         // ==================== SETTINGS PERSISTENCE (theme, sheet URLs, terminology) ====================
-        function getActiveCsvUrl() { const urlParam = new URLSearchParams(window.location.search).get('sheet'); if (urlParam) return urlParam; return store.getItem('titan_sheet_url') || ""; }
-        function getActiveGameUrl() { const urlParam = new URLSearchParams(window.location.search).get('games'); if (urlParam) return urlParam; return store.getItem('titan_game_url') || ""; }
-        function getLiveSyncUrl() { const urlParam = new URLSearchParams(window.location.search).get('live'); if (urlParam) return urlParam; return getAutoBackupUrl(); }
-        function getLiveSyncToken() { const urlParam = new URLSearchParams(window.location.search).get('liveToken'); if (urlParam) return urlParam; return getAutoBackupToken(); }
+        function getActiveCsvUrl() { const urlParam = pageParams.get('sheet'); if (urlParam) return urlParam; return store.getItem('titan_sheet_url') || ""; }
+        function getActiveGameUrl() { const urlParam = pageParams.get('games'); if (urlParam) return urlParam; return store.getItem('titan_game_url') || ""; }
+        function getLiveSyncUrl() { const urlParam = pageParams.get('live'); if (urlParam) return urlParam; return getAutoBackupUrl(); }
+        function getLiveSyncToken() { const urlParam = pageParams.get('liveToken'); if (urlParam) return urlParam; return getAutoBackupToken(); }
         function getAutoBackupUrl() { return store.getItem('titan_autobackup_url') || ""; }
         // ---- Student token ----
         // Student links never carry your real secret. They carry a one-way hash of it that the backup script accepts
@@ -2532,7 +2542,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                 const data = payload && payload.data ? payload.data : payload; const keys = Object.keys(data || {}).filter(isDashboardStorageKey);
                 if (keys.length === 0) { showToast('No dashboard data found in that file.'); fileInput.value = ''; return; }
                 if (!confirm(`Replace ${keys.length} settings on this computer with the ones in this file?`)) { fileInput.value = ''; return; }
-                keys.forEach(key => store.setItem(key, data[key])); showToast('Settings loaded. Reloading…'); setTimeout(() => location.reload(), 900);
+                keys.forEach(key => store.setItem(key, data[key])); showToast('Settings loaded. Reloading…'); setTimeout(reloadDashboard, 900);
             }; reader.readAsText(file);
         }
 
@@ -3726,7 +3736,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function buildStudentModeUrl() {
             const sheetUrl = getActiveCsvUrl(); const gamesUrl = getActiveGameUrl();
             const liveUrl = getAutoBackupUrl(); const liveToken = getAutoBackupToken();
-            const base = window.location.href.split(/[?#]/)[0];
+            const base = HOST && HOST.appUrl ? HOST.appUrl : window.location.href.split(/[?#]/)[0]; // Apps Script: the /exec link, not Google's inner frame
             let params = new URLSearchParams(); params.set('mode', 'student');
             if (sheetUrl) params.set('sheet', sheetUrl);
             if (gamesUrl) params.set('games', gamesUrl);
@@ -4790,7 +4800,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             store.setItem('titan_branding_v2', '1');
         }
         function applyStudentLinkBranding() {
-            if (!isStudentMode) return; const p = new URLSearchParams(window.location.search);
+            if (!isStudentMode) return; const p = pageParams;
             try { if (p.get('mascot')) store.setItem('titan_setting_mascot', p.get('mascot')); if (p.get('logo')) store.setItem('titan_setting_watermark', p.get('logo')); }
             catch (e) { /* storage blocked on this device: neutral defaults, page still works */ }
         }
