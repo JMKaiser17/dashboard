@@ -1175,7 +1175,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             #studentTopBar #studentTimerBadge, #studentTopBar #studentStatusBadge { justify-content:center; min-height:44px; box-sizing:border-box; }
             #studentClockDisplay { display:none !important; } /* the phone shows the time already */
             body.student-mode #mainBento { grid-template-columns:1fr !important; grid-template-rows:none !important; grid-auto-rows:auto; gap:12px; flex-grow:0 !important; height:auto !important; min-height:0; } /* never force display: the board switcher hides it with display:none */
-            body.student-mode #mainBento > .card, body.student-mode #mainBento .card-bottom-split { height:auto !important; min-height:0 !important; flex:none !important; max-height:none !important; }
+            body.student-mode #mainBento > .card, body.student-mode #mainBento .card-bottom-split { grid-column:1 / -1 !important; grid-row:auto !important; height:auto !important; min-height:0 !important; flex:none !important; max-height:none !important; }
             body.student-mode #mainBento .card-bottom-split { display:flex !important; flex-direction:column; gap:12px; }
             body.student-mode #mainBento .sub-card { height:auto !important; min-height:0 !important; }
             body.student-mode #mainBento h2 { font-size:1.35rem !important; margin-bottom:8px !important; }
@@ -1692,11 +1692,9 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;">
                         <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Primary</label><input type="color" id="themePrimary" value="#5A2B81" class="ui-field-2" style="width:100%;border:none;"></div>
                         <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Dark Accents</label><input type="color" id="themeDark" value="#111111" class="ui-field-2" style="width:100%;border:none;"></div>
-                        <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Light Accent</label><input type="color" id="themeLight" value="#e2e4e9" class="ui-field-2" style="width:100%;border:none;"></div>
-                        <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Mid Accent</label><input type="color" id="themeMid" value="#c0c2c9" class="ui-field-2" style="width:100%;border:none;"></div>
                     </div>
-                    <p style="color:var(--gray-500);font-size:0.75rem;margin:0 0 8px 0;">The board background and Light &amp; Mid Accent follow Primary unless you set the accents yourself. A class's Color column on the schedule sheet replaces Primary while that class is on screen.</p>
-                    <button type="button" id="resetColorsBtn" onclick="resetThemeColors()" title="Put Primary, Dark, Light and Mid back to the defaults" style="background:var(--white);color:var(--secondary-dark);border:1px solid var(--bg-mid);border-radius:var(--radius-pill);padding:5px 14px;margin:0 0 12px 0;font-family:inherit;font-weight:bold;font-size:0.8rem;cursor:pointer;">↺ Reset colors</button>
+                    <p style="color:var(--gray-500);font-size:0.75rem;margin:0 0 8px 0;">The board background and the light shades on cards and buttons are made from Primary. A class's Color column on the schedule sheet replaces Primary while that class is on screen.</p>
+                    <button type="button" id="resetColorsBtn" onclick="resetThemeColors()" title="Put Primary and Dark back to the defaults" style="background:var(--white);color:var(--secondary-dark);border:1px solid var(--bg-mid);border-radius:var(--radius-pill);padding:5px 14px;margin:0 0 12px 0;font-family:inherit;font-weight:bold;font-size:0.8rem;cursor:pointer;">↺ Reset colors</button>
                     <div style="margin:0 0 15px 0;"><label for="settingBoardStyle" style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Board style</label><select id="settingBoardStyle" style="width:100%;padding:6px;border-radius:var(--radius-sm);border:1px solid var(--bg-mid);font-family:inherit;font-size:0.9rem;"><optgroup label="Simple"><option value="classic">Classic</option><option value="quiet">Quiet</option><option value="spotlight">Spotlight</option><option value="contrast">High contrast</option></optgroup><optgroup label="Paper"><option value="graph">Graph paper</option><option value="dots">Dot grid</option><option value="isometric">Isometric dots</option><option value="notebook">Notebook</option><option value="ledger">Ledger</option><option value="ruler">Ruler</option></optgroup><optgroup label="Top bar"><option value="timeline">Timeline</option><option value="market">Market line</option><option value="music">Music staff</option><option value="contour">Contour ridge</option><option value="network">Network</option><option value="writing">Writing lines</option><option value="numberline">Number line</option><option value="dna">DNA</option></optgroup><optgroup label="Scattered"><option value="nightsky">Night sky</option><option value="math">Math shapes</option><option value="punctuation">Punctuation</option><option value="atoms">Atoms</option></optgroup><optgroup label="Texture"><option value="chalkboard">Chalkboard</option><option value="slate">Slate</option><option value="felt">Felt</option><option value="linen">Linen</option><option value="cork">Cork</option><option value="metal">Brushed metal</option><option value="grain">Paper grain</option></optgroup></select><p style="color:var(--gray-500);font-size:0.75rem;margin:4px 0 0 0;">A Style column on the schedule sheet can switch this per class.</p></div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                         <div><label style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Mascot/Greeting</label><input type="text" id="settingMascot" value="" class="ui-field-3" style="width:100%;border-radius:var(--radius-sm);border:1px solid var(--bg-mid);"></div>
@@ -2272,7 +2270,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         // seconds later. Unsent changes are kept here too, so a dropped connection just means "send it later".
         // Never synced: the Live Sync secret, the links that bootstrap the board, and per-screen preferences.
         const SYNC_SKIP = new Set(['titan_autobackup_token', 'titan_autobackup_url', 'titan_sheet_url', 'titan_game_url', 'titan_onboarding_seen',
-            'titan_timer', 'titan_first_used_at', 'titan_setting_muted', 'titan_setting_dark', 'titan_setting_light']);
+            'titan_timer', 'titan_first_used_at', 'titan_setting_muted', 'titan_setting_dark']);
         const SYNC_PENDING = '__sync_pending', SYNC_META = '__sync_meta'; // unsent changes {key:{v,t}}; last-known change time per key {key:t}
         function syncableKey(k) {
             k = String(k);
@@ -2374,7 +2372,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         let isFFRunning = false;
 
         // ==================== COLOR & THEME SYSTEM ====================
-        function hexToRgb(hex) { let r = parseInt(hex.slice(1,3),16)||90; let g = parseInt(hex.slice(3,5),16)||43; let b = parseInt(hex.slice(5,7),16)||129; return `${r}, ${g}, ${b}`; }
+        function hexToRgb(hex) { const ch = (i, fallback) => { const v = parseInt(String(hex).slice(i, i + 2), 16); return Number.isNaN(v) ? fallback : v; }; return `${ch(1, 90)}, ${ch(3, 43)}, ${ch(5, 129)}`; } // 0 is a real channel (black, pure green), so only unreadable text falls back
         function adjustBrightness(hex, percent) { let num = parseInt(hex.replace("#",""),16); let amt = Math.round(2.55 * percent); let R = (num >> 16) + amt; let G = (num >> 8 & 0x00FF) + amt; let B = (num & 0x0000FF) + amt; return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255)).toString(16).slice(1); }
         function mixColor(hex, targetHex, ratio) {
             let c1 = parseInt(hex.replace('#',''), 16) || 0; let c2 = parseInt(targetHex.replace('#',''), 16) || 0;
@@ -2404,11 +2402,11 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             let h = m[1].length === 3 ? m[1].split('').map(ch => ch + ch).join('') : m[1];
             return readableOnWhite('#' + h);
         }
-        function applyThemeColors(primary, allowSavedAccents) {
+        function applyThemeColors(primary) {
             let dark = store.getItem('titan_setting_dark') || '#111111';
-            // saved Light/Mid are tuned to Settings Primary; a class color always derives its own so they match
-            let light = (allowSavedAccents && store.getItem('titan_setting_light')) || mixColor(primary, '#ffffff', 0.86);
-            let mid = (allowSavedAccents && store.getItem('titan_setting_mid')) || mixColor(primary, '#ffffff', 0.62);
+            // Light and Mid are always tints of the color on screen, so changing Primary (or a class Color) can't leave them behind
+            let light = mixColor(primary, '#ffffff', 0.86);
+            let mid = mixColor(primary, '#ffffff', 0.62);
             let hoverColor = adjustBrightness(primary, 15);
             const set = (k, v) => document.documentElement.style.setProperty(k, v);
             set('--primary-color', primary); set('--primary-rgb', hexToRgb(primary)); set('--primary-hover', hoverColor); set('--primary-hover-rgb', hexToRgb(hoverColor));
@@ -2564,13 +2562,13 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function setClassBoardStyle(style) { const s = style || ''; if (s === activeBoardStyle && document.documentElement.hasAttribute('data-board-style')) return; activeBoardStyle = s; applyBoardStyle(s || settingsBoardStyle()); }
         let activeClassColor = '';
         function applyActiveTheme() {
-            if (activeClassColor) applyThemeColors(activeClassColor, false);
-            else applyThemeColors(store.getItem('titan_setting_primary') || '#5A2B81', true);
+            if (activeClassColor) applyThemeColors(activeClassColor);
+            else applyThemeColors(store.getItem('titan_setting_primary') || '#5A2B81');
         }
         // Called on every class change; only repaints when the color actually changes.
         function setClassTheme(color) { let c = color || ''; if (c === activeClassColor) return; activeClassColor = c; applyActiveTheme(); }
-        // Settings > Reset colors: back to the default Primary/Dark, with Light and Mid following Primary again. Undo restores what was saved.
-        const THEME_COLOR_KEYS = ['titan_setting_primary', 'titan_setting_dark', 'titan_setting_light', 'titan_setting_mid'];
+        // Settings > Reset colors: back to the default Primary/Dark. Undo restores what was saved.
+        const THEME_COLOR_KEYS = ['titan_setting_primary', 'titan_setting_dark'];
         function resetThemeColors() {
             const before = {}; THEME_COLOR_KEYS.forEach(k => { before[k] = store.getItem(k); });
             THEME_COLOR_KEYS.forEach(k => store.removeItem(k)); loadThemeSettings(); setTimeout(pushStudentConfig, 1500);
@@ -2578,14 +2576,13 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         }
         function loadThemeSettings() {
             let primary = store.getItem('titan_setting_primary') || '#5A2B81'; let dark = store.getItem('titan_setting_dark') || '#111111';
-            let light = store.getItem('titan_setting_light') || mixColor(primary, '#ffffff', 0.86); let mid = store.getItem('titan_setting_mid') || mixColor(primary, '#ffffff', 0.62);
             let watermark = store.getItem('titan_setting_watermark') || '';
             applyActiveTheme();
             applyBoardStyle(activeBoardStyle || settingsBoardStyle());
             document.documentElement.style.setProperty('--mascot-url', watermark ? `url(${JSON.stringify(watermark)})` : 'none'); // JSON.stringify quotes safely even if the URL has a quote in it
             let mascot = store.getItem('titan_setting_mascot') || DEFAULT_MASCOT; let leaderboard = store.getItem('titan_setting_leaderboard') || DEFAULT_LEADERBOARD; let teacher = store.getItem('titan_setting_teacher') || 'the teacher';
             document.getElementById('dynamicLeaderboardTitle').innerText = `🏆 ${leaderboard} Leaderboard`; document.getElementById('dynamicAskTeacher').innerText = `Then ask ${teacher}.`; document.getElementById('dynamicJeopardyTitle').innerText = `${mascot} Jeopardy`;
-            if(document.getElementById('themePrimary')) { document.getElementById('themePrimary').value = primary; document.getElementById('themeDark').value = dark; document.getElementById('themeLight').value = light; document.getElementById('themeMid').value = mid; document.getElementById('settingBoardStyle').value = settingsBoardStyle(); document.getElementById('settingMascot').value = mascot; document.getElementById('settingLeaderboard').value = leaderboard; document.getElementById('settingTeacher').value = teacher; document.getElementById('settingWatermark').value = watermark; document.getElementById('settingMuteSounds').checked = isSoundMuted(); document.getElementById('settingHotSeatTime').value = getGameTimerSetting('hotseat_time', 45); document.getElementById('settingFFTime').value = getGameTimerSetting('ff_time', 60); document.getElementById('settingDebateTime').value = getGameTimerSetting('debate_time', 60);
+            if(document.getElementById('themePrimary')) { document.getElementById('themePrimary').value = primary; document.getElementById('themeDark').value = dark; document.getElementById('settingBoardStyle').value = settingsBoardStyle(); document.getElementById('settingMascot').value = mascot; document.getElementById('settingLeaderboard').value = leaderboard; document.getElementById('settingTeacher').value = teacher; document.getElementById('settingWatermark').value = watermark; document.getElementById('settingMuteSounds').checked = isSoundMuted(); document.getElementById('settingHotSeatTime').value = getGameTimerSetting('hotseat_time', 45); document.getElementById('settingFFTime').value = getGameTimerSetting('ff_time', 60); document.getElementById('settingDebateTime').value = getGameTimerSetting('debate_time', 60);
             }
         }
         // Startup calls live in boot() at the bottom of this script, so every top-level let/const exists before any of them run.
@@ -2792,11 +2789,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             store.setItem('titan_autobackup_url', document.getElementById('autoBackupUrlInput').value.trim());
             store.setItem('titan_autobackup_token', document.getElementById('autoBackupTokenInput').value.trim());
             store.setItem('titan_setting_primary', document.getElementById('themePrimary').value); store.setItem('titan_setting_dark', document.getElementById('themeDark').value);
-            { // Light/Mid are only stored when you changed them; otherwise they keep following Primary (saving used to freeze them)
-                const p = document.getElementById('themePrimary').value;
-                [['themeLight', 'titan_setting_light', 0.86], ['themeMid', 'titan_setting_mid', 0.62]].forEach(([id, key, r]) => {
-                    const v = document.getElementById(id).value.toLowerCase(); if (v === mixColor(p, '#ffffff', r).toLowerCase()) store.removeItem(key); else store.setItem(key, v); });
-            }
+            store.removeItem('titan_setting_light'); store.removeItem('titan_setting_mid'); // old custom accents; Light and Mid now always come from Primary
             store.setItem('titan_setting_board_style', document.getElementById('settingBoardStyle').value); store.removeItem('titan_setting_bg_dots');
             store.setItem('titan_setting_mascot', document.getElementById('settingMascot').value); store.setItem('titan_setting_leaderboard', document.getElementById('settingLeaderboard').value);
             store.setItem('titan_setting_teacher', document.getElementById('settingTeacher').value); store.setItem('titan_setting_watermark', document.getElementById('settingWatermark').value.trim()); // blank = no logo
@@ -2809,7 +2802,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
 
         const DASHBOARD_STORAGE_PREFIXES = ['titan_', 'classPoints_', 'checklist_'];
         const LIGHT_BACKUP_KEYS = [
-            'titan_setting_primary', 'titan_setting_dark', 'titan_setting_light', 'titan_setting_mid', 'titan_setting_board_style',
+            'titan_setting_primary', 'titan_setting_dark', 'titan_setting_board_style',
             'titan_setting_mascot', 'titan_setting_watermark', 'titan_setting_teacher', 'titan_setting_leaderboard',
             'titan_setting_muted', 'titan_setting_hotseat_time', 'titan_setting_ff_time', 'titan_setting_debate_time',
             'titan_sheet_url', 'titan_game_url', 'titan_autobackup_url', 'titan_autobackup_token',
@@ -3293,7 +3286,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         }
 
         // ==================== BOARD MODE SWITCHING (Focus / Slide / Game Stage) ====================
-        function toggleFocusMode() { if (isTransitioning) return; setTimeout(() => { pushLiveState(); refreshDoneCount(); }, 50); /* students get (or lose) the task and the Done button */ if (!isFocusMode) { loadTaskNote(); setTimeout(fitWorkCards, 700); setTimeout(fitWorkCards, 1400); } /* pick up today's Agenda; fit once the board is showing */ isFocusMode = !isFocusMode; isSlideMode = false; isGameStage = false; isOpeningMode = false; document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active'); updateBoardDisplays(); }
+        function toggleFocusMode() { if (isTransitioning) return; setTimeout(refreshDoneCount, 50); /* updateBoardDisplays tells students about the task and Done button */ if (!isFocusMode) { loadTaskNote(); setTimeout(fitWorkCards, 700); setTimeout(fitWorkCards, 1400); } /* pick up today's Agenda; fit once the board is showing */ isFocusMode = !isFocusMode; isSlideMode = false; isGameStage = false; isOpeningMode = false; document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active'); updateBoardDisplays(); }
         function toggleSlideMode() { if (isTransitioning) return; isSlideMode = !isSlideMode; isFocusMode = false; isGameStage = false; isOpeningMode = false; if (isSlideMode) document.body.classList.add('slide-mode-active'); else document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active'); updateBoardDisplays(); if (isSlideMode) renderSlide(); }
         function toggleGameStage() { if (isTransitioning) return; isGameStage = !isGameStage; isSlideMode = false; isFocusMode = false; isOpeningMode = false; if (isGameStage) { document.body.classList.add('game-mode-active'); buildDynamicGameMenu(); } else { document.body.classList.remove('game-mode-active'); } document.body.classList.remove('slide-mode-active'); updateBoardDisplays(); }
         function showStudentGames() {
@@ -3866,7 +3859,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             const overlay = document.getElementById('dailyDoubleOverlay');
             overlay.classList.remove('show'); void overlay.offsetWidth; overlay.classList.add('show');
             playTone(200, 0, 0.2, 0.3, 'sawtooth'); playTone(400, 0.15, 0.2, 0.3, 'sawtooth'); playTone(600, 0.3, 0.2, 0.3, 'sawtooth'); playTone(900, 0.45, 0.6, 0.35);
-            let pColor = store.getItem('titan_setting_primary') || '#5A2B81'; let hoverColor = adjustBrightness(pColor, 15); let mColor = store.getItem('titan_setting_mid') || '#c0c2c9';
+            let pColor = store.getItem('titan_setting_primary') || '#5A2B81'; let hoverColor = adjustBrightness(pColor, 15); let mColor = themeMidColor();
             confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 }, colors: [pColor, hoverColor, mColor, '#ffffff'] });
             setTimeout(() => { overlay.classList.remove('show'); callback(); }, 1900);
         }
@@ -3924,7 +3917,9 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         // ==================== BOARD DISPLAY SWITCHING & NOTEPAD ====================
         function updateBoardDisplays() {
             let targetBoard = 'mainBento'; if (isSlideMode) targetBoard = 'slideModeBoard'; else if (isFocusMode) targetBoard = 'focusModeBoard'; else if (isGameStage) targetBoard = 'gameModeBoard'; else if (isOpeningMode) targetBoard = 'openingModeBoard';
-            if (targetBoard === activeBoard) return; const oldBoard = document.getElementById(activeBoard); const newBoard = document.getElementById(targetBoard); const topTabs = document.getElementById('topSourceTabs');
+            if (targetBoard === activeBoard) return;
+            if (!isStudentMode && (targetBoard === 'focusModeBoard' || activeBoard === 'focusModeBoard')) setTimeout(pushLiveState, 50); // students get (or lose) the task and Done button, whichever way the board left Independent Work
+            const oldBoard = document.getElementById(activeBoard); const newBoard = document.getElementById(targetBoard); const topTabs = document.getElementById('topSourceTabs');
             if (targetBoard === 'slideModeBoard') { topTabs.style.display = 'flex'; renderSlide(); } else { topTabs.style.display = 'none'; }
             if (targetBoard === 'slideModeBoard' || activeBoard === 'slideModeBoard') { oldBoard.style.display = 'none'; oldBoard.style.animation = ''; newBoard.style.display = (targetBoard === 'slideModeBoard') ? 'flex' : 'grid'; newBoard.style.animation = ''; activeBoard = targetBoard; isTransitioning = false; if (targetBoard === 'mainBento') setTimeout(autoFitCardText, 50); renderReturnChips(); checkFloatingTimer(); renderScoreboard(); return; }
             isTransitioning = true; oldBoard.style.animation = 'boardFadeOut 0.3s ease forwards';
@@ -4113,13 +4108,14 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         });
 
         // ==================== CONFETTI HELPERS ====================
+        function themeMidColor() { return getComputedStyle(document.documentElement).getPropertyValue('--bg-mid').trim() || '#c0c2c9'; }
         function fireBigConfetti() {
-            let pColor = store.getItem('titan_setting_primary') || '#5A2B81'; let mColor = store.getItem('titan_setting_mid') || '#c0c2c9';
+            let pColor = store.getItem('titan_setting_primary') || '#5A2B81'; let mColor = themeMidColor();
             confetti({ particleCount: 150, angle: 60, spread: 80, origin: { x: 0, y: 0.7 }, colors: [pColor, mColor, '#FFFFFF'] });
             confetti({ particleCount: 150, angle: 120, spread: 80, origin: { x: 1, y: 0.7 }, colors: [pColor, mColor, '#FFFFFF'] });
         }
         function fireSmallConfetti() {
-            let pColor = store.getItem('titan_setting_primary') || '#5A2B81'; let mColor = store.getItem('titan_setting_mid') || '#c0c2c9';
+            let pColor = store.getItem('titan_setting_primary') || '#5A2B81'; let mColor = themeMidColor();
             confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 }, colors: [pColor, mColor, '#FFFFFF'] });
         }
 
@@ -4861,7 +4857,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function loadTimerState() {
             let saved = store.getItem('titan_timer');
             if (saved) {
-                let state = JSON.parse(saved); totalTimeMs = state.totalTimeMs || 0; isRunning = state.isRunning || false; endTime = state.endTime || 0; remainingMs = state.remainingMs || 0; warningPlayed = state.warningPlayed || false; donePlayed = state.donePlayed || false; timerReturnBoard = typeof state.returnBoard === 'string' ? state.returnBoard : '';
+                let state; try { state = JSON.parse(saved) || {}; } catch (e) { store.removeItem('titan_timer'); return; } // a damaged save shouldn't stop the board from starting totalTimeMs = state.totalTimeMs || 0; isRunning = state.isRunning || false; endTime = state.endTime || 0; remainingMs = state.remainingMs || 0; warningPlayed = state.warningPlayed || false; donePlayed = state.donePlayed || false; timerReturnBoard = typeof state.returnBoard === 'string' ? state.returnBoard : '';
                 if (isRunning) { remainingMs = endTime - Date.now(); if (remainingMs > 0) { document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = "Pause"); timerInterval = setInterval(updateTimerDisplay, 1000); updateTimerDisplay(); } else { clearTimer(); } } 
                 else if (remainingMs > 0) { renderTime(remainingMs); document.querySelectorAll('.sync-progress').forEach(bar => { bar.style.width = ((remainingMs / totalTimeMs) * 100) + "%"; bar.style.backgroundColor = "var(--primary-color)"; }); }
             }
@@ -4879,11 +4875,11 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             saveTimerState(); renderTime(remainingMs);
             document.querySelectorAll('.sync-timer').forEach(el => el.classList.remove('pulse'));
             document.querySelectorAll('.sync-progress').forEach(bar => { if (totalTimeMs > 0) bar.style.width = ((remainingMs / totalTimeMs) * 100) + "%"; bar.style.backgroundColor = "var(--primary-color)"; });
-            checkFloatingTimer();
+            checkFloatingTimer(); pushLiveState(); // students see the new time right away
         }
         function toggleTimer() {
             initAudio(); 
-            if (isRunning) { clearInterval(timerInterval); isRunning = false; document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = "Start"); } 
+            if (isRunning) { clearInterval(timerInterval); remainingMs = Math.max(0, endTime - Date.now()); isRunning = false; document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = "Start"); } 
             else { if (remainingMs > 0) { endTime = Date.now() + remainingMs; isRunning = true; document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = "Pause"); timerInterval = setInterval(updateTimerDisplay, 1000); } }
             saveTimerState(); checkFloatingTimer(); pushLiveState();
         }
@@ -5215,7 +5211,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         }
         function resetDebateTimer(side) {
             const t = debateTimers[side]; clearInterval(t.interval); t.interval = null; t.running = false; t.seconds = getGameTimerSetting('debate_time', 60);
-            const displayEl = document.getElementById('debateTimer' + side); displayEl.innerText = formatDebateTime(60); displayEl.style.color = 'var(--bg-light)';
+            const displayEl = document.getElementById('debateTimer' + side); displayEl.innerText = formatDebateTime(t.seconds); displayEl.style.color = 'var(--bg-light)';
         }
         function flipDebateCoin() {
             const resultEl = document.getElementById('debateCoinResult');
