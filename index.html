@@ -1161,6 +1161,30 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         .qe-field:focus { outline:none; border-color:var(--primary-color); }
         #qeWarmup { min-height:3.4em; } #qeAgenda { min-height:4.4em; } #qeLinks { min-height:3.2em; } /* the modal is a flex column: without these the boxes squash to one line on a short screen */
         .settings-gear { background:none; border:none; box-shadow:none; color:inherit; font:inherit; font-size:clamp(0.95rem,1.15vw,1.35rem); line-height:1; padding:clamp(4px,0.6vh,8px); min-width:36px; min-height:36px; display:flex; align-items:center; justify-content:center; flex-shrink:0; border-radius:var(--radius-round); cursor:pointer; opacity:0.55; filter:grayscale(1); transition:opacity 0.2s; } html.mouse-input .settings-gear:hover { opacity:0.85; } .settings-gear:focus { outline:none; }
+        /* ==================== STUDENT MODE: NAV + CURRENT TASK ==================== */
+        #studentTopBar .stu-nav { background:var(--bg-light); color:var(--ink); border:2px solid var(--bg-mid); border-radius:var(--radius-lg); font-weight:bold; font-size:1rem; transition:background 0.2s,border-color 0.2s; }
+        #studentTopBar .stu-nav.active { background:var(--primary-color); color:var(--white); border-color:var(--primary-color); }
+        html.mouse-input #studentTopBar .stu-nav:not(.active):hover { border-color:var(--primary-color); }
+        #studentWorkPanel { margin:0; flex:1 1 auto; min-height:0; overflow-y:auto; }
+        .sw-grid { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(260px,1fr); gap:clamp(14px,2vw,32px); align-items:center; flex:1 1 auto; }
+        .sw-main { min-width:0; }
+        .sw-label { color:var(--primary-color); font-weight:900; font-size:clamp(1rem,1.3vw,1.4rem); margin-bottom:8px; }
+        #swTask { white-space:pre-wrap; font-size:clamp(1.3rem,2.4vw,2.6rem); font-weight:700; line-height:1.35; margin:0 0 14px 0; color:var(--secondary-dark); overflow-wrap:anywhere; }
+        .sw-links { display:flex; flex-wrap:wrap; gap:10px; }
+        .sw-link { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border:2px solid var(--primary-color); border-radius:var(--radius-pill); color:var(--primary-color); background:var(--white); font-weight:bold; font-size:clamp(1rem,1.2vw,1.25rem); text-decoration:none; }
+        .sw-link:active { transform:scale(0.97); } html.mouse-input .sw-link:hover { background:var(--bg-light); }
+        .sw-checkin { background:var(--bg-light); border-radius:var(--radius-lg); padding:clamp(12px,1.6vw,22px); display:flex; flex-direction:column; justify-content:center; min-width:0; }
+        .sw-hint, #swWho p { display:block; font-weight:bold; font-size:1rem; line-height:1.4; color:var(--secondary-dark); }
+        @media (min-width: 761px) {
+            body.student-mode.sw-active #mainBento { flex:0 0 auto; grid-template-columns:1fr 1fr; grid-template-rows:auto; } /* never force display: the board switcher hides it */
+            body.student-mode.sw-active #mainBento .card-agenda { grid-column:1 / 2; grid-row:1 / 2; }
+            body.student-mode.sw-active #mainBento .card-bottom-split { grid-column:2 / 3; grid-row:1 / 2; grid-template-columns:1fr; }
+        }
+        body.student-mode.sw-active #mainBento .card-warmup, body.student-mode.sw-active #mainBento .sub-standards { display:none !important; } /* the warm-up is over by work time */
+        body.student-mode.sw-active #mainBento .card-agenda h2 { font-size:clamp(1.1rem,1.4vw,1.5rem) !important; margin-bottom:6px !important; }
+        body.student-mode.sw-active #mainBento .sub-card h3 { font-size:clamp(1.1rem,1.4vw,1.5rem) !important; margin-bottom:6px !important; }
+        body.student-mode.sw-active #agendaItems li { font-size:clamp(1rem,1.3vw,1.35rem) !important; margin-bottom:4px !important; line-height:1.35 !important; }
+        body.student-mode.sw-active #eqText { font-size:clamp(1rem,1.3vw,1.35rem) !important; line-height:1.4 !important; }
         /* ==================== PHONE LAYOUT (Student Mode only) ====================
            The board is built for a wall screen. On a phone, Student Mode becomes one scrolling column:
            class name on top, the four student buttons as a 2x2 grid, then each card full width at its natural height. */
@@ -1184,7 +1208,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             body.student-mode #eqText, body.student-mode #standardsText { font-size:1rem !important; line-height:1.4 !important; }
             body.student-mode .card-warmup .expand-badge { display:none !important; } /* the whole warm-up already fits */
             body.student-mode .card-warmup .expandable-title { cursor:default; }
-            body.student-mode #studentWorkPanel { margin:0 !important; max-height:none !important; }
+            body.student-mode #studentWorkPanel { margin:0 !important; max-height:none !important; flex:none !important; }
+            .sw-grid { grid-template-columns:1fr; gap:14px; }
+            #swTask { font-size:1.3rem; }
             body.student-mode #activeGameContainer .ui-box-10, body.student-mode #activeGameContainer .ui-box-13, body.student-mode #activeGameContainer .ui-box-9 { flex-wrap:wrap !important; gap:8px !important; padding:12px !important; } /* game headers: Back to Hub wraps instead of running off-screen */
             body.student-mode #activeGameContainer h2 { font-size:clamp(1.1rem,5vw,1.5rem) !important; }
             body.student-mode :is(#bullMarketPrompt, #debateDisplay, #factFictionDisplay, #hivemindDisplay, #hotSeatWordDisplay, #tabooWordDisplay, #titanSaysDisplay) { font-size:clamp(1.3rem,8vw,2.4rem) !important; line-height:1.2 !important; overflow-wrap:anywhere; } /* game prompts: big, but never wider than the phone */
@@ -1850,9 +1876,9 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                     <div id="studentStatusDot" style="width:10px;height:10px;border-radius:var(--radius-round);background:var(--red-600);flex-shrink:0;"></div>
                     <span id="studentStatusText" class="ui-text-4" style="color:var(--bg-light);font-weight:bold;font-size:0.85rem;">Phones Away</span>
                 </div>
-                <button onclick="showStudentAgenda()" class="ui-btn-2" style="background:var(--bg-light);color:var(--ink);border:2px solid var(--primary-color);border-radius:var(--radius-lg);font-weight:bold;font-size:1rem;">📋 Today's Plan</button>
-                <button id="studentGamesNavBtn" onclick="showStudentGames()" class="ui-btn-2" style="background:var(--primary-color);color:var(--white);border:2px solid var(--primary-color);border-radius:var(--radius-lg);font-weight:bold;font-size:1rem;">🎮 Games</button>
-                <button onclick="showStudentNotes()" class="ui-btn-2" style="background:var(--bg-light);color:var(--ink);border:2px solid var(--bg-mid);border-radius:var(--radius-lg);font-weight:bold;font-size:1rem;">📝 Notes</button><button id="studentMissedNavBtn" onclick="showStudentMissed()" class="ui-btn-2" title="What did I miss?" style="display:none;background:var(--bg-light);color:var(--ink);border:2px solid var(--bg-mid);border-radius:var(--radius-lg);font-weight:bold;font-size:1rem;">📅 Missed?</button>
+                <button onclick="showStudentAgenda()" class="ui-btn-2 stu-nav active" data-view="plan">📋 Today's Plan</button>
+                <button id="studentGamesNavBtn" onclick="showStudentGames()" class="ui-btn-2 stu-nav" data-view="games">🎮 Games</button>
+                <button onclick="showStudentNotes()" class="ui-btn-2 stu-nav" data-view="notes">📝 Notes</button><button id="studentMissedNavBtn" onclick="showStudentMissed()" class="ui-btn-2 stu-nav" data-view="missed" title="What did I miss?" style="display:none;">📅 Missed?</button>
                 <div class="pill clock-pill clock" id="studentClockDisplay">08:00:00 AM</div>
             </div>
         </div>
@@ -1872,11 +1898,15 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             </div>
         </div>
 
-        <div id="studentWorkPanel" class="card" style="display:none;margin:0 20px 14px 20px;flex-shrink:0;max-height:60vh;overflow-y:auto;">
-            <h2 style="margin:0 0 8px 0;">🎯 Current Task</h2>
-            <p id="swTask" style="white-space:pre-wrap;font-size:clamp(1rem,1.6vw,1.5rem);line-height:1.5;margin:0 0 8px 0;color:var(--secondary-dark);"></p>
-            <ul id="swLinks" style="margin:0 0 10px 0;"></ul>
-            <div id="swWho"></div>
+        <div id="studentWorkPanel" class="card" style="display:none;">
+            <div class="sw-grid">
+                <div class="sw-main">
+                    <div class="sw-label">🎯 Current Task</div>
+                    <p id="swTask"></p>
+                    <div id="swLinks" class="sw-links"></div>
+                </div>
+                <div class="sw-checkin"><div class="sw-label">✅ Check in</div><div id="swWho"></div></div>
+            </div>
         </div>
 
         <div class="bento-grid" id="mainBento">
@@ -1884,7 +1914,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             <div class="card card-warmup"><h2 class="expandable-title" onclick="expandWarmup()"><span>Warm-Up Activity</span><span class="quick-edit-head"><button type="button" class="quick-edit-btn" onclick="event.stopPropagation();openQuickEdit('warmup')" title="Edit today's warm-up" aria-label="Edit today's warm-up">✎</button><span class="expand-badge">⛶ Expand</span></span></h2><p id="warmupText" style="white-space:pre-wrap;">Loading data...</p></div>
             <div class="card-bottom-split">
                 <div class="sub-card"><h3>Essential Question</h3><p id="eqText">Loading data...</p></div>
-                <div class="sub-card"><h3>Standards</h3><p id="standardsText">Loading data...</p></div>
+                <div class="sub-card sub-standards"><h3>Standards</h3><p id="standardsText">Loading data...</p></div>
             </div>
         </div>
 
@@ -3357,8 +3387,9 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function toggleFocusMode() { if (isTransitioning) return; setTimeout(refreshDoneCount, 50); /* updateBoardDisplays tells students about the task and Done button */ if (!isFocusMode) { loadTaskNote(); setTimeout(fitWorkCards, 700); setTimeout(fitWorkCards, 1400); } /* pick up today's Agenda; fit once the board is showing */ isFocusMode = !isFocusMode; isSlideMode = false; isGameStage = false; isOpeningMode = false; document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active'); updateBoardDisplays(); }
         function toggleSlideMode() { if (isTransitioning) return; isSlideMode = !isSlideMode; isFocusMode = false; isGameStage = false; isOpeningMode = false; if (isSlideMode) document.body.classList.add('slide-mode-active'); else document.body.classList.remove('slide-mode-active'); document.body.classList.remove('game-mode-active'); updateBoardDisplays(); if (isSlideMode) renderSlide(); }
         function toggleGameStage() { if (isTransitioning) return; isGameStage = !isGameStage; isSlideMode = false; isFocusMode = false; isOpeningMode = false; if (isGameStage) { document.body.classList.add('game-mode-active'); buildDynamicGameMenu(); } else { document.body.classList.remove('game-mode-active'); } document.body.classList.remove('slide-mode-active'); updateBoardDisplays(); }
+        function setStudentNav(view) { document.querySelectorAll('#studentTopBar .stu-nav').forEach(b => b.classList.toggle('active', b.dataset.view === view)); }
         function showStudentGames() {
-            if (isTransitioning) return;
+            if (isTransitioning) return; setStudentNav('games');
             document.getElementById('studentNotesView').style.display = 'none'; document.getElementById('studentMissedView').style.display = 'none';
             studentOnPlan = false; renderStudentWork();
             if (!isGameStage) {
@@ -3370,7 +3401,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             }
         }
         function showStudentAgenda() {
-            if (isTransitioning) return;
+            if (isTransitioning) return; setStudentNav('plan');
             document.getElementById('studentNotesView').style.display = 'none'; document.getElementById('studentMissedView').style.display = 'none';
             if (document.getElementById('mainBento').style.display === 'none' && !isGameStage) document.getElementById('mainBento').style.display = 'grid';
             studentOnPlan = true; renderStudentWork();
@@ -3383,7 +3414,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             }
         }
         function showStudentNotes() {
-            if (isTransitioning) return;
+            if (isTransitioning) return; setStudentNav('notes');
             document.getElementById('studentMissedView').style.display = 'none'; studentOnPlan = false; renderStudentWork();
             const current = document.getElementById(activeBoard); if (current) current.style.display = 'none';
             document.getElementById('studentNotesView').style.display = 'flex';
@@ -3443,20 +3474,21 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             const panel = document.getElementById('studentWorkPanel'); if (!panel) return;
             const w = liveWork;
             const mine = studentOnPlan && w && activeBlockData && String(activeBlockData.id) === w.id && missedAvailable();
+            document.body.classList.toggle('sw-active', !!mine); // work time: the plan below shrinks to Agenda + EQ
             if (!mine) { panel.style.display = 'none'; return; }
-            panel.style.display = 'block';
+            panel.style.display = 'flex';
             document.getElementById('swTask').innerText = w.task || 'Check the board for today\'s task.';
-            document.getElementById('swLinks').innerHTML = (w.links || []).map(l => `<li><a href="${escapeHtml(l.url)}" target="_blank" rel="noopener" style="color:var(--primary-color);font-weight:bold;">${escapeHtml(l.label || 'Link')}</a></li>`).join('');
+            document.getElementById('swLinks').innerHTML = (w.links || []).map(l => `<a class="sw-link" href="${escapeHtml(l.url)}" target="_blank" rel="noopener">🔗 ${escapeHtml(l.label || 'Link')}</a>`).join('');
             const who = document.getElementById('swWho'), name = localStorage.getItem(swNameKey(w.id)) || '';
             const roster = (activeBlockData.roster || []);
             if (!name || (name !== '__none__' && !roster.includes(name))) {
-                who.innerHTML = `<label for="swPick" style="font-weight:bold;">Who are you?</label><select id="swPick"><option value="">Pick your name…</option>${roster.map(n => `<option>${escapeHtml(n)}</option>`).join('')}<option value="__none__">I'm not in this class</option></select>`;
+                who.innerHTML = `<label for="swPick" class="sw-hint">Who are you?</label><select id="swPick"><option value="">Pick your name…</option>${roster.map(n => `<option>${escapeHtml(n)}</option>`).join('')}<option value="__none__">I'm not in this class</option></select>`;
                 document.getElementById('swPick').onchange = e => { if (e.target.value) { localStorage.setItem(swNameKey(w.id), e.target.value); renderStudentWork(); } };
                 return;
             }
-            if (name === '__none__') { who.innerHTML = `<p style="margin:0;">Just reading along. <button type="button" class="sw-small" onclick="swChangeName()">Pick my name</button></p>`; return; }
+            if (name === '__none__') { who.innerHTML = `<p class="sw-hint" style="margin:0;">Just reading along. <button type="button" class="sw-small" onclick="swChangeName()">Pick my name</button></p>`; return; }
             const isDone = localStorage.getItem(swDoneKey(w)) === name;
-            who.innerHTML = `<p style="margin:0 0 8px 0;">Checking in as <strong>${escapeHtml(name)}</strong> · <button type="button" class="sw-small" onclick="swChangeName()">Not you?</button></p>` +
+            who.innerHTML = `<p class="sw-hint" style="margin:0 0 8px 0;">Checking in as <strong>${escapeHtml(name)}</strong> · <button type="button" class="sw-small" onclick="swChangeName()">Not you?</button></p>` +
                 (isDone ? `<button type="button" class="sw-big done" onclick="swSetDone(false)">✓ Marked done · tap if not done yet</button>` : `<button type="button" class="sw-big" onclick="swSetDone(true)">✅ I'm done</button>`) +
                 `<p id="swMsg" style="margin:6px 0 0 0;min-height:1.2em;font-weight:bold;"></p>`;
         }
@@ -3485,7 +3517,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function prettyTime(t) { const m = String(t).match(/(\d{1,2}):(\d{2})/); if (!m) return t; let h = Number(m[1]); const ap = h >= 12 ? 'pm' : 'am'; h = h % 12 || 12; return h + ':' + m[2] + ap; }
         function prettyDay(ymd) { const p = ymd.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]).toLocaleDateString(undefined, { weekday: 'short', month: 'numeric', day: 'numeric' }); }
         async function showStudentMissed() {
-            if (isTransitioning || !missedAvailable()) return;
+            if (isTransitioning || !missedAvailable()) return; setStudentNav('missed');
             document.getElementById('studentNotesView').style.display = 'none'; studentOnPlan = false; renderStudentWork();
             const current = document.getElementById(activeBoard); if (current) current.style.display = 'none';
             document.getElementById('studentMissedView').style.display = 'flex';
