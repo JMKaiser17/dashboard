@@ -1588,7 +1588,9 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         .score-award-bar button:hover { filter:brightness(1.1); }
         .score-award-bar .score-award-skip { flex:0 0 auto; background:transparent; color:var(--bg-light); border:1.5px solid rgba(255,255,255,0.35); font-weight:700; font-size:clamp(0.8rem,0.95vw,1.05rem); padding:0 16px; }
         .score-strip button:focus-visible, .score-award-bar button:focus-visible { outline:3px solid var(--white); outline-offset:2px; }
-        .hub-score-row { grid-column:1 / -1; display:flex; justify-content:flex-end; }
+        .hub-score-row { grid-column:1 / -1; display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+        .hub-class-chip { font-weight:700; opacity:0.85; }
+        .hub-class-chip[aria-pressed="true"] { opacity:1; background:rgba(255,255,255,0.12); }
         .hub-score-start { font-family:'Poppins',sans-serif; font-weight:800; font-size:clamp(0.9rem,1.1vw,1.2rem); padding:8px 18px; border-radius:var(--radius-pill); border:2px solid var(--bg-light); background:transparent; color:var(--bg-light); cursor:pointer; }
         .hub-score-start:hover { background:rgba(255,255,255,0.1); }
         @keyframes scoreAwardIn { from { opacity:0; } to { opacity:1; } }
@@ -1685,7 +1687,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                     <p style="color:var(--gray-500);font-size:0.75rem;margin:4px 0 15px 0;">Expects columns: Date, ID; daily Warmup, Agenda, Reminders, Message; sticky Title, Start, End, Roster, EQ, Standards, Resources, Ticker, and optional Color and Style. Blank sticky cells keep the last value for that ID. Optional Standards tab: codes typed in Standards show their full text and fill in the EQ. Whichever you changed last wins: a new code with a blank EQ uses the tab's EQ, and a typed EQ wins until you change Standards again.</p>
                     <label style="font-weight:bold;color:var(--secondary-dark);font-size:0.9rem;">Game Vault CSV Link</label>
                     <input type="text" id="gameVaultUrlInput" placeholder="https://docs.google.com/spreadsheets/.../pub?output=csv" class="ui-field-1" style="width:100%;border-radius:var(--radius-sm);border:2px solid var(--bg-mid);font-family:monospace;font-size:0.9rem;">
-                    <p style="color:var(--gray-500);font-size:0.75rem;margin:4px 0 0 0;">Expects columns: Status (ACTIVE to show everyone, TEACHER_ONLY to hide just from Student Mode links while keeping it on your own dashboard), ID, Type, Title, Category, Prompt, Answer, Value. For the Reinforcement Lab (Type=reinforcement), Prompt holds the schedule (FR-5, VR-5, FI-8, VI-8, or RANDOM) and Value holds the round length in seconds.</p>
+                    <p style="color:var(--gray-500);font-size:0.75rem;margin:4px 0 0 0;">Expects columns: Status (ACTIVE to show everyone, TEACHER_ONLY to hide just from Student Mode links while keeping it on your own dashboard), Classes (optional: blank shows the pack in every class; otherwise class names or period IDs, separated by commas, on the pack's first row), ID, Type, Title, Category, Prompt, Answer, Value. For the Reinforcement Lab (Type=reinforcement), Prompt holds the schedule (FR-5, VR-5, FI-8, VI-8, or RANDOM) and Value holds the round length in seconds.</p>
                 </div>
                 <div class="ui-box-5" style="background:var(--bg-light);border-radius:var(--radius-md);">
                     <h3 class="ui-heading-2" style="color:var(--primary-color);font-size:1.2rem;">Theme & Terminology</h3>
@@ -2616,6 +2618,10 @@ html[data-board-style="atoms"] .dashboard-wrapper {
 
         let activeBlockData = null; let lastActiveBlockId = null; let isFocusMode = false; let isSlideMode = false; let isGameStage = false; let isOpeningMode = false; let activeBoard = 'mainBento'; let isTransitioning = false; let needsDataRender = true; 
         let lastGenuinelyActiveBlock = null;
+        // Games by class (see GAMES BY CLASS). Declared up here because updateDashboard can run before that section.
+        let currentClassBlock = null;  // the period genuinely in session (or the forced * day), else null
+        let hubShowAllClasses = false; // teacher-board override, resets when the period changes
+        let hubPackView = null;        // { type, title } while the deck list is showing, so a period change can redraw it
         let currentSlides = []; let currentSlideIndex = -1; let isMarketTicker = false;
         let gameVaultData = []; let miniGameLists = { hotseat: [], titansays: [], hivemind: [], debate: [], taboo: [], factorfiction: [], bullmarket: [], vault: [] };
 
@@ -3012,21 +3018,22 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             let rows = []; let pack = null;
             Papa.parse(csvText, { header: true, skipEmptyLines: false }).data.forEach((row, i) => {
                 const rowNum = i + 2;
-                const cells = { id: getCol(row, 'ID'), type: getCol(row, 'Type').toLowerCase(), title: getCol(row, 'Title'), status: getCol(row, 'Status').toUpperCase(), category: getCol(row, 'Category'), prompt: getCol(row, 'Prompt'), answer: getCol(row, 'Answer'), value: getCol(row, 'Value') };
+                const cells = { id: getCol(row, 'ID'), type: getCol(row, 'Type').toLowerCase(), title: getCol(row, 'Title'), status: getCol(row, 'Status').toUpperCase(), category: getCol(row, 'Category'), prompt: getCol(row, 'Prompt'), answer: getCol(row, 'Answer'), value: getCol(row, 'Value'), classes: getCol(row, 'Classes') };
                 if (!Object.values(cells).some(v => v)) return; // blank sheet row: ignored, and it doesn't end the pack
                 const hasContent = !!(cells.prompt || cells.answer || cells.category || cells.value);
                 // A new pack starts when the Title OR the Type changes (e.g. "debate, SEL" then "hivemind, SEL" are two packs).
                 const newTitle = cells.title && (!pack || cells.title !== pack.title);
                 const newType = pack && cells.type && cells.type !== pack.type;
                 if (newTitle || newType) {
-                    pack = { title: cells.title || pack.title, type: cells.type, status: cells.status, startRow: rowNum };
+                    pack = { title: cells.title || pack.title, type: cells.type, status: cells.status, classes: cells.classes, startRow: rowNum };
                     if (issues && !cells.type) issues.push({ row: rowNum, kind: 'hidden', title: cells.title, text: `The pack "${cells.title}" starts here but has no Type, so it won't appear. Add the game type (for example taboo or jeopardy).` });
                     if (issues && !cells.status) issues.push({ row: rowNum, kind: 'hidden', title: pack.title, text: `The ${pack.type || ''} pack "${pack.title}" has no Status, so it's hidden. Use ACTIVE or TEACHER_ONLY to show it, or OFF to hide it on purpose.` });
                 } else if (!pack) {
                     if (issues && hasContent) issues.push({ row: rowNum, kind: 'orphan', text: "This row has no Title and there's no pack above it, so it isn't part of any game. Put a Title on the first row of each pack." });
                     return;
                 }
-                rows.push({ rowNum: rowNum, id: cells.id, type: cells.type || pack.type, title: pack.title, status: cells.status || pack.status, category: cells.category, prompt: cells.prompt, answer: cells.answer, value: cells.value, hasContent: hasContent, startsPack: pack.startRow === rowNum });
+                if (issues && cells.classes && pack.startRow !== rowNum && cells.classes !== pack.classes) issues.push({ row: rowNum, kind: 'pack', pack: (cells.type || pack.type) + '\u0001' + pack.title, text: `Classes only counts on the first row of a pack, so "${cells.classes}" here is ignored. "${pack.title}" uses "${pack.classes || 'every class'}" from row ${pack.startRow}.` });
+                rows.push({ rowNum: rowNum, id: cells.id, classes: parseClassTags(pack.classes), classesRaw: pack.classes || '', packRow: pack.startRow, type: cells.type || pack.type, title: pack.title, status: cells.status || pack.status, category: cells.category, prompt: cells.prompt, answer: cells.answer, value: cells.value, hasContent: hasContent, startsPack: pack.startRow === rowNum });
             });
             return rows;
         }
@@ -3084,7 +3091,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                 if (!VAULT_LIVE_STATUSES.includes(r.status)) return; // hidden (OFF, blank, typo)
                 if (!r.hasContent && !['biddingwar', 'reinforcement'].includes(r.type)) return; // a Title-only header row: it names the pack, it isn't a question
                 if (isStudentMode && r.status === 'TEACHER_ONLY') return; // student devices never receive this row at all - protects every downstream use (decks, boards, questions), not just the hub tile
-                gameVaultData.push({ id: r.id, type: r.type, title: r.title, pack: '', category: r.category, prompt: r.prompt, answer: r.answer, value: r.value });
+                gameVaultData.push({ id: r.id, classes: r.classes, classesRaw: r.classesRaw, packRow: r.packRow, type: r.type, title: r.title, pack: '', category: r.category, prompt: r.prompt, answer: r.answer, value: r.value });
             });
             if(isGameStage) buildDynamicGameMenu();
         }
@@ -3522,6 +3529,64 @@ html[data-board-style="atoms"] .dashboard-wrapper {
 
         const GAME_ACCENT_COLORS = { jeopardy: 'var(--primary-color)', biddingwar: 'var(--primary-color)', hotseat: 'var(--primary-color)', taboo: 'var(--primary-color)', titansays: 'var(--primary-color)', hivemind: 'var(--primary-color)', debate: 'var(--primary-color)', vault: 'var(--primary-color)', factorfiction: 'var(--primary-color)', bullmarket: 'var(--primary-color)', gridlock: 'var(--primary-color)', survey: 'var(--primary-color)', gauntlet: 'var(--primary-color)', reinforcement: 'var(--primary-color)' };
         const GAME_ICONS = { jeopardy: '❓', biddingwar: '🔨', hotseat: '🔥', taboo: '🚫', titansays: '🗣️', hivemind: '🐝', debate: '⚖️', vault: '🔒', factorfiction: '🕵️', bullmarket: '📈', gridlock: '🔲', survey: '🗳️', gauntlet: '🪜', reinforcement: '🐭' };
+        // ==================== GAMES BY CLASS ====================
+        // Optional Game Vault "Classes" column, read from a pack's first row. Blank = every class (the old behavior).
+        // Otherwise a comma list; each entry matches a period whose ID is exactly that, or whose Title contains it as
+        // whole words ("EPF" matches "EPF Period 1"; "Psych" does not match "Psychology"). Filtering happens when the hub
+        // draws, so the hub follows the bell without a reload. Outside class time the teacher board shows everything and
+        // student devices show only every-class packs. This picks the right topic for the room; it isn't a privacy
+        // wall (TEACHER_ONLY is).
+        function parseClassTags(raw) { return String(raw || '').split(/[,;\n]+/).map(t => t.trim()).filter(Boolean); }
+        // Accents fold to plain letters (Español = Espanol) and letters from any language count as words (中文 2).
+        function classWords(s) { return String(s || '').normalize('NFD').replace(/\p{M}+/gu, '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim(); }
+        function classTagMatches(tag, block) {
+            if (!block) return false;
+            if (String(block.id || '').trim().toLowerCase() === tag.toLowerCase()) return true;
+            const w = classWords(tag); return !!w && (' ' + classWords(block.title) + ' ').includes(' ' + w + ' ');
+        }
+        function classFilterActive() { return gameVaultData.some(g => g.classes && g.classes.length); }
+        function packShowsNow(g) {
+            if (!g.classes || !g.classes.length) return true;
+            if (!isStudentMode && hubShowAllClasses) return true;
+            if (!currentClassBlock) return !isStudentMode; // between classes: you can preview, students get only every-class packs
+            return g.classes.some(t => classTagMatches(t, currentClassBlock));
+        }
+        function hubGames() { return gameVaultData.filter(packShowsNow); }
+        function classBlockLabel(b) { const same = schedule.filter(x => x.title === b.title && x.id !== b.id).length; const h = Math.floor(b.start / 60), m = b.start % 60; return (b.title || ('ID ' + b.id)) + (same ? ' at ' + prettyTime(h + ':' + String(m).padStart(2, '0')) : ''); }
+        // Teacher-only line under the hub: what each Classes entry matched on today's schedule, and anything that matched nothing.
+        function hubClassNoteHTML() {
+            if (isStudentMode || !classFilterActive() || !schedule.length) return '';
+            let tags = new Map(); // tag -> first pack using it
+            gameVaultData.forEach(g => (g.classes || []).forEach(t => { const k = t.toLowerCase(); if (!tags.has(k)) tags.set(k, { tag: t, title: g.title, row: g.packRow }); }));
+            let matched = [], unmatched = [];
+            tags.forEach(x => {
+                const hits = []; schedule.forEach(b => { if (classTagMatches(x.tag, b) && !hits.some(h => h.id === b.id)) hits.push(b); });
+                if (hits.length) matched.push(`"${escapeHtml(x.tag)}" → ${hits.map(b => escapeHtml(classBlockLabel(b))).join(', ')}`);
+                else unmatched.push(`"${escapeHtml(x.tag)}" on ${escapeHtml(x.title)} (row ${Number(x.row)})`);
+            });
+            let html = '';
+            if (unmatched.length) html += `<p class="hub-hidden-note">Not on today's schedule, so ${unmatched.length === 1 ? 'that pack stays' : 'those packs stay'} hidden in class: ${unmatched.join(', ')}. Check the spelling, or use the period's ID.</p>`;
+            if (matched.length) html += `<p class="hub-hidden-note">Classes today: ${matched.join(' · ')}.</p>`;
+            return html;
+        }
+        function hubClassChipHTML() {
+            if (isStudentMode || !classFilterActive() || !currentClassBlock) return '';
+            const hidden = new Set(gameVaultData.filter(g => g.classes && g.classes.length && !g.classes.some(t => classTagMatches(t, currentClassBlock))).map(g => g.type + '\u0001' + g.title)).size;
+            if (!hidden && !hubShowAllClasses) return '';
+            const label = hubShowAllClasses ? '🎯 Just this class' : `👁 Show all classes (${hidden} more)`;
+            const title = hubShowAllClasses ? 'Hide packs tagged for other classes again' : 'Show packs tagged for other classes, just for now';
+            return `<button type="button" class="hub-score-start hub-class-chip" aria-pressed="${hubShowAllClasses}" onclick="toggleHubAllClasses()" title="${title}">${label}</button>`;
+        }
+        function toggleHubAllClasses() { hubShowAllClasses = !hubShowAllClasses; redrawHubMenu(); }
+        function hubMenuShowing() { const m = document.getElementById('gameHubMenu'); return isGameStage && m && m.style.display !== 'none'; }
+        function redrawHubMenu() { if (hubPackView) handlePackSelection(hubPackView.type, hubPackView.displayTitle); else buildDynamicGameMenu(); }
+        function setCurrentClassBlock(block) {
+            const prev = currentClassBlock ? currentClassBlock.id : null, next = block ? block.id : null;
+            currentClassBlock = block;
+            if (prev === next) return;
+            hubShowAllClasses = false;
+            if (classFilterActive() && hubMenuShowing()) redrawHubMenu(); // a game in progress is never interrupted
+        }
         // ==================== GAME HUB & DECK SELECTION ====================
         function packIssues(gameType, title) { const key = gameType + '\u0001' + title; return gameVaultIssues.filter(i => i.kind === 'pack' && i.pack === key); }
         function showPackIssues(gameType, title) {
@@ -3545,10 +3610,11 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             return `<div class="game-cartridge" onclick="${onclickJs}" style="border-bottom-color:${accent};">${iconHtml}<h3>${title}</h3><p style="color:${accent};">${subtitle}</p>${extraHtml}</div>`;
         }
         function handlePackSelection(gameType, displayTitle) {
-            let matchingGames = gameVaultData.filter(g => g.type === gameType); let uniquePacks = []; let seenTitles = new Set();
+            hubPackView = { type: gameType, displayTitle: displayTitle };
+            let matchingGames = hubGames().filter(g => g.type === gameType); let uniquePacks = []; let seenTitles = new Set();
             matchingGames.forEach(g => { let gameTitle = g.title ? g.title.toString().trim() : "Untitled Deck"; if (!seenTitles.has(gameTitle)) { seenTitles.add(gameTitle); uniquePacks.push({ title: gameTitle }); } });
             const menu = document.getElementById('gameHubMenu');
-            menu.innerHTML = `<div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; grid-column:1 / -1;"><h2 style="color:var(--white); margin:0; font-size:clamp(1.4rem,2vw,2.2rem); text-transform:uppercase;">Select ${escapeHtml(displayTitle)} Deck</h2><button onclick="buildDynamicGameMenu()" style="background:var(--bg-light);border:none;padding:8px 20px;border-radius:var(--radius-lg);font-weight:bold;cursor:pointer;font-size:1rem;color:var(--ink);">Back to Hub</button></div>`;
+            menu.innerHTML = `<div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; grid-column:1 / -1;"><h2 style="color:var(--white); margin:0; font-size:clamp(1.4rem,2vw,2.2rem); text-transform:uppercase;">Select ${escapeHtml(displayTitle)} Deck</h2><span style="display:flex;gap:10px;align-items:center;">${hubClassChipHTML()}<button onclick="buildDynamicGameMenu()" style="background:var(--bg-light);border:none;padding:8px 20px;border-radius:var(--radius-lg);font-weight:bold;cursor:pointer;font-size:1rem;color:var(--ink);">Back to Hub</button></span></div>`;
             if (uniquePacks.length === 0) { menu.innerHTML += `<h3 style="color:var(--bg-mid); text-align:center; width:100%; grid-column:1 / -1;">No decks found.</h3>`; } 
             else { uniquePacks.forEach(p => {
                 const n = isStudentMode ? 0 : packIssues(gameType, p.title).length;
@@ -3557,11 +3623,13 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         }
 
         function buildDynamicGameMenu() {
-            setTimeout(renderScoreboard, 0);
+            setTimeout(renderScoreboard, 0); hubPackView = null;
             const menu = document.getElementById('gameHubMenu'); menu.innerHTML = '';
-            if (gameVaultData.length === 0) { menu.innerHTML = '<h3 style="color:var(--bg-mid); text-align:center; width:100%;">No active games found.</h3>' + (isStudentMode ? '' : hubHiddenNoteHTML()); return; }
+            const games = hubGames();
+            if (games.length === 0 && gameVaultData.length) { menu.innerHTML = isStudentMode ? '<h3 style="color:var(--bg-mid); text-align:center; width:100%;">No games for this class right now.</h3>' : `<div class="hub-score-row">${hubClassChipHTML()}</div><h3 style="color:var(--bg-mid); text-align:center; width:100%;">No games are tagged for this class.</h3>` + hubClassNoteHTML() + hubHiddenNoteHTML(); return; }
+            if (games.length === 0) { menu.innerHTML = '<h3 style="color:var(--bg-mid); text-align:center; width:100%;">No active games found.</h3>' + (isStudentMode ? '' : hubHiddenNoteHTML()); return; }
             let hasGame = { jeopardy: false, biddingwar: false, hotseat: false, taboo: false, titansays: false, hivemind: false, debate: false, vault: false, factorfiction: false, survey: false, gridlock: false, bullmarket: false, gauntlet: false, reinforcement: false };
-            gameVaultData.forEach(row => { if (hasGame[row.type] !== undefined) hasGame[row.type] = true; });
+            games.forEach(row => { if (hasGame[row.type] !== undefined) hasGame[row.type] = true; });
             if (!Object.values(hasGame).some(val => val)) { menu.innerHTML = '<h3 style="color:var(--bg-mid); text-align:center; width:100%;">No games are marked ACTIVE.</h3>' + (isStudentMode ? '' : hubHiddenNoteHTML()); return; }
             let mascot = store.getItem('titan_setting_mascot') || DEFAULT_MASCOT;
             
@@ -3579,8 +3647,8 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             if (hasGame.survey) menu.innerHTML += gameCartridgeHTML('survey', `handlePackSelection('survey', 'Survey Showdown')`, 'Survey Showdown', 'Select a Deck');
             if (hasGame.gauntlet) menu.innerHTML += gameCartridgeHTML('gauntlet', `handlePackSelection('gauntlet', 'The Fiscal Gauntlet')`, 'The Fiscal Gauntlet', 'Select a Deck');
             if (hasGame.reinforcement) menu.innerHTML += gameCartridgeHTML('reinforcement', `handlePackSelection('reinforcement', 'The Reinforcement Lab')`, 'The Reinforcement Lab', 'Select a Deck');
-            if (!isStudentMode) menu.innerHTML += hubHiddenNoteHTML();
-            if (!isStudentMode) menu.insertAdjacentHTML('afterbegin', '<div class="hub-score-row"><button type="button" id="scoreStartBtn" class="hub-score-start" onclick="startScoreboard()">🏆 Keep score</button></div>');
+            if (!isStudentMode) menu.innerHTML += hubClassNoteHTML() + hubHiddenNoteHTML();
+            if (!isStudentMode) menu.insertAdjacentHTML('afterbegin', '<div class="hub-score-row">' + hubClassChipHTML() + '<button type="button" id="scoreStartBtn" class="hub-score-start" onclick="startScoreboard()">🏆 Keep score</button></div>');
         }
 
         let currentActiveGameTitle = ''; 
@@ -4612,6 +4680,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
               if (!isStudentMode && prevId !== undefined && prevId !== nowId) pushLiveState();
               if (isStudentMode && prevId !== nowId) renderStudentWork(); } // new period: students get its notes 
 
+            setCurrentClassBlock(isGenuinelyInSession ? activeBlock : null);
             if (isGenuinelyInSession && activeBlock) { if (lastGenuinelyActiveBlock && lastGenuinelyActiveBlock.id !== activeBlock.id) autoSaveRecap(lastGenuinelyActiveBlock); lastGenuinelyActiveBlock = activeBlock; }
             else if (lastGenuinelyActiveBlock) { autoSaveRecap(lastGenuinelyActiveBlock); lastGenuinelyActiveBlock = null; } // period over: save its recap
 
