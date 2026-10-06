@@ -1204,16 +1204,16 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             #studentTopBar .right-pills > button { width:100%; min-height:48px; margin:0 !important; }
             #studentTopBar #studentTimerBadge, #studentTopBar #studentStatusBadge { justify-content:center; min-height:44px; box-sizing:border-box; }
             #studentClockDisplay { display:none !important; } /* the phone shows the time already */
-            body.student-mode #mainBento { grid-template-columns:1fr !important; grid-template-rows:none !important; grid-auto-rows:auto; gap:12px; flex-grow:0 !important; height:auto !important; min-height:0; } /* never force display: the board switcher hides it with display:none */
-            body.student-mode #mainBento > .card, body.student-mode #mainBento .card-bottom-split { grid-column:1 / -1 !important; grid-row:auto !important; height:auto !important; min-height:0 !important; flex:none !important; max-height:none !important; }
-            body.student-mode #mainBento .card-bottom-split { display:flex !important; flex-direction:column; gap:12px; }
-            body.student-mode #mainBento .sub-card { height:auto !important; min-height:0 !important; }
-            body.student-mode #mainBento h2 { font-size:1.35rem !important; margin-bottom:8px !important; }
-            body.student-mode #mainBento h3 { font-size:1.1rem !important; }
-            body.student-mode #agendaItems li, body.student-mode #warmupText { font-size:1.15rem !important; line-height:1.4 !important; }
-            body.student-mode #eqText, body.student-mode #standardsText { font-size:1rem !important; line-height:1.4 !important; }
-            body.student-mode .card-warmup .expand-badge { display:none !important; } /* the whole warm-up already fits */
-            body.student-mode .card-warmup .expandable-title { cursor:default; }
+            #mainBento { grid-template-columns:1fr !important; grid-template-rows:none !important; grid-auto-rows:auto; gap:12px; flex-grow:0 !important; height:auto !important; min-height:0; } /* never force display: the board switcher hides it with display:none */
+            #mainBento > .card, #mainBento .card-bottom-split { grid-column:1 / -1 !important; grid-row:auto !important; height:auto !important; min-height:0 !important; flex:none !important; max-height:none !important; }
+            #mainBento .card-bottom-split { display:flex !important; flex-direction:column; gap:12px; }
+            #mainBento .sub-card { height:auto !important; min-height:0 !important; }
+            #mainBento h2 { font-size:1.35rem !important; margin-bottom:8px !important; }
+            #mainBento h3 { font-size:1.1rem !important; }
+            #agendaItems li, #warmupText { font-size:1.15rem !important; line-height:1.4 !important; }
+            #eqText, #standardsText { font-size:1rem !important; line-height:1.4 !important; }
+            .card-warmup .expand-badge { display:none !important; } /* the whole warm-up already fits; the full-screen warm-up is for the wall */
+            .card-warmup .expandable-title { cursor:default; }
             body.student-mode #studentWorkPanel { margin:0 !important; max-height:none !important; flex:none !important; }
             .sw-grid { grid-template-columns:1fr; gap:14px; }
             #swTask { font-size:1.3rem; }
@@ -1222,6 +1222,26 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             body.student-mode :is(#bullMarketPrompt, #debateDisplay, #factFictionDisplay, #hivemindDisplay, #hotSeatWordDisplay, #tabooWordDisplay, #titanSaysDisplay) { font-size:clamp(1.3rem,8vw,2.4rem) !important; line-height:1.2 !important; overflow-wrap:anywhere; } /* game prompts: big, but never wider than the phone */
             body.student-mode #studentNotesView, body.student-mode #studentMissedView { padding:0 !important; flex-grow:0 !important; }
             body.student-mode #studentNotesView .card, body.student-mode #studentMissedView .card { height:auto !important; overflow:visible !important; }
+            /* Teacher board on a phone: glance and fix. The main board scrolls as one column (rules above);
+               Slides, Work, and Games stay wall-sized. */
+            body:is([data-board="mainBento"],[data-board="focusModeBoard"]):not(.student-mode) { height:auto !important; min-height:100%; overflow-y:auto !important; }
+            body:is([data-board="mainBento"],[data-board="focusModeBoard"]):not(.student-mode) .dashboard-wrapper { height:auto !important; min-height:100vh; overflow:visible !important; padding:10px 10px 24px 10px !important; gap:10px !important; border-radius:0 !important; }
+            #teacherTopBar { flex-wrap:wrap; gap:8px !important; }
+            #teacherTopBar > .pill { flex:1 1 100% !important; width:100% !important; max-width:none !important; box-sizing:border-box; }
+            #teacherTopBar .right-pills { display:flex !important; flex-wrap:wrap; gap:8px; width:100%; }
+            #teacherTopBar .right-pills > .action-pill { flex:1 1 0; min-width:0; min-height:48px; margin:0 !important; box-sizing:border-box; padding:6px 8px !important; }
+            #teacherTopBar .pill-subtitle { font-size:0.62rem !important; overflow:visible !important; text-overflow:clip !important; }
+            #teacherTopBar .right-pills .widget-text { font-size:1rem !important; white-space:nowrap; overflow:visible !important; text-overflow:clip !important; }
+            #teacherTopBar .status-light-badge { position:static !important; order:2; }
+            #clockDisplay { display:none !important; } /* the phone shows the time already */
+            /* Independent Work on a phone: task, finish early, voice level, then the timer, stacked. Never force display on the board itself. */
+            #focusModeBoard { grid-template-columns:1fr !important; grid-template-rows:none !important; grid-auto-rows:auto; flex-grow:0 !important; height:auto !important; overflow:visible !important; }
+            #focusModeBoard > * { grid-column:1 / -1 !important; grid-row:auto !important; min-height:0 !important; }
+            #focusModeBoard .zen-task-card { flex:none !important; }
+            #focusModeBoard .focus-editable { flex:none !important; min-height:3.2em; max-height:none !important; font-size:1.15rem !important; }
+            #noiseLevelWidget { flex-direction:row !important; gap:12px; padding:12px !important; }
+            #noiseLevelWidget .noise-icon-wrapper { font-size:2rem !important; margin:0 !important; }
+            #noiseLevelWidget .noise-text { font-size:1.1rem !important; }
         }
         .done-count { border:2px solid var(--primary-color); background:var(--white); color:var(--primary-color); border-radius:var(--radius-pill); font-weight:bold; font-size:0.62em; padding:4px 12px; cursor:pointer; margin-left:auto; white-space:nowrap; }
         .done-list { list-style:none; margin:0; padding:0; font-size:clamp(1rem,1.4vw,1.3rem); }
@@ -4091,6 +4111,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         // ==================== BOARD DISPLAY SWITCHING & NOTEPAD ====================
         function updateBoardDisplays() {
             let targetBoard = 'mainBento'; if (isSlideMode) targetBoard = 'slideModeBoard'; else if (isFocusMode) targetBoard = 'focusModeBoard'; else if (isGameStage) targetBoard = 'gameModeBoard'; else if (isOpeningMode) targetBoard = 'openingModeBoard';
+            document.body.dataset.board = targetBoard; // lets the phone layout scroll the main board only
             if (targetBoard === activeBoard) return;
             if (!isStudentMode && (targetBoard === 'focusModeBoard' || activeBoard === 'focusModeBoard')) setTimeout(pushLiveState, 50); // students get (or lose) the task and Done button, whichever way the board left Independent Work
             const oldBoard = document.getElementById(activeBoard); const newBoard = document.getElementById(targetBoard); const topTabs = document.getElementById('topSourceTabs');
@@ -4943,7 +4964,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         // ==================== OPENING MODE (warm-up + check-in) ====================
         // Opened from the Warm-Up card's Expand badge or Shift+W. Nothing starts on its own: the teacher taps Start.
         // Check-in on/off and the warm-up length are remembered per class.
-        function expandWarmup() { if (isStudentMode) toggleWarmupModal(); else toggleOpeningMode(); }
+        function expandWarmup() { if (isStudentMode) toggleWarmupModal(); else if (window.innerWidth > 760) toggleOpeningMode(); } /* phone: the warm-up is already in full */
         function toggleOpeningMode() {
             if (isTransitioning || isStudentMode) return;
             isOpeningMode = !isOpeningMode; isFocusMode = false; isSlideMode = false; isGameStage = false;
@@ -5509,6 +5530,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             catch (e) { /* storage blocked on this device: neutral defaults, page still works */ }
         }
         function boot() {
+            document.body.dataset.board = activeBoard;
             applyStudentLinkBranding();
             preserveLegacyBranding();
             loadThemeSettings();
