@@ -3112,11 +3112,13 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         const looksLikeStandardCode = t => /^[A-Za-z]{2,6}(\.[A-Za-z0-9]{1,6}){1,4}$/.test(t);
         function resolveStandardsCell(raw) {
             raw = String(raw || '').trim(); if (!raw) return { text: '', eq: '', unknown: [] };
-            const hasLookup = Object.keys(standardsLookup).length > 0;
+            // Only codes that start like ones on the tab (EPF., PSY., SOC.) count as typos. Your own codes (SS.2.1)
+            // and plain sentences are left alone, and with no Standards tab nothing is ever flagged.
+            const prefixes = new Set(Object.keys(standardsLookup).map(c => c.split('.')[0]));
             let hits = [], rest = [], unknown = [];
             raw.split(/[,;\n]+/).map(t => t.trim()).filter(Boolean).forEach(t => {
                 const s = standardsLookup[t.toUpperCase()];
-                if (s) hits.push(s); else { rest.push(t); if (hasLookup && looksLikeStandardCode(t)) unknown.push(t); }
+                if (s) hits.push(s); else { rest.push(t); if (looksLikeStandardCode(t) && prefixes.has(t.split('.')[0].toUpperCase())) unknown.push(t); }
             });
             if (!hits.length) return { text: `Standard(s): ${raw}`, eq: '', unknown: unknown };
             const lines = hits.map(s => s.text ? `${s.code}: ${s.text}` : s.code); if (rest.length) lines.push(rest.join(', '));
