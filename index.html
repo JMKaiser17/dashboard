@@ -1702,6 +1702,17 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             </div>
         </div>
     </div>
+    <div class="modal" id="phoneModeModal">
+        <div class="leaderboard-wrapper ui-box-3" style="max-width:520px;width:92%;text-align:center;padding:clamp(16px,2.4vh,30px) clamp(16px,2.6vw,36px);">
+            <h1 id="pmTitle" class="lb-header" style="margin:0 0 6px 0;font-size:clamp(1.3rem,2.2vw,1.9rem);">Switch to Work?</h1>
+            <p style="margin:0 0 16px 0;color:var(--gray-500);font-weight:bold;">Change the board in the room too, or just look on your phone?</p>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+                <button type="button" onclick="phoneModeChoice(true)" style="background:var(--primary-color);color:var(--white);border:none;padding:12px 30px;border-radius:var(--radius-lg);font-weight:bold;cursor:pointer;font-size:1.2rem;box-shadow:var(--shadow-md);">📺 Board and phone</button>
+                <button type="button" onclick="phoneModeChoice(false)" style="background:var(--bg-light);color:var(--secondary-dark);border:2px solid var(--primary-color);padding:12px 30px;border-radius:var(--radius-lg);font-weight:bold;cursor:pointer;font-size:1.2rem;">📱 Just my phone</button>
+                <button type="button" onclick="toggleModal('phoneModeModal')" class="close-btn" style="margin-top:0;padding:12px 30px;font-size:1.2rem;">Cancel</button>
+            </div>
+        </div>
+    </div>
     <div class="modal" id="workEditModal">
         <div class="leaderboard-wrapper ui-box-3" style="max-width:900px;width:95%;max-height:94vh;overflow-y:auto;text-align:left;padding:clamp(14px,2.4vh,30px) clamp(18px,2.6vw,40px);">
             <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;"><h1 id="weTitle" class="lb-header" style="text-align:left;margin:0;font-size:clamp(1.3rem,2.2vw,1.9rem);">✎ Current Task</h1><p id="weWho" style="margin:0;color:var(--gray-500);font-weight:bold;"></p></div>
@@ -1887,8 +1898,8 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             </div>
             <div class="right-pills">
                 <div class="pill action-pill countdown-pill" onclick="toggleModal('timerModal')"><div class="pill-subtitle">Countdown</div><div class="widget-text sync-timer" style="color:var(--primary-color);">00:00</div></div>
-                <div class="pill action-pill" onclick="toggleSlideMode()"><div class="pill-subtitle">Present</div><div class="widget-text">📺 Slides</div></div>
-                <div class="pill action-pill" onclick="toggleFocusMode()" title="Independent Work (Shift+Z)"><div class="pill-subtitle">Independent</div><div class="widget-text">🎯 Work</div></div>
+                <div class="pill action-pill" onclick="modeTap('slides')"><div class="pill-subtitle">Present</div><div class="widget-text">📺 Slides</div></div>
+                <div class="pill action-pill" onclick="modeTap('focus')" title="Independent Work (Shift+Z)"><div class="pill-subtitle">Independent</div><div class="widget-text">🎯 Work</div></div>
                 <div class="pill action-pill" id="groupsPill" style="display:none;" onclick="toggleModal('groupModal')" title="Random groups (Shift+A). Shows on days your Agenda or Warm-Up mentions groups."><div class="pill-subtitle">Sort</div><div class="widget-text">👥 Groups</div></div>
             <div class="pill clock-pill clock" id="clockDisplay">08:00:00 AM</div>
                 <button type="button" class="settings-gear" onclick="openSettingsModal()" title="Settings (Shift+O)" aria-label="Settings">⚙️</button>
@@ -2830,6 +2841,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             return { id: String(activeBlockData.id), date: ymdLocal(activeBlockData.date), task: currentTaskText(), links: links, voice: noiseState };
         }
         function pushLiveState() {
+            if (isGlanceDevice()) return; // a phone is a second board: its timer, light, and mode never overwrite the room's (edits go through pushPhoneEdit)
             const url = getAutoBackupUrl(); const token = getAutoBackupToken();
             if (!url || !token) return; // live sync isn't configured - silently does nothing, same spirit as auto-backup
             const badge = document.getElementById('statusLightBadge');
@@ -2837,9 +2849,11 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             const timerActive = isRunning || remainingMs > 0;
             const state = {
                 statusLight: { active: lightActive, state: lightActive ? statusLightState : null },
-                timer: { active: timerActive, running: isRunning, endTime: isRunning ? endTime : null, remainingMs: remainingMs },
+                timer: { active: timerActive, running: isRunning, endTime: isRunning ? endTime : null, remainingMs: remainingMs, totalMs: totalTimeMs },
                 notes: liveNotesText(),
                 work: liveWorkState(),
+                voice: noiseState,
+                applied: remoteApplied.slice(-40), // phone requests the board has carried out
             };
             const payload = JSON.stringify({ token: token, action: 'liveState', data: state });
             fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }).catch(() => { /* silent - same reasoning as auto-backup's fetch */ });
@@ -4177,7 +4191,145 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             const id = activeBlockData.id, text = document.getElementById('weText').value.replace(/\s+$/, '');
             if (workEditField === 'task') { store.setItem('titan_task_' + id, textToParagraphs(text)); store.setItem('titan_task_edited_' + id, dayStamp(activeBlockData.date)); }
             else store.setItem('titan_finish_early_' + id, textToParagraphs(text || FINISH_EARLY_DEFAULT));
-            loadTaskNote(); toggleModal('workEditModal'); showToast('Saved.'); saveRecapSoon(); pushLiveState();
+            loadTaskNote(); toggleModal('workEditModal'); saveRecapSoon();
+            if (!isGlanceDevice()) { showToast('Saved.'); pushLiveState(); return; }
+            pushPhoneEdit({ id: String(id), field: workEditField, text: text, stamp: dayStamp(activeBlockData.date), taskText: workEditField === 'task' ? currentTaskText() : undefined })
+                .then(ok => showToast(ok ? 'Saved. The board picks it up in a few seconds.' : "Saved on this phone, but the board couldn't be reached. Try again in a moment."));
+        }
+
+        // ==================== EDITS FROM A PHONE (glance and fix) ====================
+        // The phone layout is a second copy of the board. It never pushes its own live state (that would send students
+        // the phone's timer and phone light). A Work pencil edit is merged into the room's current live state instead:
+        // students see a new task right away, and the board adopts the edit on its next check and takes over again.
+        function isGlanceDevice() { return !isStudentMode && window.matchMedia('(max-width: 760px)').matches; }
+        async function readTeacherLiveState() {
+            const url = getAutoBackupUrl(), token = getAutoBackupToken(); if (!url || !token) return null;
+            const resp = await fetch(url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(token) + '&action=liveState');
+            const json = await resp.json(); return (json && json.ok && json.data && typeof json.data === 'object') ? json.data : null;
+        }
+        function pushPhoneEdit(edit) { const run = remoteChain.then(() => pushPhoneEditNow(edit)); remoteChain = run.catch(() => {}); return run; }
+        async function pushPhoneEditNow(edit) {
+            const url = getAutoBackupUrl(), token = getAutoBackupToken(); if (!url || !token) return false;
+            let state; try { state = await readTeacherLiveState(); } catch (e) { return false; }
+            if (!state) return false; // can't merge without the room's state, and sending ours would overwrite it
+            const taskText = edit.taskText; delete edit.taskText;
+            edit.n = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+            state.edit = edit;
+            if (edit.field === 'task' && state.work && String(state.work.id) === edit.id && typeof taskText === 'string') state.work.task = taskText; // students see it now
+            try { await fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ token: token, action: 'liveState', data: state }) }); return true; }
+            catch (e) { return false; }
+        }
+        // ==================== PHONE AS A REMOTE ====================
+        // Timer, voice level, phone light, and (when you choose "Board and phone") the board mode. A tap on the phone
+        // changes the phone right away and queues a request in the shared live state; the board checks every 5 seconds,
+        // carries it out (students see it the normal way), and lists it as applied. The phone resends anything the board
+        // missed and, when nothing is waiting, mirrors the board so it always shows what the room sees.
+        let remotePending = [], remoteChain = Promise.resolve(), remoteFlushTimer = null, remoteLightTimer = null, remoteWarned = false;
+        function remoteOn() { return isGlanceDevice() && !!getAutoBackupUrl() && !!getAutoBackupToken(); }
+        function userTap() { const e = window.event; return !!(e && e.isTrusted && /^(click|pointerup|pointerdown|touchend|keydown|change)$/.test(e.type)); } // never a timer tick or a page load
+        function remoteQueue(cmd) {
+            if (!remoteOn() || !userTap()) return;
+            if (cmd.t === 'voice' || cmd.t === 'light' || cmd.t === 'run') remotePending = remotePending.filter(p => p.sentAt || p.cmd.t !== cmd.t); // only the latest of these matters
+            cmd.n = Date.now().toString(36) + Math.random().toString(36).slice(2, 8); cmd.at = Date.now();
+            remotePending.push({ cmd: cmd, sentAt: 0, queuedAt: Date.now() });
+            clearTimeout(remoteFlushTimer); remoteFlushTimer = setTimeout(remoteSend, 350);
+        }
+        function remoteLight() { if (!remoteOn() || !userTap()) return; const on = document.getElementById('statusLightBadge').style.display === 'flex'; remoteQueue({ t: 'light', on: on, state: statusLightState }); }
+        function remoteSend() {
+            remoteChain = remoteChain.then(async () => {
+                if (!remotePending.length) return;
+                let state; try { state = await readTeacherLiveState(); } catch (e) { state = null; }
+                if (!state) return; // the next check tries again
+                const applied = new Set(Array.isArray(state.applied) ? state.applied : []), now = Date.now();
+                remotePending = remotePending.filter(p => !applied.has(p.cmd.n));
+                const cmds = (Array.isArray(state.cmds) ? state.cmds : []).filter(c => c && c.n && !applied.has(c.n) && now - (c.at || 0) < 120000);
+                remotePending.forEach(p => { if (!cmds.some(c => c.n === p.cmd.n)) cmds.push(p.cmd); p.sentAt = now; });
+                state.cmds = cmds;
+                const url = getAutoBackupUrl(), token = getAutoBackupToken();
+                try { await fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ token: token, action: 'liveState', data: state }) }); } catch (e) { /* resent on the next check */ }
+            }).catch(() => {});
+            return remoteChain;
+        }
+        // Phone: every 3 seconds, confirm, resend, or mirror.
+        async function remoteCheck() {
+            if (!remoteOn() || document.hidden) return;
+            let state; try { state = await readTeacherLiveState(); } catch (e) { return; }
+            if (!state) return;
+            const applied = new Set(Array.isArray(state.applied) ? state.applied : []), waiting = new Set((state.cmds || []).map(c => c && c.n)), now = Date.now();
+            remotePending = remotePending.filter(p => !applied.has(p.cmd.n));
+            const stale = remotePending.filter(p => now - p.queuedAt > 30000);
+            if (stale.length) { remotePending = remotePending.filter(p => now - p.queuedAt <= 30000); if (!remoteWarned) { remoteWarned = true; showToast("The board hasn't picked that up. Is it on?"); } }
+            if (remotePending.some(p => p.sentAt && now - p.sentAt > 8000 && !waiting.has(p.cmd.n))) { remoteSend(); return; }
+            if (remotePending.length) return; // don't undo a tap the board hasn't carried out yet
+            remoteWarned = false; remoteMirror(state);
+        }
+        function remoteMirror(state) {
+            const t = state.timer || {};
+            clearInterval(timerInterval);
+            isRunning = !!(t.running && t.endTime); endTime = isRunning ? t.endTime : 0;
+            remainingMs = isRunning ? Math.max(0, t.endTime - Date.now()) : Math.max(0, t.remainingMs || 0);
+            totalTimeMs = t.active ? Math.max(t.totalMs || 0, remainingMs) : 0;
+            warningPlayed = true; donePlayed = true; timerReturnBoard = ''; // the board chimes and returns, not the phone
+            document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = isRunning ? 'Pause' : 'Start');
+            if (isRunning) { timerInterval = setInterval(updateTimerDisplay, 1000); updateTimerDisplay(); }
+            else { renderTime(remainingMs); document.querySelectorAll('.sync-progress').forEach(bar => { bar.style.width = (totalTimeMs > 0 ? (remainingMs / totalTimeMs) * 100 : 0) + '%'; bar.style.backgroundColor = 'var(--primary-color)'; }); }
+            checkFloatingTimer();
+            if (typeof state.voice === 'number' && state.voice !== noiseState) setNoiseLevel(state.voice, true);
+            const L = state.statusLight || {}, badge = document.getElementById('statusLightBadge'), on = !!(L.active && STATUS_LIGHT_STATES[L.state]);
+            if (on) statusLightState = L.state;
+            badge.style.display = on ? 'flex' : 'none'; document.body.classList.toggle('status-light-on', on);
+            if (on) renderStatusLight(); renderPhoneRow();
+        }
+        // Board mode from the phone: always ask.
+        let phoneModeTarget = '';
+        function modeTap(kind) {
+            if (!isGlanceDevice()) { if (kind === 'slides') toggleSlideMode(); else toggleFocusMode(); return; }
+            phoneModeTarget = kind === 'slides' ? (isSlideMode ? 'main' : 'slides') : (isFocusMode ? 'main' : 'focus');
+            document.getElementById('pmTitle').innerText = phoneModeTarget === 'main' ? 'Back to the main board?' : phoneModeTarget === 'focus' ? 'Switch to Work?' : 'Switch to Slides?';
+            toggleModal('phoneModeModal');
+        }
+        function phoneModeChoice(alsoBoard) {
+            toggleModal('phoneModeModal');
+            if (!remoteOn() && alsoBoard) showToast("The board can't be reached from here, so only your phone switched.");
+            if (alsoBoard) remoteQueue({ t: 'mode', board: phoneModeTarget });
+            setBoardMode(phoneModeTarget);
+        }
+        function setBoardMode(target, tries) {
+            if (isTransitioning) { if ((tries || 0) < 6) setTimeout(() => setBoardMode(target, (tries || 0) + 1), 400); return; }
+            if (target === 'main') { if (isFocusMode) toggleFocusMode(); else if (isSlideMode) toggleSlideMode(); else if (isGameStage) toggleGameStage(); else if (isOpeningMode) toggleOpeningMode(); }
+            else if (target === 'focus') { if (!isFocusMode) toggleFocusMode(); }
+            else if (target === 'slides') { if (!isSlideMode) toggleSlideMode(); }
+        }
+        // Board: carry out what the phone asked for, once each.
+        let remoteApplied = (() => { try { const a = JSON.parse(store.getItem('__remote_applied') || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } })();
+        function runRemoteCmd(c) {
+            if (c.t === 'add') { const m = Number(c.min); if (isFinite(m) && m > 0 && m <= 60) addTime(m); }
+            else if (c.t === 'run') { if (!!c.on !== isRunning) toggleTimer(); }
+            else if (c.t === 'clear') clearTimer();
+            else if (c.t === 'voice') setNoiseLevel(Number(c.level) || 0);
+            else if (c.t === 'light') { const st = Number(c.state); if (!c.on) setStatusLight(-1); else if (STATUS_LIGHT_STATES[st]) setStatusLight(st); }
+            else if (c.t === 'mode') { if (['main', 'focus', 'slides'].includes(c.board)) setBoardMode(c.board); }
+        }
+        let lastPhoneEdit = '';
+        async function pollPhoneEdits() {
+            if (isStudentMode || isGlanceDevice() || document.hidden) return;
+            let state; try { state = await readTeacherLiveState(); } catch (e) { return; }
+            const cmds = (state && Array.isArray(state.cmds) ? state.cmds : []).filter(c => c && typeof c.n === 'string' && !remoteApplied.includes(c.n) && Date.now() - (Number(c.at) || 0) < 120000).sort((a, b) => (a.at || 0) - (b.at || 0));
+            if (cmds.length) {
+                cmds.forEach(c => { remoteApplied.push(c.n); }); remoteApplied = remoteApplied.slice(-40);
+                try { store.setItem('__remote_applied', JSON.stringify(remoteApplied)); } catch (e) {}
+                cmds.forEach(c => { try { runRemoteCmd(c); } catch (e) { console.warn('Phone request skipped', e); } });
+                pushLiveState(); // confirms them to the phone and clears the queue
+            }
+            const e = state && state.edit;
+            if (!e || typeof e !== 'object' || typeof e.n !== 'string' || e.n === lastPhoneEdit || !e.id || typeof e.text !== 'string' || e.text.length > 20000) return;
+            lastPhoneEdit = e.n;
+            if (e.field === 'task') { store.setItem('titan_task_' + e.id, textToParagraphs(e.text)); if (/^\d{4}-\d{2}-\d{2}$/.test(e.stamp || '')) store.setItem('titan_task_edited_' + e.id, e.stamp); }
+            else if (e.field === 'early') store.setItem('titan_finish_early_' + e.id, textToParagraphs(e.text || FINISH_EARLY_DEFAULT));
+            else return;
+            if (activeBlockData && String(activeBlockData.id) === String(e.id)) { loadTaskNote(); saveRecapSoon(); }
+            pushLiveState(); // the board is the source again (this also clears the edit from the shared state)
+            showToast(e.field === 'task' ? 'Current Task updated from your phone.' : 'Finish Early updated from your phone.');
         }
         function clearNotepad() {
             if (!activeBlockData) return; const undo = snapshotKeys(['titan_notepad_' + activeBlockData.id]);
@@ -4213,7 +4365,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             const badge = document.getElementById('statusLightBadge');
             if (badge.style.display === 'flex') { badge.style.display = 'none'; } else { badge.style.display = 'flex'; renderStatusLight(); }
             document.body.classList.toggle('status-light-on', badge.style.display === 'flex');
-            renderPhoneRow(); pushLiveState();
+            renderPhoneRow(); pushLiveState(); remoteLight();
         }
         function renderStatusLight() {
             const state = STATUS_LIGHT_STATES[statusLightState];
@@ -4230,7 +4382,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             if (index < 0) { if (isOn) toggleStatusLight(); renderPhoneRow(); return; }
             statusLightState = index; renderStatusLight();
             if (!isOn) toggleStatusLight(); else pushLiveState();
-            renderPhoneRow();
+            renderPhoneRow(); remoteLight();
         }
         function renderPhoneRow() {
             const row = document.getElementById('phoneRow'); if (!row) return;
@@ -4241,14 +4393,17 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function cycleStatusLightState() {
             statusLightState = (statusLightState + 1) % STATUS_LIGHT_STATES.length;
             renderStatusLight(); renderPhoneRow(); playTone(500 + statusLightState * 150, 0, 0.1, 0.1);
-            pushLiveState();
+            pushLiveState(); remoteLight();
         }
-        function cycleNoiseLevel() {
-            noiseState = (noiseState + 1) % 3; const widget = document.getElementById('noiseLevelWidget'); const icon = document.getElementById('noiseIcon'); const text = document.getElementById('noiseText');
+        function cycleNoiseLevel() { setNoiseLevel(noiseState + 1); }
+        function setNoiseLevel(level, mirror) {
+            noiseState = ((Number(level) || 0) % 3 + 3) % 3; const widget = document.getElementById('noiseLevelWidget'); const icon = document.getElementById('noiseIcon'); const text = document.getElementById('noiseText');
             if(noiseState === 0) { widget.style.borderColor = 'var(--primary-color)'; icon.innerText = '🤫'; icon.style.filter = 'drop-shadow(0 0 12px rgba(var(--primary-rgb), 0.5))'; text.innerText = 'Level 0: Silent'; text.style.color = ''; } 
             else if(noiseState === 1) { widget.style.borderColor = 'var(--bg-mid)'; icon.innerText = '🗣️'; icon.style.filter = 'drop-shadow(0 0 12px rgba(var(--bg-mid-rgb), 0.5))'; text.innerText = 'Level 1: Whisper'; text.style.color = 'var(--bg-mid)'; } 
             else { widget.style.borderColor = '#ffffff'; icon.innerText = '👥'; icon.style.filter = 'drop-shadow(0 0 12px rgba(255, 255, 255, 0.5))'; text.innerText = 'Level 2: Group'; text.style.color = '#ffffff'; }
+            if (mirror) return; // the phone copying the board: nothing to send
             if (!isStudentMode) { clearTimeout(voicePushTimer); voicePushTimer = setTimeout(pushLiveState, 600); } // students see it on their task card; a few quick taps send once
+            remoteQueue({ t: 'voice', level: noiseState });
         }
         let voicePushTimer = null;
 
@@ -5081,18 +5236,21 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             document.querySelectorAll('.sync-timer').forEach(el => el.classList.remove('pulse'));
             document.querySelectorAll('.sync-progress').forEach(bar => { if (totalTimeMs > 0) bar.style.width = ((remainingMs / totalTimeMs) * 100) + "%"; bar.style.backgroundColor = "var(--primary-color)"; });
             checkFloatingTimer(); pushLiveState(); // students see the new time right away
+            remoteQueue({ t: 'add', min: minutes });
         }
         function toggleTimer() {
             initAudio(); 
             if (isRunning) { clearInterval(timerInterval); remainingMs = Math.max(0, endTime - Date.now()); isRunning = false; document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = "Start"); } 
             else { if (remainingMs > 0) { endTime = Date.now() + remainingMs; isRunning = true; document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = "Pause"); timerInterval = setInterval(updateTimerDisplay, 1000); } }
             saveTimerState(); checkFloatingTimer(); pushLiveState();
+            remoteQueue({ t: 'run', on: isRunning });
         }
         function clearTimer() {
             clearInterval(timerInterval); isRunning = false; totalTimeMs = 0; remainingMs = 0; endTime = 0; warningPlayed = false; donePlayed = false; timerReturnBoard = ''; timerReturnChoice = null;
             document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = "Start"); renderTime(0);
             document.querySelectorAll('.sync-progress').forEach(bar => { bar.style.backgroundColor = "var(--primary-color)"; bar.style.width = "0%"; });
             saveTimerState(); checkFloatingTimer(); pushLiveState();
+            remoteQueue({ t: 'clear' });
         }
         function updateTimerDisplay() {
             remainingMs = endTime - Date.now();
@@ -5538,6 +5696,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             if (!isStudentMode) { try { pruneOldAbsences(); } catch (e) { /* storage trouble: keep going */ } }
             ensureFirstUseTimestamp(); updateBackupReminderUI(); checkFirstRun();
             fetchAgendaData(); fetchGameVaultData(); setInterval(updateDashboard, 1000); setInterval(fetchAgendaData, 60000);
+            if (!isStudentMode) { setInterval(pollPhoneEdits, 5000); setInterval(remoteCheck, 3000); } // board: carry out phone requests; phone: confirm and mirror
             loadTimerState(); renderReturnChips();
         }
         // On Apps Script, pull the sheet's saved data first (capped at 5 seconds), then draw the board.
