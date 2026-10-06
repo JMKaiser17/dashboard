@@ -1165,10 +1165,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         #studentTopBar .stu-nav { background:var(--bg-light); color:var(--ink); border:2px solid var(--bg-mid); border-radius:var(--radius-lg); font-weight:bold; font-size:1rem; transition:background 0.2s,border-color 0.2s; }
         #studentTopBar .stu-nav.active { background:var(--primary-color); color:var(--white); border-color:var(--primary-color); }
         html.mouse-input #studentTopBar .stu-nav:not(.active):hover { border-color:var(--primary-color); }
-        #studentWorkPanel { margin:0; flex:1 1 auto; min-height:0; overflow-y:auto; }
+        #studentWorkPanel { margin:0; flex:0 0 auto; max-height:60vh; overflow-y:auto; } /* hugs the task; the plan row below takes the rest */
         .sw-grid { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(260px,1fr); gap:clamp(14px,2vw,32px); align-items:center; flex:1 1 auto; }
         .sw-main { min-width:0; }
         .sw-label { color:var(--primary-color); font-weight:900; font-size:clamp(1rem,1.3vw,1.4rem); margin-bottom:8px; }
+        #swTask.sw-short { font-size:clamp(1.6rem,3.2vw,3.4rem); } /* a line or two reads big */
         #swTask { white-space:pre-wrap; font-size:clamp(1.3rem,2.4vw,2.6rem); font-weight:700; line-height:1.35; margin:0 0 14px 0; color:var(--secondary-dark); overflow-wrap:anywhere; }
         .sw-links { display:flex; flex-wrap:wrap; gap:10px; }
         .sw-link { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border:2px solid var(--primary-color); border-radius:var(--radius-pill); color:var(--primary-color); background:var(--white); font-weight:bold; font-size:clamp(1rem,1.2vw,1.25rem); text-decoration:none; }
@@ -1176,15 +1177,17 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         .sw-checkin { background:var(--bg-light); border-radius:var(--radius-lg); padding:clamp(12px,1.6vw,22px); display:flex; flex-direction:column; justify-content:center; min-width:0; }
         .sw-hint, #swWho p { display:block; font-weight:bold; font-size:1rem; line-height:1.4; color:var(--secondary-dark); }
         @media (min-width: 761px) {
-            body.student-mode.sw-active #mainBento { flex:0 0 auto; grid-template-columns:1fr 1fr; grid-template-rows:auto; } /* never force display: the board switcher hides it */
+            body.student-mode.sw-active #mainBento { flex:1 1 auto; min-height:0; grid-template-columns:1fr 1fr 1fr; grid-template-rows:minmax(0,1fr); } /* Agenda | EQ | Standards. Never force display: the board switcher hides it */
             body.student-mode.sw-active #mainBento .card-agenda { grid-column:1 / 2; grid-row:1 / 2; }
-            body.student-mode.sw-active #mainBento .card-bottom-split { grid-column:2 / 3; grid-row:1 / 2; grid-template-columns:1fr; }
+            body.student-mode.sw-active #mainBento .card-bottom-split { grid-column:2 / 4; grid-row:1 / 2; grid-template-columns:1fr 1fr; }
+            body.student-mode.sw-active #mainBento .sub-card { overflow-y:auto; }
+            body.student-mode.sw-active #eqText, body.student-mode.sw-active #standardsText { font-size:clamp(1.1rem,1.6vw,1.8rem); line-height:1.4; } /* no !important: the board's auto-fit can still shrink long text */
         }
-        body.student-mode.sw-active #mainBento .card-warmup, body.student-mode.sw-active #mainBento .sub-standards { display:none !important; } /* the warm-up is over by work time */
-        body.student-mode.sw-active #mainBento .card-agenda h2 { font-size:clamp(1.1rem,1.4vw,1.5rem) !important; margin-bottom:6px !important; }
-        body.student-mode.sw-active #mainBento .sub-card h3 { font-size:clamp(1.1rem,1.4vw,1.5rem) !important; margin-bottom:6px !important; }
-        body.student-mode.sw-active #agendaItems li { font-size:clamp(1rem,1.3vw,1.35rem) !important; margin-bottom:4px !important; line-height:1.35 !important; }
-        body.student-mode.sw-active #eqText { font-size:clamp(1rem,1.3vw,1.35rem) !important; line-height:1.4 !important; }
+        body.student-mode.sw-active #mainBento .card-warmup { display:none !important; } /* the warm-up is over by work time */
+        body.student-mode.sw-active #mainBento .card-agenda h2 { font-size:clamp(1.15rem,1.6vw,1.8rem) !important; margin-bottom:8px !important; }
+        body.student-mode.sw-active #mainBento .sub-card h3 { font-size:clamp(1.15rem,1.6vw,1.8rem) !important; margin-bottom:8px !important; }
+        body.student-mode.sw-active #agendaItems { font-size:clamp(1.05rem,1.6vw,1.8rem); }
+        body.student-mode.sw-active #agendaItems li { font-size:1em !important; margin-bottom:0.3em !important; line-height:1.35 !important; } /* sized by the list, so fitWorkPlan can grow it */
         /* ==================== PHONE LAYOUT (Student Mode only) ====================
            The board is built for a wall screen. On a phone, Student Mode becomes one scrolling column:
            class name on top, the four student buttons as a 2x2 grid, then each card full width at its natural height. */
@@ -3474,10 +3477,13 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             const panel = document.getElementById('studentWorkPanel'); if (!panel) return;
             const w = liveWork;
             const mine = studentOnPlan && w && activeBlockData && String(activeBlockData.id) === w.id && missedAvailable();
-            document.body.classList.toggle('sw-active', !!mine); // work time: the plan below shrinks to Agenda + EQ
+            const wasActive = document.body.classList.contains('sw-active');
+            document.body.classList.toggle('sw-active', !!mine); // work time: the plan below becomes Agenda | EQ | Standards
+            if (wasActive !== !!mine) setTimeout(autoFitCardText, 60); // the cards just changed size
             if (!mine) { panel.style.display = 'none'; return; }
             panel.style.display = 'flex';
-            document.getElementById('swTask').innerText = w.task || 'Check the board for today\'s task.';
+            const taskEl = document.getElementById('swTask'); taskEl.innerText = w.task || 'Check the board for today\'s task.';
+            taskEl.classList.toggle('sw-short', taskEl.innerText.length <= 70 && taskEl.innerText.split('\n').length <= 3);
             document.getElementById('swLinks').innerHTML = (w.links || []).map(l => `<a class="sw-link" href="${escapeHtml(l.url)}" target="_blank" rel="noopener">🔗 ${escapeHtml(l.label || 'Link')}</a>`).join('');
             const who = document.getElementById('swWho'), name = localStorage.getItem(swNameKey(w.id)) || '';
             const roster = (activeBlockData.roster || []);
@@ -4548,6 +4554,13 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             // A short warm-up grows to fill its card (capped), so a one-line question isn't marooned at the top.
             const warm = document.getElementById('warmupText');
             if (warm && warm.offsetParent !== null) growToFit(warm, warm.closest('.card'), Math.min(88, window.innerHeight * 0.085), 14, 2);
+            fitWorkPlan();
+        }
+        // Student work time: Agenda, EQ, and Standards share one row, so short text grows to fill its card (capped).
+        function fitWorkPlan() {
+            if (!isStudentMode || !document.body.classList.contains('sw-active') || window.innerWidth <= 760) return;
+            const cap = Math.min(44, window.innerHeight * 0.045);
+            ['agendaItems', 'eqText', 'standardsText'].forEach(id => { const el = document.getElementById(id); if (el && el.offsetParent !== null) growToFit(el, el.closest('.sub-card, .card'), cap, 14, 1); });
         }
 
         // ==================== CLASS RECAP PDF ====================
