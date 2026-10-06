@@ -1682,7 +1682,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                     <h3 class="ui-heading-2" style="color:var(--primary-color);font-size:1.2rem;">Data Links</h3>
                     <label style="font-weight:bold;color:var(--secondary-dark);font-size:0.9rem;">Daily Agenda CSV Link</label>
                     <input type="text" id="customSheetUrlInput" placeholder="https://docs.google.com/spreadsheets/.../pub?output=csv" class="ui-field-1" style="width:100%;border-radius:var(--radius-sm);border:2px solid var(--primary-color);font-family:monospace;font-size:0.9rem;">
-                    <p style="color:var(--gray-500);font-size:0.75rem;margin:4px 0 15px 0;">Expects columns: Date, ID; daily Warmup, Agenda, Reminders, Message; sticky Title, Start, End, Roster, EQ, Standards, Resources, Ticker, and optional Color and Style. Blank sticky cells keep the last value for that ID.</p>
+                    <p style="color:var(--gray-500);font-size:0.75rem;margin:4px 0 15px 0;">Expects columns: Date, ID; daily Warmup, Agenda, Reminders, Message; sticky Title, Start, End, Roster, EQ, Standards, Resources, Ticker, and optional Color and Style. Blank sticky cells keep the last value for that ID. Optional Standards tab: codes typed in Standards show their full text and fill in the EQ.</p>
                     <label style="font-weight:bold;color:var(--secondary-dark);font-size:0.9rem;">Game Vault CSV Link</label>
                     <input type="text" id="gameVaultUrlInput" placeholder="https://docs.google.com/spreadsheets/.../pub?output=csv" class="ui-field-1" style="width:100%;border-radius:var(--radius-sm);border:2px solid var(--bg-mid);font-family:monospace;font-size:0.9rem;">
                     <p style="color:var(--gray-500);font-size:0.75rem;margin:4px 0 0 0;">Expects columns: Status (ACTIVE to show everyone, TEACHER_ONLY to hide just from Student Mode links while keeping it on your own dashboard), ID, Type, Title, Category, Prompt, Answer, Value. For the Reinforcement Lab (Type=reinforcement), Prompt holds the schedule (FR-5, VR-5, FI-8, VI-8, or RANDOM) and Value holds the round length in seconds.</p>
@@ -2797,7 +2797,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             store.setItem('titan_setting_hotseat_time', parseInt(document.getElementById('settingHotSeatTime').value, 10) || 45);
             store.setItem('titan_setting_ff_time', parseInt(document.getElementById('settingFFTime').value, 10) || 60);
             store.setItem('titan_setting_debate_time', parseInt(document.getElementById('settingDebateTime').value, 10) || 60);
-            loadThemeSettings(); showToast('Settings saved. Refreshing data…'); toggleModal('settingsModal'); fetchAgendaData(); fetchGameVaultData();
+            loadThemeSettings(); showToast('Settings saved. Refreshing data…'); toggleModal('settingsModal'); standardsFetchedAt = 0; fetchAgendaData(); fetchGameVaultData();
         }
 
         const DASHBOARD_STORAGE_PREFIXES = ['titan_', 'classPoints_', 'checklist_'];
@@ -2922,9 +2922,10 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             list.innerHTML = body || '<p style="color:var(--ink);">No issues found. Everything in your sheets is being read.</p>';
         }
         function openSheetIssues() { renderSheetIssuesList(); toggleModal('sheetIssuesModal'); }
-        function retryFetchNow() { fetchAgendaData(); fetchGameVaultData(); }
+        function retryFetchNow() { standardsFetchedAt = 0; fetchAgendaData(); fetchGameVaultData(); }
         async function fetchAgendaData() {
             const currentUrl = getActiveCsvUrl(); if (!currentUrl) { loadSandboxData(); setStaleDataBadge(false); return; }
+            if (Date.now() - standardsFetchedAt > 5 * 60000) { standardsFetchedAt = Date.now(); try { await fetchStandardsData(); } catch (e) { /* never blocks the schedule */ } }
             try {
                 const csvText = await readSheetText('schedule', currentUrl);
                 // Process FIRST, cache only after it worked - otherwise a bad response overwrites the good fallback.
@@ -3088,6 +3089,57 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             if(isGameStage) buildDynamicGameMenu();
         }
 
+        // ---- Standards lookup ----
+        // An optional "Standards" tab (Code, Course, Unit, Level, Text, EQ) lets the Standards column hold short codes
+        // like EPF.MCM.3. The board shows each code's full text, and when a class's EQ wasn't typed more recently than
+        // its Standards, the EQ comes from the tab. Objective rows (EPF.MCM.3.2) borrow their parent's EQ unless they
+        // have their own. No tab, or a code that isn't on it, means the cell shows exactly as typed, like before.
+        let standardsLookup = {}; // CODE (upper case) -> { code, text, eq }
+        let standardsFetchedAt = 0;
+        function parseStandardsCsv(csvText) {
+            let map = {};
+            Papa.parse(csvText, { header: true, skipEmptyLines: true }).data.forEach(row => {
+                const code = getCol(row, 'Code'); if (!code) return;
+                map[code.toUpperCase()] = { code: code, text: getCol(row, 'Text'), eq: getCol(row, 'EQ') };
+            });
+            return map;
+        }
+        function lookupStandardEq(code) {
+            let c = String(code || '').toUpperCase();
+            while (c) { const s = standardsLookup[c]; if (s && s.eq) return s.eq; const i = c.lastIndexOf('.'); if (i < 0) break; c = c.slice(0, i); }
+            return '';
+        }
+        const looksLikeStandardCode = t => /^[A-Za-z]{2,6}(\.[A-Za-z0-9]{1,6}){1,4}$/.test(t);
+        function resolveStandardsCell(raw) {
+            raw = String(raw || '').trim(); if (!raw) return { text: '', eq: '', unknown: [] };
+            const hasLookup = Object.keys(standardsLookup).length > 0;
+            let hits = [], rest = [], unknown = [];
+            raw.split(/[,;\n]+/).map(t => t.trim()).filter(Boolean).forEach(t => {
+                const s = standardsLookup[t.toUpperCase()];
+                if (s) hits.push(s); else { rest.push(t); if (hasLookup && looksLikeStandardCode(t)) unknown.push(t); }
+            });
+            if (!hits.length) return { text: `Standard(s): ${raw}`, eq: '', unknown: unknown };
+            const lines = hits.map(s => s.text ? `${s.code}: ${s.text}` : s.code); if (rest.length) lines.push(rest.join(', '));
+            let eq = ''; for (const s of hits) { eq = lookupStandardEq(s.code); if (eq) break; }
+            return { text: lines.join('\n'), eq: eq, unknown: unknown };
+        }
+        function studentServerAvailable() { return !!(HOST && isStudentMode && pageParams.get('liveToken') && window.google && google.script && google.script.run); }
+        // Reads the tab through the script (teacher board or Student Mode on Apps Script). Any failure keeps the last
+        // good copy, so a hiccup never strips the standards off the board.
+        async function fetchStandardsData() {
+            let token = directReadAvailable() ? getAutoBackupToken() : studentServerAvailable() ? pageParams.get('liveToken') : '';
+            let csv = null;
+            if (token) {
+                try {
+                    const r = await serverCall('dashReadTab', [token, 'standards'], 8000);
+                    if (r && r.ok && typeof r.csv === 'string') csv = r.csv;
+                    else if (r && /No tab named/.test(r.error || '')) { standardsLookup = {}; store.removeItem('titan_last_good_standards_csv'); return; }
+                } catch (e) { console.warn('Standards tab not read, keeping the last copy:', e && e.message ? e.message : e); }
+            }
+            if (csv !== null) { standardsLookup = parseStandardsCsv(csv); store.setItem('titan_last_good_standards_csv', csv); return; }
+            if (!Object.keys(standardsLookup).length) { const cached = store.getItem('titan_last_good_standards_csv'); if (cached) { try { standardsLookup = parseStandardsCsv(cached); } catch (e) { /* ignore */ } } }
+        }
+
         // ---- Schedule carry-forward ----
         // Sticky columns inherit from the most recent earlier row with the same ID when left blank.
         // Daily columns never inherit: a stale warm-up on the board is worse than an empty one.
@@ -3109,6 +3161,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                 let cells = {}; SCHEDULE_STICKY_COLS.concat(SCHEDULE_DAILY_COLS).forEach(c => { cells[c] = getCol(row, c); });
                 if (issues && cells.Color && cells.Color.toLowerCase() !== 'none' && !parseClassColor(cells.Color)) issues.push({ row: rowNum, text: `Color "${cells.Color}" isn't a color the dashboard knows, so the class uses your Primary color. Try a name like green, navy, or maroon, or a hex code like #1E6B3A.` });
                 if (issues && cells.Style && cells.Style.toLowerCase() !== 'none' && !parseBoardStyle(cells.Style)) issues.push({ row: rowNum, text: `Style "${cells.Style}" isn't a board style the dashboard knows, so the class uses your Settings style. Try a name from the Board style list in Settings, like graph paper, number line, or night sky.` });
+                if (issues && cells.Standards) resolveStandardsCell(cells.Standards).unknown.forEach(c => issues.push({ row: rowNum, text: `Standards code "${c}" isn't on the Standards tab, so it shows as typed. Check the spelling, or add it to the tab.` }));
                 if (issues) ['Start', 'End'].forEach(c => { let v = cells[c]; if (v && v.toLowerCase() !== 'none' && parseSheetTime(v) === null) issues.push({ row: rowNum, text: `${c} "${v}" isn't a time the dashboard can read, so it's treated as blank. Try 7:25 AM.` }); });
                 entries.push({ date: rowDate, forced: rawDateStr.includes('*'), id: getCol(row, 'ID'), cells: cells, order: i, row: rowNum });
             });
@@ -3129,13 +3182,16 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function applyStickyCells(prev, cells) {
             let next = Object.assign({}, prev);
             SCHEDULE_STICKY_COLS.forEach(c => { let v = cells[c]; if (!v) return; next[c] = v.toLowerCase() === 'none' ? '' : v; });
+            if (cells.Standards) next.__eqFromStd = true; // new Standards with no EQ typed: the EQ follows the Standards tab
+            if (cells.EQ) next.__eqFromStd = false;       // a typed EQ (or "none") wins until Standards change again
             if (cells.Title && cells.Title.toLowerCase() === 'none') next.__retired = true; else if (cells.Title) next.__retired = false;
             return next;
         }
         function scheduleBlockFrom(date, id, sticky, daily, forced, carried) {
-            let t;
+            let t; const std = resolveStandardsCell(sticky.Standards);
+            const eqTyped = sticky.__eqFromStd === undefined ? !!sticky.EQ : !sticky.__eqFromStd; // rows without an ID never set the flag
             let block = { date: new Date(date.getTime()), forced: !!forced, carried: !!carried, id: id, title: sticky.Title || 'Class Block', start: 0, end: 0,
-                eq: sticky.EQ || '', standards: sticky.Standards ? `Standard(s): ${sticky.Standards}` : "", resources: sticky.Resources || '',
+                eq: (eqTyped ? sticky.EQ : (std.eq || sticky.EQ)) || '', standards: std.text, resources: sticky.Resources || '',
                 warmup: daily.Warmup || '', message: daily.Message || '', ticker: sticky.Ticker || '', color: parseClassColor(sticky.Color) || '', boardStyle: parseBoardStyle(sticky.Style) || '', agenda: [], reminders: [], roster: [] };
             t = parseSheetTime(sticky.Start || ''); if (t !== null) block.start = t;
             t = parseSheetTime(sticky.End || ''); if (t !== null) block.end = t;
