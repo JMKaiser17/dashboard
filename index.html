@@ -1682,7 +1682,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
                     <h3 class="ui-heading-2" style="color:var(--primary-color);font-size:1.2rem;">Data Links</h3>
                     <label style="font-weight:bold;color:var(--secondary-dark);font-size:0.9rem;">Daily Agenda CSV Link</label>
                     <input type="text" id="customSheetUrlInput" placeholder="https://docs.google.com/spreadsheets/.../pub?output=csv" class="ui-field-1" style="width:100%;border-radius:var(--radius-sm);border:2px solid var(--primary-color);font-family:monospace;font-size:0.9rem;">
-                    <p style="color:var(--gray-500);font-size:0.75rem;margin:4px 0 15px 0;">Expects columns: Date, ID; daily Warmup, Agenda, Reminders, Message; sticky Title, Start, End, Roster, EQ, Standards, Resources, Ticker, and optional Color and Style. Blank sticky cells keep the last value for that ID. Optional Standards tab: codes typed in Standards show their full text and fill in the EQ.</p>
+                    <p style="color:var(--gray-500);font-size:0.75rem;margin:4px 0 15px 0;">Expects columns: Date, ID; daily Warmup, Agenda, Reminders, Message; sticky Title, Start, End, Roster, EQ, Standards, Resources, Ticker, and optional Color and Style. Blank sticky cells keep the last value for that ID. Optional Standards tab: codes typed in Standards show their full text and fill in the EQ. Whichever you changed last wins: a new code with a blank EQ uses the tab's EQ, and a typed EQ wins until you change Standards again.</p>
                     <label style="font-weight:bold;color:var(--secondary-dark);font-size:0.9rem;">Game Vault CSV Link</label>
                     <input type="text" id="gameVaultUrlInput" placeholder="https://docs.google.com/spreadsheets/.../pub?output=csv" class="ui-field-1" style="width:100%;border-radius:var(--radius-sm);border:2px solid var(--bg-mid);font-family:monospace;font-size:0.9rem;">
                     <p style="color:var(--gray-500);font-size:0.75rem;margin:4px 0 0 0;">Expects columns: Status (ACTIVE to show everyone, TEACHER_ONLY to hide just from Student Mode links while keeping it on your own dashboard), ID, Type, Title, Category, Prompt, Answer, Value. For the Reinforcement Lab (Type=reinforcement), Prompt holds the schedule (FR-5, VR-5, FI-8, VI-8, or RANDOM) and Value holds the round length in seconds.</p>
@@ -3096,11 +3096,14 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         // have their own. No tab, or a code that isn't on it, means the cell shows exactly as typed, like before.
         let standardsLookup = {}; // CODE (upper case) -> { code, text, eq }
         let standardsFetchedAt = 0;
+        // Header names a colleague might reasonably use. First match wins, so "Standard Code" counts as Code, not Text.
+        const STANDARDS_HEADERS = { code: ['Code', 'Standard Code', 'Std Code'], text: ['Text', 'Standard Text', 'Standard', 'Description', 'Objective'], eq: ['EQ', 'Essential Question', 'Essential Questions', 'Question'] };
+        function getColAny(row, names) { for (const n of names) { const v = getCol(row, n); if (v) return v; } return ''; }
         function parseStandardsCsv(csvText) {
             let map = {};
             Papa.parse(csvText, { header: true, skipEmptyLines: true }).data.forEach(row => {
-                const code = getCol(row, 'Code'); if (!code) return;
-                map[code.toUpperCase()] = { code: code, text: getCol(row, 'Text'), eq: getCol(row, 'EQ') };
+                const code = getColAny(row, STANDARDS_HEADERS.code); if (!code) return;
+                map[code.toUpperCase()] = { code: code, text: getColAny(row, STANDARDS_HEADERS.text), eq: getColAny(row, STANDARDS_HEADERS.eq) };
             });
             return map;
         }
