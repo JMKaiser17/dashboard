@@ -1168,6 +1168,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         #studentWorkPanel { margin:0; flex:0 0 auto; max-height:60vh; overflow-y:auto; } /* hugs the task; the plan row below takes the rest */
         .sw-grid { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(260px,1fr); gap:clamp(14px,2vw,32px); align-items:center; flex:1 1 auto; }
         .sw-main { min-width:0; }
+        .sw-head { display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; margin-bottom:8px; } .sw-head .sw-label { margin-bottom:0; }
+        .sw-voice { align-items:center; padding:4px 12px; border-radius:var(--radius-pill); border:2px solid var(--primary-color); background:var(--bg-light); color:var(--primary-color); font-weight:bold; font-size:clamp(0.85rem,1vw,1.05rem); white-space:nowrap; }
+        .sw-voice.silent { background:var(--primary-color); color:var(--white); }
         .sw-label { color:var(--primary-color); font-weight:900; font-size:clamp(1rem,1.3vw,1.4rem); margin-bottom:8px; }
         #swTask.sw-short { font-size:clamp(1.6rem,3.2vw,3.4rem); } /* a line or two reads big */
         #swTask { white-space:pre-wrap; font-size:clamp(1.3rem,2.4vw,2.6rem); font-weight:700; line-height:1.35; margin:0 0 14px 0; color:var(--secondary-dark); overflow-wrap:anywhere; }
@@ -1904,7 +1907,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         <div id="studentWorkPanel" class="card" style="display:none;">
             <div class="sw-grid">
                 <div class="sw-main">
-                    <div class="sw-label">🎯 Current Task</div>
+                    <div class="sw-head"><div class="sw-label">🎯 Current Task</div><span id="swVoice" class="sw-voice" style="display:none;"></span></div>
                     <p id="swTask"></p>
                     <div id="swLinks" class="sw-links"></div>
                 </div>
@@ -2804,7 +2807,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
         function liveWorkState() {
             if (!isFocusMode || !activeBlockData || !activeBlockData.id || !(activeBlockData.date instanceof Date)) return null;
             const links = String(activeBlockData.resources || '').split('|').map(x => x.trim()).filter(Boolean).map(x => { const i = x.indexOf('='); return (i > 0 && !/^https?:/i.test(x)) ? { label: x.slice(0, i).trim(), url: x.slice(i + 1).trim() } : { label: 'Link', url: x }; }).filter(l => /^https:\/\//.test(l.url));
-            return { id: String(activeBlockData.id), date: ymdLocal(activeBlockData.date), task: currentTaskText(), links: links };
+            return { id: String(activeBlockData.id), date: ymdLocal(activeBlockData.date), task: currentTaskText(), links: links, voice: noiseState };
         }
         function pushLiveState() {
             const url = getAutoBackupUrl(); const token = getAutoBackupToken();
@@ -3471,6 +3474,7 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             if (!id || !/^[A-Za-z0-9]{12,40}$/.test(id)) { id = Array.from(crypto.getRandomValues(new Uint8Array(12))).map(b => b.toString(16).padStart(2, '0')).join(''); try { localStorage.setItem('titan_device_id', id); } catch (e) {} }
             return id;
         }
+        const SW_VOICE = ['🤫 Level 0: Silent', '🗣️ Level 1: Whisper', '👥 Level 2: Group']; // matches the board's voice level widget
         function swNameKey(id) { return 'titan_done_name_' + id; }
         function swDoneKey(w) { return 'titan_done_state_' + w.date + '_' + w.id; }
         function renderStudentWork() {
@@ -3482,6 +3486,9 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             if (wasActive !== !!mine) setTimeout(autoFitCardText, 60); // the cards just changed size
             if (!mine) { panel.style.display = 'none'; return; }
             panel.style.display = 'flex';
+            const voiceEl = document.getElementById('swVoice'), lvl = SW_VOICE[w.voice];
+            voiceEl.style.display = lvl ? 'inline-flex' : 'none'; // older boards don't send it
+            if (lvl) { voiceEl.innerText = lvl; voiceEl.classList.toggle('silent', w.voice === 0); }
             const taskEl = document.getElementById('swTask'); taskEl.innerText = w.task || 'Check the board for today\'s task.';
             taskEl.classList.toggle('sw-short', taskEl.innerText.length <= 70 && taskEl.innerText.split('\n').length <= 3);
             document.getElementById('swLinks').innerHTML = (w.links || []).map(l => `<a class="sw-link" href="${escapeHtml(l.url)}" target="_blank" rel="noopener">🔗 ${escapeHtml(l.label || 'Link')}</a>`).join('');
@@ -4220,7 +4227,9 @@ html[data-board-style="atoms"] .dashboard-wrapper {
             if(noiseState === 0) { widget.style.borderColor = 'var(--primary-color)'; icon.innerText = '🤫'; icon.style.filter = 'drop-shadow(0 0 12px rgba(var(--primary-rgb), 0.5))'; text.innerText = 'Level 0: Silent'; text.style.color = ''; } 
             else if(noiseState === 1) { widget.style.borderColor = 'var(--bg-mid)'; icon.innerText = '🗣️'; icon.style.filter = 'drop-shadow(0 0 12px rgba(var(--bg-mid-rgb), 0.5))'; text.innerText = 'Level 1: Whisper'; text.style.color = 'var(--bg-mid)'; } 
             else { widget.style.borderColor = '#ffffff'; icon.innerText = '👥'; icon.style.filter = 'drop-shadow(0 0 12px rgba(255, 255, 255, 0.5))'; text.innerText = 'Level 2: Group'; text.style.color = '#ffffff'; }
+            if (!isStudentMode) { clearTimeout(voicePushTimer); voicePushTimer = setTimeout(pushLiveState, 600); } // students see it on their task card; a few quick taps send once
         }
+        let voicePushTimer = null;
 
         function checkFloatingTimer() {
             const floatingTimer = document.getElementById('floatingTimer'); if (!floatingTimer) return;
