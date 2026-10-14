@@ -2392,6 +2392,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             <button type="button" class="cb-link cb-home" id="cbHome" style="display:none;" onclick="calmTool('home')">← Main board</button>
             <span class="cb-spacer" aria-hidden="true"></span>
             <button type="button" class="cb-link cb-alert" id="demoModeBadge" style="display:none;" onclick="openSettingsModal()">Demo mode: connect a sheet</button>
+            <button type="button" class="cb-link cb-alert" id="syncFailBadge" style="display:none;" onclick="syncRetryNow()">Not saving to sheet</button>
             <button type="button" class="cb-link cb-alert" id="staleDataBadge" style="display:none;" onclick="retryFetchNow()" title="Tap to try the sheet again"><span id="staleDataText">Cached data: retry</span></button>
             <button type="button" class="cb-link cb-alert" id="sheetIssuesBadge" style="display:none;" onclick="openSheetIssues()"><span id="sheetIssuesText">Sheet issues</span></button>
             <button type="button" class="cb-link" id="cbLight" style="display:none;" onclick="calmTool('phone')"></button>
@@ -2842,6 +2843,10 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
         const SYNC_SKIP = new Set(['titan_autobackup_token', 'titan_autobackup_url', 'titan_sheet_url', 'titan_game_url', 'titan_onboarding_seen',
             'titan_timer', 'titan_first_used_at', 'titan_setting_muted', 'titan_setting_dark']);
         const SYNC_PENDING = '__sync_pending', SYNC_META = '__sync_meta'; // unsent changes {key:{v,t}}; last-known change time per key {key:t}
+        // The sheet's version of each item this browser last agreed with ({key:{t,v}}). A change only replaces the sheet's copy when it was
+        // made on top of that version; otherwise the two are merged (or the sheet's copy wins), so a new computer's defaults or a board
+        // that's been open since morning can't wipe out what another device saved. v is kept only for small lists, maps and counters, to merge.
+        const SYNC_BASE = '__sync_base';
         function syncableKey(k) {
             k = String(k);
             if (SYNC_SKIP.has(k) || k.startsWith('titan_last_') || k.startsWith('__')) return false;
@@ -2849,6 +2854,79 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
         }
         function syncRead(name) { try { return JSON.parse(storeBacking.getItem(STORE_NS + name) || '{}') || {}; } catch (e) { return {}; } }
         function syncWrite(name, obj) { try { storeBacking.setItem(STORE_NS + name, JSON.stringify(obj)); } catch (e) { console.warn('Sync bookkeeping not saved', e); } }
+        function syncBaseRead() {
+            const base = syncRead(SYNC_BASE); if (base.__v) return base;
+            // First run with bases: what this browser already had counts as agreed; unsent changes keep the old "newest wins" rule (-1).
+            const meta = syncRead(SYNC_META), pending = syncRead(SYNC_PENDING);
+            Object.keys(meta).forEach(k => { base[k] = { t: pending[k] ? -1 : meta[k] }; }); base.__v = 1; syncWrite(SYNC_BASE, base); return base;
+        }
+        function syncBaseSet(base, k, t, v) { base[k] = { t: t }; if (typeof v === 'string' && v.length < 50000 && /^\s*([\[{]|-?\d)/.test(v)) base[k].v = v; }
+        // Three-way merge of JSON maps, lists and counters: each side's changes since the shared version are kept (points add up on point counters,
+        // a check-in on one device and an absence on another both stay). Returns null when it can't merge; then the sheet's copy wins.
+        function syncMerge(local, baseV, server, additive) {
+            let L, B, S; try { L = JSON.parse(local); B = JSON.parse(baseV); S = JSON.parse(server); } catch (e) { return null; }
+            const same = (x, y) => JSON.stringify(x) === JSON.stringify(y), isMap = x => !!x && typeof x === 'object' && !Array.isArray(x);
+            const flat = x => Array.isArray(x) && x.every(y => y === null || typeof y !== 'object'), has = (arr, x) => arr.some(y => same(y, x));
+            const merge = (l, b, srv) => {
+                if (same(l, b)) return srv; if (same(srv, b)) return l; // only one side changed
+                if (additive && typeof l === 'number' && typeof b === 'number' && typeof srv === 'number') return srv + (l - b); // points: both devices' taps count
+                if (isMap(l) && isMap(b) && isMap(srv)) {
+                    const r = Object.assign({}, srv);
+                    new Set(Object.keys(l).concat(Object.keys(b))).forEach(k => {
+                        if (!(k in l)) { if (same(srv[k], b[k])) delete r[k]; } // removed here and untouched there
+                        else if (!same(l[k], b[k])) r[k] = (k in b && k in srv) ? merge(l[k], b[k], srv[k]) : l[k];
+                    });
+                    return r;
+                }
+                if (flat(l) && flat(b) && flat(srv)) return srv.filter(x => !(has(b, x) && !has(l, x))).concat(l.filter(x => !has(b, x) && !has(srv, x)));
+                return l; // both changed one plain value: the change made here wins
+            };
+            const out = merge(L, B, S); return out === undefined ? null : JSON.stringify(out);
+        }
+        // The sheet has a newer version than the one this browser's change was made on: merge, or take the sheet's copy.
+        function syncResolve(k, server, pending, base) {
+            const mine = pending[k], b = base[k] || {};
+            const merged = mine && mine.v !== null && server.v !== null && b.v ? syncMerge(mine.v, b.v, server.v, /^(classPoints_|titan_tracker_)/.test(k)) : null;
+            syncBaseSet(base, k, server.t, server.v);
+            if (merged !== null && merged !== server.v) { storeBacking.setItem(STORE_NS + k, merged); pending[k] = { v: merged, t: Math.max(Date.now(), server.t + 1) }; return pending[k].t; }
+            if (server.v === null) storeBacking.removeItem(STORE_NS + k); else storeBacking.setItem(STORE_NS + k, server.v);
+            delete pending[k]; return server.t;
+        }
+        // Save trouble shows as a badge after a few misses in a row, so a wrong secret can't quietly keep everything on this computer all day.
+        let syncLoaded = false, syncFails = 0, syncLastError = '', syncPulling = null, syncSetupAt = 0, bootAt = 0;
+        function syncOk() { syncFails = 0; syncLastError = ''; renderSyncBadge(); }
+        function syncFailed(e) { syncFails++; syncLastError = String((e && e.message) || e || ''); console.warn('Sheet sync will retry:', syncLastError); renderSyncBadge(); }
+        function syncProblemText() {
+            if (/unauthorized/i.test(syncLastError)) return "Not saving to your sheet: the Live Sync secret in Settings doesn't match the script's. Your changes are kept on this computer.";
+            if (/^setup/i.test(syncLastError)) return 'Not saving to your sheet: the script has no secret yet (see the setup guide). Your changes are kept on this computer.';
+            return "Can't reach your sheet right now. Your changes are kept on this computer and sent when it's back.";
+        }
+        function renderSyncBadge() {
+            const badge = document.getElementById('syncFailBadge'); if (!badge) return;
+            badge.style.display = syncFails >= 3 && !isStudentMode ? 'flex' : 'none'; badge.title = syncProblemText();
+        }
+        function syncRetryNow() { showToast(syncProblemText()); syncFails = Math.min(syncFails, 2); scheduleSyncFlush(200); }
+        // Another device changed saved data: redraw what shows it (never the notepad, which may be mid-typing).
+        function syncRefreshUI() {
+            try { loadThemeSettings(); calmLoad(); calmApply(); calmRender(true); } catch (e) { console.warn('Refresh after sync skipped', e); }
+            try { loadClassPoints(); renderLeaderboard(); renderTracker(); renderCheckinGrid(true); loadTaskNote(); } catch (e) { console.warn('Refresh after sync skipped', e); }
+        }
+        // Pull the sheet's copy. The first pull this session (a new computer, a slow start, a secret just entered) reloads the board
+        // if anything came in, so every screen starts from it; later pulls redraw in place.
+        function syncPull(retry) {
+            if (syncPulling) return syncPulling;
+            syncPulling = serverCall('dashDataLoad', [getAutoBackupToken()], 15000).then(r => {
+                if (!r || !r.ok) throw new Error((r && r.error) || 'load refused');
+                const n = applyRemoteData(r.items), first = !syncLoaded; syncLoaded = true; syncOk();
+                if (n) console.info('Restored ' + n + ' saved item(s) from the sheet');
+                if (n && bootAt) {
+                    if (first && Date.now() - Math.max(bootAt, syncSetupAt) < 120000) { showToast('Loaded your saved data from the sheet. Refreshing…'); setTimeout(() => location.reload(), 1500); }
+                    else syncRefreshUI();
+                }
+                return true;
+            }).catch(e => { syncFailed(e); if (retry) scheduleSyncFlush(30000); return false; }).finally(() => { syncPulling = null; });
+            return syncPulling;
+        }
         let syncFlushTimer = null, syncFlushing = false;
         function syncNote(k, v) { // called by every store write; never throws
             try {
@@ -2862,32 +2940,41 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
         function scheduleSyncFlush(ms) { clearTimeout(syncFlushTimer); syncFlushTimer = setTimeout(flushSync, ms); }
         async function flushSync() {
             if (syncFlushing) return scheduleSyncFlush(2000);
-            const pending = syncRead(SYNC_PENDING), entries = Object.keys(pending).map(k => ({ k: k, v: pending[k].v, t: pending[k].t }));
-            if (!entries.length || !directReadAvailable()) return;
+            if (!directReadAvailable()) return;
+            // Never send before this browser has seen the sheet's copy once this session.
+            if (!syncLoaded && !(await syncPull(true))) return;
+            const pending = syncRead(SYNC_PENDING), base = syncBaseRead();
+            const entries = Object.keys(pending).map(k => ({ k: k, v: pending[k].v, t: pending[k].t, b: base[k] ? base[k].t : 0 }));
+            if (!entries.length) return;
             syncFlushing = true;
             try {
                 const r = await serverCall('dashDataSave', [getAutoBackupToken(), entries], 30000);
                 if (!r || !r.ok) throw new Error((r && r.error) || 'save refused');
-                const now = syncRead(SYNC_PENDING); // only clear what was sent and hasn't changed since
-                entries.forEach(e => { if (now[e.k] && now[e.k].t === e.t) delete now[e.k]; });
-                syncWrite(SYNC_PENDING, now);
+                const now = syncRead(SYNC_PENDING), meta = syncRead(SYNC_META), base2 = syncBaseRead(), lost = new Set();
+                (Array.isArray(r.conflicts) ? r.conflicts : []).forEach(c => { if (!c || typeof c.k !== 'string') return; lost.add(c.k); meta[c.k] = syncResolve(c.k, { v: c.v, t: Number(c.t) || 0 }, now, base2); });
+                entries.forEach(e => { if (lost.has(e.k)) return; if (now[e.k] && now[e.k].t === e.t) delete now[e.k]; syncBaseSet(base2, e.k, e.t, e.v); }); // only clear what was sent and hasn't changed since
+                syncWrite(SYNC_PENDING, now); syncWrite(SYNC_META, meta); syncWrite(SYNC_BASE, base2); syncOk();
+                if (lost.size) syncRefreshUI();
                 if (Object.keys(now).length) scheduleSyncFlush(1000);
             } catch (e) {
-                console.warn('Sheet sync will retry:', e && e.message ? e.message : e);
-                scheduleSyncFlush(30000);
+                syncFailed(e); scheduleSyncFlush(30000);
             } finally { syncFlushing = false; }
         }
-        // Merge the sheet's copy into this browser before the board draws. Newer change wins, key by key.
+        // Merge the sheet's copy into this browser. A change made here on top of the sheet's current version stays and goes up;
+        // anything else the sheet has newer is merged in or taken.
         function applyRemoteData(items) {
-            const pending = syncRead(SYNC_PENDING), meta = syncRead(SYNC_META), seen = new Set();
+            const pending = syncRead(SYNC_PENDING), meta = syncRead(SYNC_META), base = syncBaseRead(), seen = new Set();
             let pulled = 0;
             (items || []).forEach(it => {
                 if (!it || !syncableKey(it.k)) return;
-                seen.add(it.k);
-                if (pending[it.k] && pending[it.k].t >= it.t) return; // ours is newer and on its way
-                if ((meta[it.k] || 0) >= it.t) return;                // already have this version
+                seen.add(it.k); const t = Number(it.t) || 0, b = base[it.k];
+                if (pending[it.k]) {
+                    if (b && (b.t === t || (b.t === -1 && pending[it.k].t >= t))) return; // ours was made on this version (or is newer, from before bases): ours goes up
+                    meta[it.k] = syncResolve(it.k, { v: it.v, t: t }, pending, base); pulled++; return;
+                }
+                if ((meta[it.k] || 0) >= t) { if (meta[it.k] === t && (!b || b.t !== t)) syncBaseSet(base, it.k, t, it.v); return; } // already have this version
                 if (it.v === null) storeBacking.removeItem(STORE_NS + it.k); else storeBacking.setItem(STORE_NS + it.k, it.v);
-                meta[it.k] = it.t; delete pending[it.k]; pulled++;
+                meta[it.k] = t; syncBaseSet(base, it.k, t, it.v); pulled++;
             });
             // First run on this sheet: upload what this browser has that the sheet doesn't.
             for (let i = 0; i < storeBacking.length; i++) {
@@ -2897,7 +2984,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
                 if (!syncableKey(k) || seen.has(k) || pending[k]) continue;
                 const t = meta[k] || 1; pending[k] = { v: storeBacking.getItem(raw), t: t }; meta[k] = t;
             }
-            syncWrite(SYNC_PENDING, pending); syncWrite(SYNC_META, meta);
+            syncWrite(SYNC_PENDING, pending); syncWrite(SYNC_META, meta); syncWrite(SYNC_BASE, base);
             return pulled;
         }
         // Hover highlights only while a real mouse is in use. A touch or pen tap turns them off so a tapped button on the board doesn't stay lit.
@@ -2908,8 +2995,9 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
         })();
         const store = {
             getItem(k) { return storeBacking.getItem(STORE_NS + k); },
-            setItem(k, v) { storeBacking.setItem(STORE_NS + k, v); syncNote(k, v); },
-            removeItem(k) { storeBacking.removeItem(STORE_NS + k); syncNote(k, null); },
+            // Writing the same value again isn't a change: it isn't sent, so it can't replace a newer copy another device saved.
+            setItem(k, v) { const was = storeBacking.getItem(STORE_NS + k); storeBacking.setItem(STORE_NS + k, v); if (was !== String(v)) syncNote(k, v); },
+            removeItem(k) { const was = storeBacking.getItem(STORE_NS + k); storeBacking.removeItem(STORE_NS + k); if (was !== null) syncNote(k, null); },
             _keys() { let out = []; for (let i = 0; i < storeBacking.length; i++) { let k = storeBacking.key(i); if (k === null) continue; if (STORE_NS ? k.startsWith(STORE_NS) : !k.startsWith('ns:')) out.push(STORE_NS ? k.slice(STORE_NS.length) : k); } return out; },
             get length() { return this._keys().length; },
             key(i) { let ks = this._keys(); return i >= 0 && i < ks.length ? ks[i] : null; }
@@ -2925,6 +3013,8 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
                 ls.setItem(STORE_NS + '__ns_migrated', Date.now().toString());
             } catch (e) { console.warn('Storage migration skipped', e); }
         })();
+        // Record sync versions now, before anything this session writes, so only changes from earlier visits count as "from before versions".
+        if (HOST) syncBaseRead();
         let timerInterval, endTime = 0, totalTimeMs = 0, remainingMs = 0, isRunning = false, warningPlayed = false, donePlayed = false; // timer state: toggleModal -> checkFloatingTimer reads totalTimeMs, so this must exist before init code can open a modal
         let sheetIssues = { schedule: [], games: [] }; // preflight findings, shown by the Sheet Issues pill
         let timerReturnBoard = ''; // board to leave for the main board when the current timer ends ('' = stay put); saved with the timer
@@ -3182,6 +3272,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }).catch(() => { /* silent - same reasoning as auto-backup's fetch */ });
         }
         function saveSettings() {
+            syncSetupAt = Date.now(); // a secret entered just now: the sheet's saved data loads before anything is sent
             setTimeout(pushStudentConfig, 1500); // short student links pick up a new sheet link or logo
             let inputUrl = document.getElementById('customSheetUrlInput').value.trim(); let gameUrl = document.getElementById('gameVaultUrlInput').value.trim();
             if(inputUrl) store.setItem('titan_sheet_url', inputUrl); if(gameUrl) store.setItem('titan_game_url', gameUrl);
@@ -4078,7 +4169,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             if (gameType === 'biddingwar') { document.getElementById('biddingWarRules').style.display = 'flex'; document.getElementById('biddingWarTimer').style.display = 'flex'; } 
             else if (gameType === 'jeopardy') { document.getElementById('jeopardyContainer').style.display = 'flex'; renderJeopardyBoard(gameTitle); }
             else if (gameType === 'gridlock') { document.getElementById('gridlockContainer').style.display = 'flex'; renderGridlockBoard(gameTitle); }
-            else if (gameType === 'bullmarket') { document.getElementById('bullMarketContainer').style.display = 'flex'; renderBullMarketBoard(gameTitle); }
+            else if (gameType === 'bullmarket') { document.getElementById('bullMarketContainer').style.display = 'flex'; renderBullMarketBoard(gameTitle); loadMiniGamePrompts('bullmarket', gameTitle); }
             else if (gameType === 'survey') { loadSurveyModule(gameTitle); }
             else if (gameType === 'gauntlet') { loadGauntletModule(gameTitle); }
             else if (gameType === 'vault') { loadVaultModule(gameTitle); }
@@ -4093,6 +4184,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             buildDynamicGameMenu(); 
             if (typeof ffTimerInterval !== 'undefined') clearInterval(ffTimerInterval); 
             if (reinforcementTimerInterval) { clearInterval(reinforcementTimerInterval); reinforcementTimerInterval = null; }
+            if (bullSpinInterval) { clearInterval(bullSpinInterval); bullSpinInterval = null; bullMarketSpinning = false; } // a spin left running beeps on every other screen
         }
 
         let gridlockWinAnnounced = false;
@@ -4494,6 +4586,9 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             });
         }
         window.addEventListener('resize', () => { if (isFocusMode) fitWorkCards(); });
+        // Attendance board and groups re-fit after a resize or fullscreen (each fit returns early when its screen is hidden).
+        let refitTimer = null;
+        window.addEventListener('resize', () => { clearTimeout(refitTimer); refitTimer = setTimeout(() => { if (activeBoard === 'openingModeBoard') fitOpeningBoard(); fitGroupsGrid(); }, 150); });
         let workEditField = 'task';
         function openWorkEdit(field) {
             workEditField = field === 'early' ? 'early' : 'task';
@@ -4526,7 +4621,9 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
         function isGlanceDevice() { return !isStudentMode && window.matchMedia('(max-width: 760px)').matches; }
         async function readTeacherLiveState() {
             const url = getAutoBackupUrl(), token = getAutoBackupToken(); if (!url || !token) return null;
-            const resp = await fetch(url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(token) + '&action=liveState');
+            // A hung Apps Script call gives up after 15s instead of leaving the poll waiting forever.
+            const ctl = window.AbortController ? new AbortController() : null, stop = ctl ? setTimeout(() => ctl.abort(), 15000) : 0;
+            let resp; try { resp = await fetch(url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(token) + '&action=liveState', ctl ? { signal: ctl.signal } : undefined); } finally { clearTimeout(stop); }
             const json = await resp.json(); return (json && json.ok && json.data && typeof json.data === 'object') ? json.data : null;
         }
         function pushPhoneEdit(edit) { const run = remoteChain.then(() => pushPhoneEditNow(edit)); remoteChain = run.catch(() => {}); return run; }
@@ -4633,9 +4730,13 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             else if (c.t === 'mode') { if (['main', 'focus', 'slides'].includes(c.board)) setBoardMode(c.board); }
         }
         let lastPhoneEdit = '';
+        let phonePollBusy = false, phonePollLast = 0;
         async function pollPhoneEdits() {
-            if (isStudentMode || isGlanceDevice() || document.hidden) return;
-            let state; try { state = await readTeacherLiveState(); } catch (e) { return; }
+            if (isStudentMode || isGlanceDevice() || document.hidden || phonePollBusy) return;
+            // Every 5s during the school day; once a minute nights and weekends (each check is an Apps Script run).
+            const now = Date.now(); if (!schoolDayActive(now) && now - phonePollLast < 60000) return;
+            phonePollLast = now; phonePollBusy = true;
+            let state; try { state = await readTeacherLiveState(); } catch (e) { return; } finally { phonePollBusy = false; }
             const cmds = (state && Array.isArray(state.cmds) ? state.cmds : []).filter(c => c && typeof c.n === 'string' && !remoteApplied.includes(c.n) && Date.now() - (Number(c.at) || 0) < 120000).sort((a, b) => (a.at || 0) - (b.at || 0));
             if (cmds.length) {
                 cmds.forEach(c => { remoteApplied.push(c.n); }); remoteApplied = remoteApplied.slice(-40);
@@ -4744,8 +4845,9 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
         }
 
         document.addEventListener('keydown', function(event) {
-            const target = event.target; const isTyping = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
-            if (isTyping) return; 
+            const target = event.target; const isTyping = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable);
+            // Escape still closes a pop-up while its text box has the cursor (the task editor focuses its box on open); every other key belongs to the field.
+            if (isTyping) { if (event.key === 'Escape' && target.closest && target.closest('.modal.active')) target.blur(); else return; }
 
             if (event.key === 'Escape' && !document.querySelector('.modal.active') && isGameStage && document.getElementById('activeGameContainer').style.display === 'flex') { closeGameModule(); return; }
             if (event.key === 'Escape') { const activeModals = document.querySelectorAll('.modal.active'); activeModals.forEach(modal => { if (modal.id === 'wheelModal') closeWheelModal(); else modal.classList.remove('active'); }); checkFloatingTimer(); return; }
@@ -4907,7 +5009,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             return base + '?' + params.toString();
         }
         // ==================== STUDENT MODE LIVE SYNC (read-only: Phone Status, timer, notes) ====================
-        let syncedTimerState = { active: false };
+        let syncedTimerState = { active: false }; let livePushedSinceBoot = false;
         function startLiveStatePolling() {
             if (!isStudentMode || !getLiveSyncUrl() || !getLiveSyncToken()) return;
             pollLiveStateOnce();
@@ -4921,11 +5023,14 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
                 const sep = url.includes('?') ? '&' : '?';
                 const resp = await fetch(url + sep + 'token=' + encodeURIComponent(token) + '&action=liveState');
                 const json = await resp.json();
-                if (json && json.ok && json.data) applyLiveState(json.data);
+                if (json && json.ok && json.data) applyLiveState(json.data, json.timestamp);
             } catch (e) { /* network hiccup - next poll will try again */ }
         }
-        function applyLiveState(state) {
+        function applyLiveState(state, savedAt) {
             calmStudentLook(state && state.look);
+            // State saved on an earlier day (the board hasn't been opened yet today): yesterday's light, timer and task don't carry over.
+            const at = savedAt ? new Date(savedAt) : null;
+            if (at && !isNaN(at) && ymdLocal(at) !== ymdLocal(new Date())) state = Object.assign({}, state, { statusLight: { active: false }, timer: { active: false }, work: null });
             const statusBadge = document.getElementById('studentStatusBadge');
             if (statusBadge) {
                 if (state.statusLight && state.statusLight.active && state.statusLight.state !== null && STATUS_LIGHT_STATES[state.statusLight.state]) {
@@ -4938,7 +5043,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             renderStudentTimer();
             const notesEl = document.getElementById('studentNotesText');
             if (notesEl) notesEl.innerText = (state.notes && state.notes.trim()) ? state.notes : 'No notes shared yet.';
-            const w = state.work && typeof state.work === 'object' ? state.work : null;
+            const w = state.work && typeof state.work === 'object' && (!state.work.date || state.work.date === ymdLocal(new Date())) ? state.work : null;
             if (JSON.stringify(w) !== JSON.stringify(liveWork)) { liveWork = w; renderStudentWork(); }
         }
         function renderStudentTimer() {
@@ -5218,7 +5323,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             else { for (let block of schedule) { let startMs = block.date.getTime() + (block.start * 60000); let endMs = block.date.getTime() + (block.end * 60000); if (nowMs >= startMs && nowMs < endMs) { activeBlock = block; isGenuinelyInSession = true; break; } } if (!activeBlock) { activeBlock = schedule.find(b => { let endMs = b.date.getTime() + (b.end * 60000); return endMs > nowMs; }); } }
             { const prevId = activeBlockData ? activeBlockData.id : undefined; activeBlockData = activeBlock;
               const nowId = activeBlock ? activeBlock.id : undefined;
-              if (!isStudentMode && prevId !== undefined && prevId !== nowId) pushLiveState();
+              if (!isStudentMode && (prevId !== nowId || !livePushedSinceBoot)) { livePushedSinceBoot = true; pushLiveState(); } // also once after boot, so students never keep yesterday's state
               if (isStudentMode && prevId !== nowId) renderStudentWork(); } // new period: students get its notes 
 
             setCurrentClassBlock(isGenuinelyInSession ? activeBlock : null);
@@ -5493,16 +5598,30 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
         }
         function fitCheckinGrid() {
             const grid = document.getElementById('checkinGrid'); if (!grid || !grid.clientHeight) return;
-            grid.style.fontSize = ''; const base = parseFloat(window.getComputedStyle(grid).fontSize) || 16;
-            growToFit(grid, grid, base, 11, 1); // shrink only: growing the font would also widen the em-based columns and drop a column
+            grid.style.fontSize = ''; grid.style.gridTemplateColumns = ''; const base = parseFloat(window.getComputedStyle(grid).fontSize) || 16;
+            growToFit(grid, grid, base, 11, 1); // shrink only: a bigger font would crowd the vw-based columns
             // A single long word (Christopher) shrinks only its own tile, instead of shrinking every name on the grid.
             const range = document.createRange();
             // Measure the text's real width with a Range: scrollWidth rounds to whole pixels and can miss a sub-pixel overflow that still draws "…".
-            const overflows = (t, n) => { const cs = window.getComputedStyle(t); const room = t.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight); range.selectNodeContents(n); return range.getBoundingClientRect().width > room - 0.5; };
-            // Shrink a long name a little; if it still doesn't fit (fonts render differently across browsers), let it wrap to two lines.
-            Array.prototype.forEach.call(grid.children, t => { const n = t.querySelector('.checkin-name') || t; t.style.fontSize = ''; t.classList.remove('wraps');
-                for (let em = 0.95; em >= 0.75 && overflows(t, n); em -= 0.05) t.style.fontSize = em.toFixed(2) + 'em';
-                if (overflows(t, n)) { t.classList.add('wraps'); t.style.fontSize = '0.85em'; } }); // tiles grow into empty space for bigger tap targets, capped so 10 names don't become billboards
+            const room = t => { const cs = window.getComputedStyle(t); return t.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight); };
+            // Range sizes include transforms (the board fades in at scale 0.98), clientWidth doesn't: undo the scale so both match.
+            const textWidth = n => { range.selectNodeContents(n); const t = n.closest('.checkin-tile') || n, s = t.offsetWidth ? t.getBoundingClientRect().width / t.offsetWidth : 1; return range.getBoundingClientRect().width / (s || 1); };
+            const overflows = (t, n) => textWidth(n) > room(t) - 0.5;
+            // Shrink a long name a little. Returns the tile width that would fit it at 0.8em, or 0 when it already fits.
+            const shrink = () => { let need = 0; Array.prototype.forEach.call(grid.children, t => { const n = t.querySelector('.checkin-name') || t; t.style.fontSize = t.style.paddingLeft = t.style.paddingRight = ''; t.classList.remove('wraps');
+                for (let k = 19; k >= 15 && overflows(t, n); k--) t.style.fontSize = (k / 20).toFixed(2) + 'em';
+                if (overflows(t, n)) need = Math.max(need, textWidth(n) / 0.75 * 0.8 + (t.offsetWidth - room(t)) + 2); }); return need; };
+            const need = shrink();
+            if (need) { // a name still doesn't fit: widen every column (one fewer per row) so it stays on one line
+                const before = grid.style.fontSize, beforePx = parseFloat(window.getComputedStyle(grid).fontSize) || base;
+                if (need <= grid.clientWidth) { grid.style.gridTemplateColumns = 'repeat(auto-fill,minmax(' + Math.ceil(need) + 'px,1fr))'; growToFit(grid, grid, beforePx, 11, 1);
+                    // Fewer columns means more rows: if the names no longer fit without shrinking or scrolling, keep the columns.
+                    if (grid.scrollHeight > grid.clientHeight + 1 || parseFloat(window.getComputedStyle(grid).fontSize) < beforePx - 0.5) { grid.style.gridTemplateColumns = ''; grid.style.fontSize = before; } }
+                // Last resort (no room for wider columns): trim that tile's side padding and shrink a bit more, then wrap to two lines.
+                if (shrink()) Array.prototype.forEach.call(grid.children, t => { const n = t.querySelector('.checkin-name') || t; if (!overflows(t, n)) return;
+                    t.style.paddingLeft = t.style.paddingRight = '0.25em'; for (let k = 14; k >= 13 && overflows(t, n); k--) t.style.fontSize = (k / 20).toFixed(2) + 'em';
+                    if (overflows(t, n)) { t.style.paddingLeft = t.style.paddingRight = ''; t.classList.add('wraps'); t.style.fontSize = '0.85em'; } });
+            } // tiles grow into empty space for bigger tap targets, capped so 10 names don't become billboards
         }
         window.checkInTap = function(student) {
             if (!activeBlockData) return; const k = absentKeyFor(activeBlockData.id);
@@ -5519,7 +5638,8 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
         function loadTimerState() {
             let saved = store.getItem('titan_timer');
             if (saved) {
-                let state; try { state = JSON.parse(saved) || {}; } catch (e) { store.removeItem('titan_timer'); return; } // a damaged save shouldn't stop the board from starting totalTimeMs = state.totalTimeMs || 0; isRunning = state.isRunning || false; endTime = state.endTime || 0; remainingMs = state.remainingMs || 0; warningPlayed = state.warningPlayed || false; donePlayed = state.donePlayed || false; timerReturnBoard = typeof state.returnBoard === 'string' ? state.returnBoard : '';
+                let state; try { state = JSON.parse(saved) || {}; } catch (e) { store.removeItem('titan_timer'); return; } // a damaged save shouldn't stop the board from starting
+                totalTimeMs = state.totalTimeMs || 0; isRunning = state.isRunning || false; endTime = state.endTime || 0; remainingMs = state.remainingMs || 0; warningPlayed = state.warningPlayed || false; donePlayed = state.donePlayed || false; timerReturnBoard = typeof state.returnBoard === 'string' ? state.returnBoard : '';
                 if (isRunning) { remainingMs = endTime - Date.now(); if (remainingMs > 0) { document.querySelectorAll('.sync-btn-start').forEach(btn => btn.innerText = "Pause"); timerInterval = setInterval(updateTimerDisplay, 1000); updateTimerDisplay(); } else { clearTimer(); } } 
                 else if (remainingMs > 0) { renderTime(remainingMs); document.querySelectorAll('.sync-progress').forEach(bar => { bar.style.width = ((remainingMs / totalTimeMs) * 100) + "%"; bar.style.backgroundColor = "var(--primary-color)"; }); }
             }
@@ -6204,7 +6324,8 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             items.forEach((it, i) => {
                 const done = checked.includes(it), state = done ? 'done' : (i === nowIdx ? 'now' : 'todo');
                 const row = calmMake('button', 'cb-st ' + state); row.type = 'button';
-                row.setAttribute('aria-pressed', String(done)); if (done) row.classList.add('completed'); // toggleChecklist flips this class to decide add or remove row.title = done ? 'Tap to mark not done' : 'Tap to mark done';
+                row.setAttribute('aria-pressed', String(done)); if (done) row.classList.add('completed'); // toggleChecklist flips this class to decide add or remove
+                row.title = done ? 'Tap to mark not done' : 'Tap to mark done';
                 row.appendChild(calmMake('span', 'cb-node')); row.appendChild(calmMake('span', 'cb-n', String(i + 1).padStart(2, '0')));
                 row.appendChild(calmMake('span', 'cb-t', it));
                 row.appendChild(calmMake('span', 'cb-s', done ? 'Done' : i === nowIdx ? 'Now' : i === nextIdx ? 'Next' : ''));
@@ -6271,6 +6392,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
         // Long panel text shrinks a little at a time until it fits its card.
         function calmFitPanel(bd) {
             if (!bd || !bd.clientHeight) return; const ps = [...bd.querySelectorAll('p, .cb-pbar')];
+            ps.forEach(p => { p.style.fontSize = ''; }); // start from full size so a bigger window can grow it back
             let size = ps.length ? parseFloat(window.getComputedStyle(ps[0]).fontSize) : 0;
             for (let i = 0; i < 30 && size > 11 && bd.scrollHeight > bd.clientHeight + 1; i++) { size -= 1; ps.forEach(p => { p.style.fontSize = size + 'px'; }); }
         }
@@ -6328,7 +6450,9 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
         // The headline is sized by the look; long text shrinks to fit the column (never grows past the look's size).
         // Measured with layout boxes, not scrollHeight: Anton's tall glyphs report overflow even when the text fits.
         function calmFitSoon() { clearTimeout(cbFitTimer); cbFitTimer = setTimeout(calmFit, 40); }
-        function calmFit() {
+        // The panel stack can rebuild while the main board is hidden (each check-in tap changes the count), so its fit re-runs here too.
+        function calmFit() { calmFitHeadline(); if (calmOn() && activeBoard === 'mainBento') calmFitPanel(document.querySelector('#cbStack .cb-card[data-pos="0"] .cb-bd')); }
+        function calmFitHeadline() {
             const h1 = calmEl('cbH1'), box = calmEl('cbWarm'), det = calmEl('cbDetail'); if (!h1 || !box) return;
             h1.style.fontSize = '';
             if (!calmOn() || activeBoard !== 'mainBento' || window.innerWidth <= 760) return;
@@ -6447,7 +6571,9 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
         function calmWatchEmoji() {
             calmWrapEmoji();
             if (!window.MutationObserver) return;
-            new MutationObserver(() => { if (cbEmojiQueued) return; cbEmojiQueued = true; requestAnimationFrame(() => { cbEmojiQueued = false; calmWrapEmoji(); }); })
+            // Only changes in or around the labels above matter: the clocks and timers rewrite their text every second.
+            const touchesSpot = m => { const el = m.target.nodeType === 1 ? m.target : m.target.parentElement; return !!el && (!!el.closest(CB_EMOJI_SPOTS) || (m.type === 'childList' && [...m.addedNodes].some(n => n.nodeType === 1 && (n.matches(CB_EMOJI_SPOTS) || n.querySelector(CB_EMOJI_SPOTS))))); };
+            new MutationObserver(list => { if (cbEmojiQueued || !list.some(touchesSpot)) return; cbEmojiQueued = true; requestAnimationFrame(() => { cbEmojiQueued = false; calmWrapEmoji(); }); })
                 .observe(document.body, { childList: true, subtree: true, characterData: true });
         }
         const CB_VOICE_WORDS = ['Silent', 'Whisper', 'Group'];
@@ -6487,7 +6613,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             catch (e) { /* storage blocked on this device: neutral defaults, page still works */ }
         }
         function boot() {
-            document.body.dataset.board = activeBoard;
+            bootAt = Date.now(); document.body.dataset.board = activeBoard;
             applyStudentLinkBranding();
             preserveLegacyBranding();
             loadThemeSettings();
@@ -6496,7 +6622,9 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             if (!isStudentMode) { try { pruneOldAbsences(); } catch (e) { /* storage trouble: keep going */ } }
             ensureFirstUseTimestamp(); updateBackupReminderUI(); checkFirstRun();
             fetchAgendaData(); fetchGameVaultData(); setInterval(updateDashboard, 1000); setInterval(fetchAgendaData, 60000);
-            if (!isStudentMode) { setInterval(pollPhoneEdits, 5000); setInterval(remoteCheck, 3000); } // board: carry out phone requests; phone: confirm and mirror
+            if (!isStudentMode) { setInterval(pollPhoneEdits, 5000); setInterval(remoteCheck, 3000); }
+            // Pick up what another device saved (a laptop, a phone) once a minute during the school day.
+            if (!isStudentMode) setInterval(() => { if (!document.hidden && directReadAvailable() && schoolDayActive(Date.now())) syncPull(false); }, 60000); // board: carry out phone requests; phone: confirm and mirror
             loadTimerState(); renderReturnChips();
         }
         // On Apps Script, pull the sheet's saved data first (capped at 5 seconds), then draw the board.
@@ -6505,11 +6633,8 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             if (!HOST || isStudentMode || !directReadAvailable()) { boot(); return; }
             let started = false;
             const start = () => { if (started) return; started = true; boot(); scheduleSyncFlush(1500); setTimeout(pushStudentConfig, 4000); };
-            const cap = setTimeout(start, 5000);
-            serverCall('dashDataLoad', [getAutoBackupToken()], 8000)
-                .then(r => { if (!started && r && r.ok) { const n = applyRemoteData(r.items); if (n) console.info('Restored ' + n + ' saved item(s) from the sheet'); } })
-                .catch(e => console.warn('Saved data not loaded from the sheet; using this browser\'s copy:', e && e.message ? e.message : e))
-                .finally(() => { clearTimeout(cap); start(); });
+            const cap = setTimeout(start, 5000); // a slower load still lands: syncPull refreshes the board when it does
+            syncPull(false).finally(() => { clearTimeout(cap); start(); });
         }
         syncThenBoot();
         // Student Mode on Apps Script: offer "What did I miss?"; ?view=missed opens straight to it (and is what a Canvas page embeds).
