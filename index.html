@@ -1534,6 +1534,133 @@ html[data-cb-bg=glow] .cb-bgart{background:radial-gradient(80% 70% at 85% 0%,var
 html[data-cb-bg=stars] .cb-bgart{background:linear-gradient(160deg,color-mix(in oklab,var(--cb-glow) 90%,var(--cb-ground)),var(--cb-ground) 65%)}
 .cb-stars{position:absolute;inset:0;display:none}.cb-stars i{position:absolute;border-radius:50%;background:var(--cb-fg);opacity:var(--o)}
 html[data-cb-bg=stars] .cb-stars{display:block}
+/* more backgrounds (2026-10-13): all built from the two school colors; the two that move stop for reduced motion */
+.cb-bgart::before, .cb-bgart::after { content: none; position: absolute; pointer-events: none; }
+
+/* 1. NIGHT SKY: the classic night sky, full screen. Three star layers (small, medium, a few bright ones that twinkle),
+   a deep sky in the main color, and a soft horizon glow at the bottom. */
+html[data-cb-bg=nightsky] .cb-bgart {
+  background:
+    radial-gradient(120% 55% at 50% 118%, color-mix(in oklab, var(--cb-a1) 45%, transparent), transparent 62%),
+    radial-gradient(70% 50% at 85% -10%, color-mix(in oklab, var(--cb-glow) 80%, transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in oklab, var(--cb-glow) 55%, var(--cb-ground2)) 0%, var(--cb-ground2) 75%);
+}
+html[data-cb-bg=nightsky] .cb-bgart::before {
+  content: ""; inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 23px 41px, #fff 60%, transparent), radial-gradient(1px 1px at 91px 133px, #fff 60%, transparent),
+    radial-gradient(1px 1px at 157px 67px, #fff 60%, transparent), radial-gradient(1px 1px at 201px 181px, #fff 60%, transparent),
+    radial-gradient(1px 1px at 47px 211px, #fff 60%, transparent), radial-gradient(1px 1px at 133px 9px, #fff 60%, transparent),
+    radial-gradient(1.5px 1.5px at 260px 120px, #fff 60%, transparent), radial-gradient(1.5px 1.5px at 300px 30px, #fff 60%, transparent),
+    radial-gradient(1.5px 1.5px at 73px 290px, #fff 60%, transparent), radial-gradient(1.5px 1.5px at 230px 270px, #fff 60%, transparent);
+  background-size: 320px 320px; opacity: .55;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 95%); mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 95%);
+}
+html[data-cb-bg=nightsky] .cb-bgart::after {
+  content: ""; inset: 0;
+  background-image:
+    radial-gradient(2.5px 2.5px at 120px 80px, #fff 50%, transparent), radial-gradient(2px 2px at 610px 190px, var(--cb-a3) 50%, transparent),
+    radial-gradient(2.5px 2.5px at 930px 60px, #fff 50%, transparent), radial-gradient(2px 2px at 380px 330px, var(--cb-b) 50%, transparent),
+    radial-gradient(2.5px 2.5px at 1180px 260px, #fff 50%, transparent);
+  background-size: 1300px 700px; opacity: .9; filter: drop-shadow(0 0 3px #fff);
+  animation: cbTwinkle 6s ease-in-out infinite alternate;
+}
+@keyframes cbTwinkle { from { opacity: .35 } to { opacity: .95 } }
+
+/* 2. AURORA: soft ribbons of both school colors across the top, drifting very slowly. */
+html[data-cb-bg=aurora] .cb-bgart { background: linear-gradient(180deg, color-mix(in oklab, var(--cb-glow) 40%, var(--cb-ground)) 0%, var(--cb-ground) 70%); }
+html[data-cb-bg=aurora] .cb-bgart::before {
+  content: ""; inset: -25% -15% 35% -15%;
+  background:
+    radial-gradient(38% 55% at 22% 45%, color-mix(in oklab, var(--cb-a1) 60%, transparent), transparent 70%),
+    radial-gradient(32% 48% at 55% 30%, color-mix(in oklab, var(--cb-b) 45%, transparent), transparent 70%),
+    radial-gradient(30% 50% at 82% 50%, color-mix(in oklab, var(--cb-a2) 50%, transparent), transparent 70%);
+  filter: blur(48px); opacity: .75; transform-origin: 50% 0;
+  animation: cbAurora 38s ease-in-out infinite alternate;
+}
+@keyframes cbAurora { from { transform: translateX(-4%) skewX(-6deg) } to { transform: translateX(4%) skewX(6deg) } }
+
+/* 3. COLOR WASH: big soft pools of both colors in opposite corners. Static, very calm. */
+html[data-cb-bg=wash] .cb-bgart {
+  background:
+    radial-gradient(55% 65% at 0% 0%, color-mix(in oklab, var(--cb-a1) 42%, transparent), transparent 70%),
+    radial-gradient(50% 60% at 100% 100%, color-mix(in oklab, var(--cb-b) 30%, transparent), transparent 70%),
+    radial-gradient(35% 40% at 100% 0%, color-mix(in oklab, var(--cb-a2) 18%, transparent), transparent 70%),
+    var(--cb-ground);
+}
+
+/* 4. CONTOUR MAP: topographic rings in the second color from two corners, like a trail map. */
+html[data-cb-bg=contour] .cb-bgart { background: radial-gradient(70% 70% at 12% 0%, var(--cb-glow), transparent 62%), var(--cb-ground); }
+html[data-cb-bg=contour] .cb-bgart::before, html[data-cb-bg=contour] .cb-bgart::after { content: ''; inset: 0; }
+html[data-cb-bg=contour] .cb-bgart::before { /* rings from the bottom left, fading out before the middle */
+  background: repeating-radial-gradient(ellipse 130% 100% at 0% 100%, transparent 0 30px, color-mix(in oklab, var(--cb-b) 30%, transparent) 30px 31.5px);
+  -webkit-mask-image: radial-gradient(75% 85% at 0% 100%, #000 20%, transparent 72%); mask-image: radial-gradient(75% 85% at 0% 100%, #000 20%, transparent 72%);
+}
+html[data-cb-bg=contour] .cb-bgart::after { /* a smaller hill at the top right */
+  background: repeating-radial-gradient(ellipse 100% 80% at 100% 0%, transparent 0 26px, color-mix(in oklab, var(--cb-a2) 26%, transparent) 26px 27.5px);
+  -webkit-mask-image: radial-gradient(50% 60% at 100% 0%, #000 15%, transparent 70%); mask-image: radial-gradient(50% 60% at 100% 0%, #000 15%, transparent 70%);
+}
+
+/* 5. BLUEPRINT: graph paper across the whole board, fine lines plus a heavier line every fifth square. */
+html[data-cb-bg=blueprint] .cb-bgart {
+  background:
+    linear-gradient(color-mix(in oklab, var(--cb-b) 16%, transparent) 1px, transparent 1px) 0 0 / 120px 120px,
+    linear-gradient(90deg, color-mix(in oklab, var(--cb-b) 16%, transparent) 1px, transparent 1px) 0 0 / 120px 120px,
+    linear-gradient(color-mix(in oklab, var(--cb-fg) 6%, transparent) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, color-mix(in oklab, var(--cb-fg) 6%, transparent) 1px, transparent 1px) 0 0 / 24px 24px,
+    radial-gradient(70% 70% at 15% 0%, var(--cb-glow), transparent 65%),
+    var(--cb-ground);
+}
+
+/* 6. CHALKBOARD: a slate in a deep version of the main color, with chalk grain and old eraser smudges. */
+html[data-cb-bg=chalk] .cb-bgart {
+  background:
+    radial-gradient(30% 18% at 22% 30%, rgba(255,255,255,.05), transparent 70%),
+    radial-gradient(40% 20% at 70% 62%, rgba(255,255,255,.045), transparent 70%),
+    radial-gradient(25% 15% at 85% 18%, rgba(255,255,255,.04), transparent 70%),
+    color-mix(in oklab, var(--cb-a1) 18%, var(--cb-ground2));
+}
+html[data-cb-bg=chalk] .cb-bgart::before {
+  content: ""; inset: 0; opacity: .34; mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+html[data-cb-bg=chalk] .cb-bgart::after { content: ""; inset: auto 0 0 0; height: 10px; background: linear-gradient(180deg, color-mix(in oklab, var(--cb-b) 30%, transparent), transparent); opacity: .6; } /* the chalk tray edge */
+
+/* 7. HORIZON: layered rolling hills along the bottom in the main color, the second color as the far ridge. */
+html[data-cb-bg=horizon] .cb-bgart { background: radial-gradient(90% 60% at 50% 100%, color-mix(in oklab, var(--cb-glow) 70%, transparent), transparent 70%), var(--cb-ground); }
+html[data-cb-bg=horizon] .cb-bgart::before, html[data-cb-bg=horizon] .cb-bgart::after {
+  content: ""; left: 0; right: 0; bottom: 0;
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
+html[data-cb-bg=horizon] .cb-bgart::before {
+  height: 52%; background: color-mix(in oklab, var(--cb-b) 20%, transparent);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 200' preserveAspectRatio='none'%3E%3Cpath d='M0 120 C120 60 220 70 330 105 S560 40 690 80 S880 120 1000 70 V200 H0Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 200' preserveAspectRatio='none'%3E%3Cpath d='M0 120 C120 60 220 70 330 105 S560 40 690 80 S880 120 1000 70 V200 H0Z'/%3E%3C/svg%3E");
+}
+html[data-cb-bg=horizon] .cb-bgart::after {
+  height: 38%; background: color-mix(in oklab, var(--cb-a1) 34%, var(--cb-ground));
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 200' preserveAspectRatio='none'%3E%3Cpath d='M0 90 C150 140 300 40 470 95 S760 150 860 90 S960 60 1000 80 V200 H0Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 200' preserveAspectRatio='none'%3E%3Cpath d='M0 90 C150 140 300 40 470 95 S760 150 860 90 S960 60 1000 80 V200 H0Z'/%3E%3C/svg%3E");
+}
+
+/* 8. VARSITY: school-spirit stripes in both colors cutting across the bottom right corner, like a jersey sleeve. */
+html[data-cb-bg=varsity] .cb-bgart {
+  background:
+    linear-gradient(135deg, transparent 0 80%, color-mix(in oklab, var(--cb-a1) 42%, transparent) 80% 84%, transparent 84% 85.2%, color-mix(in oklab, var(--cb-b) 36%, transparent) 85.2% 86.8%, transparent 86.8% 88%, color-mix(in oklab, var(--cb-a1) 42%, transparent) 88% 92%, transparent 92%),
+    radial-gradient(60% 60% at 0% 0%, var(--cb-glow), transparent 65%),
+    var(--cb-ground);
+}
+
+/* 9. HALFTONE: a printed dot pattern in the second color that fades in from one corner. */
+html[data-cb-bg=halftone] .cb-bgart { background: radial-gradient(70% 70% at 12% 0%, var(--cb-glow), transparent 62%), var(--cb-ground); }
+html[data-cb-bg=halftone] .cb-bgart::before {
+  content: ""; inset: 0;
+  background: radial-gradient(circle, color-mix(in oklab, var(--cb-b) 55%, transparent) 2.2px, transparent 2.7px) 0 0 / 18px 18px;
+  -webkit-mask-image: radial-gradient(85% 95% at 100% 100%, #000 0%, rgba(0,0,0,.35) 40%, transparent 70%);
+  mask-image: radial-gradient(85% 95% at 100% 100%, #000 0%, rgba(0,0,0,.35) 40%, transparent 70%);
+}
+
+@media (prefers-reduced-motion: reduce) { .cb-bgart::before, .cb-bgart::after { animation: none !important; } }
 
 /* top bar */
 .cb-nav{display:flex;align-items:center;gap:2vw;min-width:0}
@@ -1737,6 +1864,17 @@ html.mouse-input .cb-tool:hover{border-color:var(--cb-fg)}
 .cb-sec{margin-top:2.4vh;padding-top:1.8vh;border-top:1px solid var(--cb-line)}
 .cb-sec h3{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--cb-faint);font-weight:500;margin:0 0 1.2vh 0}
 .cb-sec h3 + .cb-chips + h3,.cb-sec .cb-chips + h3{margin-top:2vh}
+.cb-fold{padding-top:0}
+.cb-fold > summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1em;min-height:48px;cursor:pointer;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--cb-dim);font-weight:600;-webkit-tap-highlight-color:transparent}
+.cb-fold > summary::-webkit-details-marker{display:none}
+.cb-fold > summary::after{content:"";width:.55em;height:.55em;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translate(-2px,-2px);transition:transform .2s;flex:none}
+.cb-fold[open] > summary{color:var(--cb-fg)}
+.cb-fold[open] > summary::after{transform:rotate(-135deg) translate(-2px,-2px)}
+html.mouse-input .cb-fold > summary:hover{color:var(--cb-fg)}
+.cb-fold > summary:focus-visible{outline:2px solid var(--cb-b);outline-offset:2px;border-radius:6px}
+.cb-fold-body{padding:.4vh 0 1.4vh}
+.cb-fold-body > h3:first-child{margin-top:0}
+@media (prefers-reduced-motion:reduce){.cb-fold > summary::after{transition:none}}
 .cb-note{font-size:.72rem;color:var(--cb-faint);margin:.8vh 0 0 0;line-height:1.5}
 .cb-chips{display:flex;flex-wrap:wrap;gap:.5em}
 .cb-chip{min-height:44px;padding:.5em 1.1em;border-radius:999px;border:1px solid var(--cb-line2);background:none;font-size:.82rem;letter-spacing:.04em;cursor:pointer}
@@ -2026,23 +2164,17 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
     <aside class="cb-drawer" id="cbDrawer" role="dialog" aria-label="Customize the board" aria-hidden="true">
         <h2>Make it yours <button type="button" class="cb-x" onclick="calmDrawer(false)" aria-label="Close">✕</button></h2>
         <div class="cb-sec"><h3>These choices are for</h3><div class="cb-chips" id="cbScope"></div><p class="cb-note" id="cbScopeNote"></p></div>
-        <div class="cb-sec"><h3>Starting looks</h3><div class="cb-chips" id="cbLooks"></div><p class="cb-note">One tap sets the style options below. Your colors stay as they are.</p></div>
-        <div class="cb-sec"><h3>School colors</h3><div class="cb-chips" id="cbPresets"></div>
+        <details class="cb-sec cb-fold" data-fold="looks" open><summary>Starting looks</summary><div class="cb-fold-body"><div class="cb-chips" id="cbLooks"></div><p class="cb-note">One tap sets the style options below. Your colors stay as they are.</p></div></details>
+        <details class="cb-sec cb-fold" data-fold="colors" open><summary>School colors and mode</summary><div class="cb-fold-body"><div class="cb-chips" id="cbPresets"></div>
             <div class="cb-colors"><label>Main color <input type="color" id="cbMain" oninput="calmPickColor('main', this.value)"></label><label>Second color <input type="color" id="cbAcc" oninput="calmPickColor('acc', this.value)"></label></div>
-            <div class="cb-chips" style="margin-top:1.4vh;" id="cbModes"></div></div>
-        <div class="cb-sec"><h3>Headline type</h3><div class="cb-chips" data-cb-chips="hfont"></div><h3>Emphasis</h3><div class="cb-chips" data-cb-chips="emph"></div><h3>Text size</h3><div class="cb-chips" data-cb-chips="size"></div></div>
-        <div class="cb-sec"><h3>Agenda style</h3><div class="cb-chips" data-cb-chips="agenda"></div></div>
-        <div class="cb-sec"><h3>Panel surfaces</h3><div class="cb-chips" data-cb-chips="surface"></div></div>
-        <div class="cb-sec"><h3>Background</h3><div class="cb-chips" data-cb-chips="bg"></div></div>
-        <div class="cb-sec"><h3>Layout</h3><div class="cb-chips" data-cb-chips="layout"></div></div>
-        <div class="cb-sec"><h3>Timer</h3><div class="cb-chips" data-cb-chips="timer"></div></div>
-        <div class="cb-sec"><h3>Bottom panels (tap the card to flip)</h3><div class="cb-chips" id="cbPanels"></div><p class="cb-note">Empty panels skip themselves. None on hides the stack.</p></div>
-        <div class="cb-sec"><h3>Quiet readouts under the question</h3><div class="cb-chips" id="cbExtras"></div></div>
-        <div class="cb-sec"><h3>Pinned tools in the top bar (up to 5)</h3><div class="cb-chips" id="cbPins"></div><p class="cb-note">Everything else stays one tap away in Tools.</p></div>
-        <div class="cb-sec"><h3>Show or hide</h3><div class="cb-chips" id="cbMods"></div></div>
-        <div class="cb-sec"><h3>Share with a colleague</h3>
-            <div class="cb-chips"><button type="button" class="cb-chip" id="cbCopy" onclick="calmCopyCode()">Copy my settings</button><button type="button" class="cb-chip" onclick="calmApplyCode()">Apply pasted settings</button><button type="button" class="cb-chip" onclick="calmReset()">Reset</button></div>
-            <textarea id="cbCode" spellcheck="false" aria-label="Settings code"></textarea></div>
+            <div class="cb-chips" style="margin-top:1.4vh;" id="cbModes"></div></div></details>
+        <details class="cb-sec cb-fold" data-fold="bg"><summary>Background</summary><div class="cb-fold-body"><div class="cb-chips" data-cb-chips="bg"></div></div></details>
+        <details class="cb-sec cb-fold" data-fold="type"><summary>Type</summary><div class="cb-fold-body"><h3>Headline type</h3><div class="cb-chips" data-cb-chips="hfont"></div><h3>Emphasis</h3><div class="cb-chips" data-cb-chips="emph"></div><h3>Text size</h3><div class="cb-chips" data-cb-chips="size"></div></div></details>
+        <details class="cb-sec cb-fold" data-fold="layout"><summary>Layout, agenda and timer</summary><div class="cb-fold-body"><h3>Layout</h3><div class="cb-chips" data-cb-chips="layout"></div><h3>Agenda style</h3><div class="cb-chips" data-cb-chips="agenda"></div><h3>Timer</h3><div class="cb-chips" data-cb-chips="timer"></div></div></details>
+        <details class="cb-sec cb-fold" data-fold="panels"><summary>Panels and what shows</summary><div class="cb-fold-body"><h3>Panel surfaces</h3><div class="cb-chips" data-cb-chips="surface"></div><h3>Bottom panels (tap the card to flip)</h3><div class="cb-chips" id="cbPanels"></div><p class="cb-note">Empty panels skip themselves. None on hides the stack.</p><h3>Quiet readouts under the question</h3><div class="cb-chips" id="cbExtras"></div><h3>Show or hide</h3><div class="cb-chips" id="cbMods"></div></div></details>
+        <details class="cb-sec cb-fold" data-fold="pins"><summary>Pinned tools (up to 5)</summary><div class="cb-fold-body"><div class="cb-chips" id="cbPins"></div><p class="cb-note">Everything else stays one tap away in Tools.</p></div></details>
+        <details class="cb-sec cb-fold" data-fold="share"><summary>Share with a colleague</summary><div class="cb-fold-body"><div class="cb-chips"><button type="button" class="cb-chip" id="cbCopy" onclick="calmCopyCode()">Copy my settings</button><button type="button" class="cb-chip" onclick="calmApplyCode()">Apply pasted settings</button><button type="button" class="cb-chip" onclick="calmReset()">Reset</button></div>
+            <textarea id="cbCode" spellcheck="false" aria-label="Settings code"></textarea></div></details>
         <div class="cb-sec"><div class="cb-chips"><button type="button" class="cb-chip" onclick="calmDrawer(false);openSettingsModal();">All dashboard settings</button></div></div>
     </aside>
 <div id="floatingTimer" class="sync-timer" onclick="toggleModal('timerModal')" title="Open Timer">00:00</div>
@@ -5855,7 +5987,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             size: [['0.88', 'Smaller'], ['1', 'Normal'], ['1.12', 'Larger']],
             agenda: [['wire', 'Wire'], ['list', 'List'], ['rail', 'Rail'], ['console', 'Run log']],
             surface: [['ring', 'Color ring'], ['hairline', 'Hairline'], ['glass', 'Glass'], ['solid', 'Solid'], ['brutal', 'Outlined']],
-            bg: [['dots', 'Dot grid'], ['glow', 'Glow'], ['stars', 'Stars'], ['plain', 'Plain']],
+            bg: [['dots', 'Dot grid'], ['glow', 'Glow'], ['stars', 'Stars'], ['nightsky', 'Night sky'], ['aurora', 'Aurora'], ['wash', 'Color wash'], ['contour', 'Contour map'], ['blueprint', 'Blueprint'], ['chalk', 'Chalkboard'], ['horizon', 'Horizon'], ['varsity', 'Varsity'], ['halftone', 'Halftone'], ['plain', 'Plain']],
             layout: [['calm', 'Calm'], ['agenda-left', 'Agenda left'], ['focus', 'Focus']],
             timer: [['digits', 'Digits'], ['ring', 'Rings'], ['bar', 'Big bar'], ['keycap', 'Keycap'], ['off', 'Off']]
         };
@@ -6330,6 +6462,11 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             { let s = 7; const r = () => (s = (s * 16807) % 2147483647) / 2147483647, box = calmEl('cbStars');
               for (let i = 0; i < 70; i++) { const d = calmMake('i'), z = r() * 2.2 + .8; d.style.left = (r() * 100) + '%'; d.style.top = (r() * 100) + '%'; d.style.width = d.style.height = z + 'px'; d.style.setProperty('--o', String(r() * .45 + .12)); box.appendChild(d); } }
             if (!isStudentMode) calmEl('cbDrawer').addEventListener('click', calmDrawerClick);
+            { let saved = null; try { saved = JSON.parse(localStorage.getItem('cbDrawerOpen') || 'null'); } catch (e) { saved = null; } // which drawer sections were open last time on this device
+              document.querySelectorAll('#cbDrawer .cb-fold').forEach(d => {
+                  if (Array.isArray(saved)) d.open = saved.includes(d.dataset.fold);
+                  d.addEventListener('toggle', () => { try { localStorage.setItem('cbDrawerOpen', JSON.stringify([...document.querySelectorAll('#cbDrawer .cb-fold[open]')].map(x => x.dataset.fold))); } catch (e) { /* storage blocked: just don't remember */ } });
+              }); }
             document.addEventListener('keydown', e => { if (e.key === 'Escape') { calmDrawer(false); calmTray(false); } });
             window.addEventListener('resize', calmFitSoon);
             if (document.fonts && document.fonts.ready) document.fonts.ready.then(calmFitSoon);
