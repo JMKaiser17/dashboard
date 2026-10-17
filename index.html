@@ -2019,6 +2019,29 @@ html.cb-theme :is(.modal,#focusModeBoard,#openingModeBoard,#slideModeBoard,#game
 /* the phone light row keeps a hint of its color when chosen */
 html.cb-theme .phone-row button.is-on{background:var(--phone-color,var(--cbtn-fg))!important;border-color:var(--phone-color,var(--cbtn-fg))!important;color:#fff!important}
 html.cb-theme .phone-row button:last-child.is-on{background:var(--cbtn-fg)!important;border-color:var(--cbtn-fg)!important;color:var(--cbtn-ink)!important}
+/* phone-free minutes: top-bar counter and its pop-up */
+.cb-bank{font-variant-numeric:tabular-nums}
+.cb-bank.cb-bank-paused{opacity:.65}
+/* a crowded top bar (light wording + minutes) cuts the class times first and never lets them run under Main board */
+.cb-brand{min-width:min(9em,100%)}
+.cb-brand span{flex:0 1 auto;min-width:5.5em}
+.cb-brand small{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+@media (min-width:1101px) and (max-width:1500px){.cb-nav{gap:1.3vw}.cb-pinned{gap:1.2vw}}
+@media (min-width:1101px) and (max-width:1250px){.cb-nav{gap:.8vw}.cb-pinned{gap:.8vw}}
+.bank-now{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.bank-now .bank-big{font-size:clamp(2rem,4vw,3rem);line-height:1.1;font-variant-numeric:tabular-nums}
+.bank-now .bank-sub{opacity:.8;font-weight:600}
+.bank-now .bank-bar{width:100%;height:14px}
+.bank-bar{display:block;height:10px;border-radius:999px;background:rgba(127,127,127,.25);overflow:hidden;text-decoration:none}
+.bank-bar b{display:block;height:100%;border-radius:inherit;background:var(--primary-color)}
+.bank-all{display:flex;flex-direction:column;gap:8px}
+.bank-row{display:grid;grid-template-columns:minmax(0,1.3fr) 2fr auto;align-items:center;gap:10px;font-weight:600}
+.bank-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bank-row em{font-style:normal;font-variant-numeric:tabular-nums;opacity:.8}
+.bank-row.bank-me{font-weight:800}
+.bank-check{display:flex;align-items:flex-start;gap:10px;font-weight:bold;font-size:.95rem;cursor:pointer;margin-bottom:12px}
+.bank-check input{width:20px;height:20px;flex:none;cursor:pointer;margin:0}
+#bankModal button:disabled{opacity:.45;cursor:default}
 /* small round controls (group size, roster +/-, warm-up length) stay round */
 html.cb-theme :is(.group-controls button,.t-btn,.opening-icon-btn:not(.timer-return-chip)){border-radius:999px!important}
 html.cb-theme .group-controls{background:transparent;border:1px solid var(--cbtn-line)}
@@ -2089,7 +2112,7 @@ html.cb-theme .game-cartridge h3{color:var(--cb-fg)!important}html.cb-theme .gam
    student tabs, the teacher's timer and the phone light. During work time the task takes the warm-up's place. */
 .cb-stu{display:none}
 body.student-mode .cb-stu{display:inline-flex}
-body.student-mode :is(#cbPinned,#cbToolsBtn,.cb-gear,#cbHome,#cbTabs,#cbLight,.cb-alert,#calmBoard .quick-edit-btn){display:none!important}
+body.student-mode :is(#cbPinned,#cbToolsBtn,.cb-gear,#cbHome,#cbTabs,#cbLight,#cbBank,.cb-alert,#calmBoard .quick-edit-btn){display:none!important}
 body.student-mode .cb-brand{pointer-events:none;cursor:default}
 body.student-mode #calmBoard :is(.cb-warm){cursor:zoom-in}
 .cb-stutabs{align-items:center;gap:1.6vw}
@@ -2345,6 +2368,27 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             </div>
         </div>
     </div>
+    <div class="modal" id="bankModal">
+        <div class="leaderboard-wrapper ui-box-3" style="max-width:620px;width:92%;padding:clamp(16px,2.4vh,30px) clamp(16px,2.6vw,36px);max-height:92vh;overflow-y:auto;">
+            <h1 class="lb-header" style="margin:0 0 10px 0;font-size:clamp(1.3rem,2.2vw,1.9rem);text-align:center;">Phone-free minutes</h1>
+            <div class="bank-now" id="bankNow"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;">
+                <button type="button" id="bankPauseBtn" onclick="bankPause()" style="flex:2 1 200px;background:var(--primary-color);color:var(--white);border:none;padding:12px 20px;border-radius:var(--radius-lg);font-weight:bold;cursor:pointer;font-size:1.1rem;box-shadow:var(--shadow-md);">Pause 2 minutes</button>
+                <button type="button" id="bankResetBtn" onclick="bankRewardGiven()" style="flex:1 1 140px;background:var(--bg-light);color:var(--secondary-dark);border:2px solid var(--primary-color);padding:12px 20px;border-radius:var(--radius-lg);font-weight:bold;cursor:pointer;font-size:1.1rem;">Reward given</button>
+            </div>
+            <div class="bank-all" id="bankAll"></div>
+            <div class="ui-box-6 bank-set" style="background:var(--bg-light);border-radius:var(--radius-md);margin-top:14px;">
+                <label class="bank-check"><input type="checkbox" id="bankAuto" onchange="bankSaveSettings()"> Phone light follows the mode (Present and Attendance: phones and earbuds away; Independent Work: earbuds OK, phones when done)</label>
+                <label class="bank-check"><input type="checkbox" id="bankOn" onchange="bankSaveSettings()"> Count phone-free minutes</label>
+                <label class="bank-check"><input type="checkbox" id="bankCompare" onchange="bankSaveSettings()"> Show every class here</label>
+                <div class="settings-cols" style="display:grid;grid-template-columns:1fr 2fr;gap:12px;">
+                    <div><label for="bankGoal" style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Goal (minutes)</label><input type="number" id="bankGoal" min="10" max="100000" value="300" class="ui-field-4" onchange="bankSaveSettings()" style="width:100%;border-radius:var(--radius-sm);border:1px solid var(--bg-mid);"></div>
+                    <div><label for="bankRewardInput" style="font-weight:bold;color:var(--secondary-dark);font-size:0.8rem;display:block;">Reward (the class votes)</label><input type="text" id="bankRewardInput" maxlength="60" placeholder="Free Friday" class="ui-field-4" onchange="bankSaveSettings()" style="width:100%;border-radius:var(--radius-sm);border:1px solid var(--bg-mid);"></div>
+                </div>
+            </div>
+            <button type="button" onclick="toggleModal('bankModal')" class="close-btn" style="margin-top:14px;padding:12px 30px;font-size:1.1rem;width:100%;">Close</button>
+        </div>
+    </div>
     <div class="modal" id="workEditModal">
         <div class="leaderboard-wrapper ui-box-3" style="max-width:900px;width:95%;max-height:94vh;overflow-y:auto;text-align:left;padding:clamp(14px,2.4vh,30px) clamp(18px,2.6vw,40px);">
             <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;"><h1 id="weTitle" class="lb-header" style="text-align:left;margin:0;font-size:clamp(1.3rem,2.2vw,1.9rem);">✎ Current Task</h1><p id="weWho" style="margin:0;color:var(--gray-500);font-weight:bold;"></p></div>
@@ -2432,7 +2476,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
                 <h3 class="ui-heading-2" style="color:var(--primary-color);font-size:1.2rem;">⌨️ Keyboard Shortcuts Reference</h3>
                 <div class="cheat-grid" style="font-size:0.9rem;">
                     <div><p><kbd>Shift</kbd> + <kbd>Z</kbd> Independent Work</p><p><kbd>Shift</kbd> + <kbd>P</kbd> Presentation</p><p><kbd>Shift</kbd> + <kbd>G</kbd> Game Vault</p><p><kbd>Shift</kbd> + <kbd>R</kbd> Class Roster</p><p><kbd>Shift</kbd> + <kbd>B</kbd> Leaderboard</p><p><kbd>Shift</kbd> + <kbd>W</kbd> Attendance</p><p><kbd>Shift</kbd> + <kbd>A</kbd> Random Groups</p></div>
-                    <div><p><kbd>Shift</kbd> + <kbd>N</kbd> Quick Pick</p><p><kbd>Shift</kbd> + <kbd>S</kbd> Spin Wheel</p><p><kbd>Shift</kbd> + <kbd>D</kbd> Eyes Up Front</p><p><kbd>Shift</kbd> + <kbd>T</kbd> Tardy Screen</p><p><kbd>Shift</kbd> + <kbd>E</kbd> Exam Mode</p><p><kbd>Shift</kbd> + <kbd>L</kbd> Phone Light</p><p><kbd>Shift</kbd> + <kbd>M</kbd> Class Timer</p></div>
+                    <div><p><kbd>Shift</kbd> + <kbd>N</kbd> Quick Pick</p><p><kbd>Shift</kbd> + <kbd>S</kbd> Spin Wheel</p><p><kbd>Shift</kbd> + <kbd>D</kbd> Eyes Up Front</p><p><kbd>Shift</kbd> + <kbd>T</kbd> Tardy Screen</p><p><kbd>Shift</kbd> + <kbd>E</kbd> Exam Mode</p><p><kbd>Shift</kbd> + <kbd>L</kbd> Phone Light</p><p><kbd>Shift</kbd> + <kbd>F</kbd> Phone-free minutes</p><p><kbd>Shift</kbd> + <kbd>M</kbd> Class Timer</p></div>
                     <div><p><kbd>Shift</kbd> + <kbd>Q</kbd> QR Code</p><p><kbd>Shift</kbd> + <kbd>C</kbd> Confetti</p><p><kbd>Shift</kbd> + <kbd>0</kbd> Settings Menu</p><p><kbd>Space</kbd> Start/Pause Timer</p><p><kbd>&rarr;</kbd> Next Game Prompt</p><p><kbd>Alt</kbd> + <kbd>1</kbd>&ndash;<kbd>4</kbd> Sound Effects</p><p><kbd>ESC</kbd> Close Active Screen</p></div>
                 </div>
             </div>
@@ -2512,10 +2556,12 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             <button type="button" class="cb-link cb-alert" id="staleDataBadge" style="display:none;" onclick="retryFetchNow()" title="Tap to try the sheet again"><span id="staleDataText">Cached data: retry</span></button>
             <button type="button" class="cb-link cb-alert" id="sheetIssuesBadge" style="display:none;" onclick="openSheetIssues()"><span id="sheetIssuesText">Sheet issues</span></button>
             <button type="button" class="cb-link" id="cbLight" style="display:none;" onclick="calmTool('phone')"></button>
+            <button type="button" class="cb-link cb-bank" id="cbBank" style="display:none;" onclick="openBankModal()" title="Phone-free minutes (Shift+F)"></button>
             <div class="cb-tabs" id="cbTabs"><div id="topSourceTabs"></div></div>
             <div class="cb-pinned" id="cbPinned"></div>
             <button type="button" class="cb-link" id="cbToolsBtn" aria-haspopup="dialog" aria-expanded="false" onclick="calmTray()">Tools</button>
             <span class="cb-link cb-readout cb-stu" id="studentStatusBadge" style="display:none;"><i class="cb-dot" id="studentStatusDot"></i><span id="studentStatusText">Phones Away</span></span>
+            <span class="cb-link cb-readout cb-stu cb-bank" id="studentBankBadge" style="display:none;"><span id="studentBankText"></span></span>
             <span class="cb-link cb-readout cb-stu" id="studentTimerBadge" style="display:none;">Timer <b id="studentTimerText">0:00</b></span>
             <nav class="cb-stutabs cb-stu" id="studentTabs" aria-label="Student views">
                 <button type="button" onclick="showStudentAgenda()" class="cb-link stu-nav active" data-view="plan">Today's plan</button>
@@ -2923,6 +2969,12 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
         let scoreUndoStack = []; let scorePendingAward = null; let scoreEnding = false; // shared team scoreboard
         let gameVaultIssues = []; // Game Vault problems, shown only inside the Game Hub (never in the top-bar pill)
         let appToastTimer = null; let appToastUndoFn = null; // the fading message that replaces browser alert/confirm boxes
+        // Phone light text set by the mode (see PHONE LIGHT FOLLOWS THE MODE): 'away' = phones and earbuds, 'work' = earbuds OK, phones once you're done.
+        const LIGHT_DETAIL_TEXT = { away: 'No phones or earbuds', work: 'Earbuds OK, no phones' };
+        let lightDetail = '', lightAutoBoard = '';
+        let studentLight = null, studentBank = null; // Student Mode: the board's light and minutes from the live state
+        const BANK_PAUSE_MS = 120000; // phone-free minutes (see PHONE-FREE MINUTES); declared early because pushLiveState reads them
+        let bankSecs = 0, bankLastTick = 0, bankPausedUntil = 0, bankClassId = null, bankInSession = false;
         let liveStatePollTimer = null; // declared here (not near its usage below) - referenced by code that runs immediately during init
 
         // ==================== COLOR & THEME SYSTEM ====================
@@ -3154,7 +3206,8 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             const lightActive = statusLightOn;
             const timerActive = isRunning || remainingMs > 0;
             const state = {
-                statusLight: { active: lightActive, state: lightActive ? statusLightState : null },
+                statusLight: { active: lightActive, state: lightActive ? statusLightState : null, detail: lightActive ? lightDetail : '' },
+                bank: bankLiveState(), // phone-free minutes for the class in session (null when the bank is off)
                 timer: { active: timerActive, running: isRunning, endTime: isRunning ? endTime : null, remainingMs: remainingMs, totalMs: totalTimeMs },
                 notes: liveNotesText(),
                 work: liveWorkState(),
@@ -3889,14 +3942,14 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             if (msg()) msg().innerText = 'Sending…';
             try {
                 const r = await serverCall('dashDoneSet', [pageParams.get('liveToken'), { id: w.id, device: deviceId(), name: name, done: done }], 15000);
-                if (r && r.ok) { if (done) store.setItem(swDoneKey(w), name); else store.removeItem(swDoneKey(w)); renderStudentWork(); return; }
+                if (r && r.ok) { if (done) store.setItem(swDoneKey(w), name); else store.removeItem(swDoneKey(w)); renderStudentWork(); renderStudentLight(); return; }
                 if (msg()) msg().innerText = r && r.closed ? 'Check-ins are closed for this period.' : "That didn't go through: " + ((r && r.error) || 'try again') + '.';
             } catch (e) { if (msg()) msg().innerText = "Couldn't reach the board. Try again in a moment."; }
         }
         async function swChangeName() {
             const w = liveWork; if (!w) return;
             if (store.getItem(swDoneKey(w))) { await swSetDone(false); } // take back the old name's check-in first
-            store.removeItem(swNameKey(w.id)); renderStudentWork();
+            store.removeItem(swNameKey(w.id)); renderStudentWork(); renderStudentLight();
         }
 
         // ==================== WHAT DID I MISS? (Student Mode, Apps Script only) ====================
@@ -4785,7 +4838,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             if (!isGameStage && gameOpen()) closeGameModule();
             let targetBoard = 'mainBento'; if (isSlideMode) targetBoard = 'slideModeBoard'; else if (isFocusMode) targetBoard = 'focusModeBoard'; else if (isGameStage) targetBoard = 'gameModeBoard'; else if (isOpeningMode) targetBoard = 'openingModeBoard';
             document.body.dataset.board = targetBoard; // lets the phone layout scroll the main board only
-            calmTick();
+            calmTick(); phoneAutoForBoard(targetBoard);
             if (targetBoard === activeBoard) return;
             if (!isStudentMode && (targetBoard === 'focusModeBoard' || activeBoard === 'focusModeBoard')) setTimeout(pushLiveState, 50); // students get (or lose) the task and Done button, whichever way the board left Independent Work
             const oldBoard = document.getElementById(activeBoard); const newBoard = document.getElementById(targetBoard); const topTabs = document.getElementById('topSourceTabs');
@@ -4941,7 +4994,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             checkFloatingTimer();
             if (typeof state.voice === 'number' && state.voice !== noiseState) setNoiseLevel(state.voice, true);
             const L = state.statusLight || {}, on = !!(L.active && STATUS_LIGHT_STATES[L.state]);
-            if (on) statusLightState = L.state;
+            if (on) statusLightState = L.state; lightDetail = on && LIGHT_DETAIL_TEXT[L.detail] ? L.detail : '';
             statusLightOn = on; document.body.classList.toggle('status-light-on', on);
             if (on) renderStatusLight(); renderPhoneRow();
         }
@@ -5031,7 +5084,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
         const STATUS_LIGHT_STATES = [ { text: 'Phones Away', color: '#e53935' }, { text: 'Reference Only', color: '#fbc02d' }, { text: 'Phones Allowed', color: '#43a047' } ];
         let statusLightState = 0, statusLightOn = false;
         function toggleStatusLight() {
-            statusLightOn = !statusLightOn; if (statusLightOn) renderStatusLight();
+            statusLightOn = !statusLightOn; if (statusLightOn) renderStatusLight(); else lightDetail = '';
             document.body.classList.toggle('status-light-on', statusLightOn);
             renderPhoneRow(); pushLiveState(); remoteLight();
         }
@@ -5041,8 +5094,9 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
         }
 
         // Set the light directly (0-2 = a state, -1 = off). Used by the Phones row in the Countdown pop-up.
-        function setStatusLight(index) {
-            const isOn = statusLightOn;
+        // detail is only passed by the mode (phoneAutoForBoard); any hand-set light clears it.
+        function setStatusLight(index, detail) {
+            const isOn = statusLightOn; lightDetail = index === 0 && LIGHT_DETAIL_TEXT[detail] ? detail : '';
             if (index < 0) { if (isOn) toggleStatusLight(); renderPhoneRow(); return; }
             statusLightState = index; renderStatusLight();
             if (!isOn) toggleStatusLight(); else pushLiveState();
@@ -5055,7 +5109,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             if (isOn) row.style.setProperty('--phone-color', STATUS_LIGHT_STATES[statusLightState].color); else row.style.removeProperty('--phone-color');
         }
         function cycleStatusLightState() {
-            statusLightState = (statusLightState + 1) % STATUS_LIGHT_STATES.length;
+            statusLightState = (statusLightState + 1) % STATUS_LIGHT_STATES.length; lightDetail = '';
             renderStatusLight(); renderPhoneRow(); playTone(500 + statusLightState * 150, 0, 0.1, 0.1);
             pushLiveState(); remoteLight();
         }
@@ -5071,6 +5125,113 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             remoteQueue({ t: 'voice', level: noiseState });
         }
         let voicePushTimer = null;
+
+        // ==================== PHONE LIGHT FOLLOWS THE MODE ====================
+        // Present and Attendance (check-in) set "Phones and earbuds away"; Independent Work sets "Earbuds OK, phones when done",
+        // and a student who taps I'm done sees "Phones OK" on their own screen. The main board and games leave the light alone.
+        // A hand-set light holds until the next mode change. Off switch: titan_phone_auto = '0' (Phone-free minutes pop-up).
+        function phoneAutoOn() { return store.getItem('titan_phone_auto') !== '0'; }
+        function lightLabel() { if (!statusLightOn) return 'Off'; return (statusLightState === 0 && LIGHT_DETAIL_TEXT[lightDetail]) || STATUS_LIGHT_STATES[statusLightState].text; }
+        function phoneAutoForBoard(board) {
+            if (isStudentMode || isGlanceDevice() || board === lightAutoBoard) return;
+            lightAutoBoard = board; if (!phoneAutoOn()) return;
+            const d = (board === 'slideModeBoard' || board === 'openingModeBoard') ? 'away' : board === 'focusModeBoard' ? 'work' : '';
+            if (d && !(statusLightOn && statusLightState === 0 && lightDetail === d)) setStatusLight(0, d);
+        }
+
+        // ==================== PHONE-FREE MINUTES ====================
+        // Each class banks a minute for every minute its period is in session with the light on Phones Away.
+        // Pause gives 2 minutes off (nothing is taken away). Reaching the goal celebrates; "Reward given" starts the bank over.
+        // Saved per class (titan_bank_min_<id>, whole minutes, so the sheet sync sees at most one change a minute).
+        function bankOn() { return store.getItem('titan_bank_on') !== '0'; }
+        function bankCompareOn() { return store.getItem('titan_bank_compare') !== '0'; }
+        function bankGoal() { const g = parseInt(store.getItem('titan_bank_goal'), 10); return g >= 10 && g <= 100000 ? g : 300; }
+        function bankReward() { return String(store.getItem('titan_bank_reward') || '').slice(0, 60); }
+        function bankMinutes(id) { const m = parseInt(store.getItem('titan_bank_min_' + id), 10); return m > 0 ? m : 0; }
+        function bankPaused() { return Date.now() < bankPausedUntil; }
+        function bankCounting() { return bankOn() && bankInSession && statusLightOn && statusLightState === 0 && !bankPaused(); }
+        // Once a second from updateDashboard. Real elapsed time is used (capped), so a slow or sleeping tab doesn't over- or under-count much.
+        function bankTick(inSession) {
+            if (isStudentMode || isGlanceDevice()) return;
+            const now = Date.now(), id = activeBlockData && inSession ? String(activeBlockData.id) : null;
+            if (id !== bankClassId) { bankClassId = id; bankSecs = 0; bankPausedUntil = 0; }
+            bankInSession = !!id;
+            const step = bankLastTick ? Math.min(Math.max(now - bankLastTick, 0), 5000) : 0; bankLastTick = now;
+            if (bankPausedUntil && now >= bankPausedUntil) { bankPausedUntil = 0; pushLiveState(); }
+            if (!id || !bankCounting()) return;
+            bankSecs += step / 1000; if (bankSecs < 60) return;
+            const add = Math.floor(bankSecs / 60); bankSecs -= add * 60;
+            const goal = bankGoal(), before = bankMinutes(id), after = before + add;
+            store.setItem('titan_bank_min_' + id, String(after));
+            if (before < goal && after >= goal) { fireBigConfetti(); showToast('Phone-free goal reached!' + (bankReward() ? ' Reward: ' + bankReward() : '')); }
+            bankRender(); pushLiveState();
+        }
+        function bankLiveState() {
+            if (!bankOn() || !activeBlockData) return null;
+            return { min: bankMinutes(activeBlockData.id), goal: bankGoal(), reward: bankReward(), paused: bankPaused() ? bankPausedUntil : 0 };
+        }
+        function bankText(b) { // b = { min, goal, paused }
+            if (b.paused && Date.now() < b.paused) { const s = Math.ceil((b.paused - Date.now()) / 1000); return 'Paused ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+            return b.min >= b.goal ? 'Goal reached!' : b.min + ' / ' + b.goal + ' min';
+        }
+        function bankPause() {
+            if (!activeBlockData) return; bankPausedUntil = Date.now() + BANK_PAUSE_MS; bankRender(); pushLiveState();
+            if (document.getElementById('bankModal').classList.contains('active')) toggleModal('bankModal');
+            showToast('Phone-free minutes paused for 2 minutes.', { undo: () => { bankPausedUntil = 0; bankRender(); pushLiveState(); } });
+        }
+        function bankRewardGiven() {
+            if (!activeBlockData) return; const id = String(activeBlockData.id), undo = snapshotKeys(['titan_bank_min_' + id]);
+            store.setItem('titan_bank_min_' + id, '0'); bankSecs = 0; bankRender(); pushLiveState();
+            showToast('Bank reset for ' + (activeBlockData.title || 'this class') + '.', { undo: () => { undo(); bankRender(); pushLiveState(); } });
+        }
+        // Today's classes, once each, in schedule order.
+        function bankClasses() {
+            const today = ymdLocal(new Date()), seen = new Set(), out = [];
+            (schedule || []).forEach(b => { if (!b || !b.id || !(b.date instanceof Date) || ymdLocal(b.date) !== today || seen.has(String(b.id))) return; seen.add(String(b.id)); out.push(b); });
+            return out;
+        }
+        function openBankModal() { if (isStudentMode) return; bankRenderModal(); toggleModal('bankModal'); }
+        function bankRenderModal() {
+            const modal = document.getElementById('bankModal'); if (!modal) return;
+            const b = activeBlockData, goal = bankGoal();
+            const auto = document.getElementById('bankAuto'), on = document.getElementById('bankOn'), cmp = document.getElementById('bankCompare');
+            auto.checked = phoneAutoOn(); on.checked = bankOn(); cmp.checked = bankCompareOn();
+            if (document.activeElement !== document.getElementById('bankGoal')) document.getElementById('bankGoal').value = goal;
+            if (document.activeElement !== document.getElementById('bankRewardInput')) document.getElementById('bankRewardInput').value = bankReward();
+            const now = document.getElementById('bankNow'); now.textContent = '';
+            if (b && bankInSession) {
+                const min = bankMinutes(b.id);
+                now.appendChild(calmMake('b', 'bank-big', bankText({ min: min, goal: goal, paused: bankPaused() ? bankPausedUntil : 0 })));
+                now.appendChild(calmMake('span', 'bank-sub', (b.title || 'This class') + (bankReward() ? ' · working toward ' + bankReward() : '')));
+                now.appendChild(bankBar(min, goal));
+            } else now.appendChild(calmMake('span', 'bank-sub', 'No class in session. Minutes count during class while the light is on Phones Away.'));
+            document.getElementById('bankPauseBtn').disabled = !(b && bankInSession && bankOn());
+            document.getElementById('bankResetBtn').disabled = !(b && bankInSession);
+            const list = document.getElementById('bankAll'); list.textContent = '';
+            const classes = bankClasses(); list.style.display = bankCompareOn() && classes.length > 1 ? '' : 'none';
+            classes.forEach(c => {
+                const min = bankMinutes(c.id), row = calmMake('div', 'bank-row' + (b && String(b.id) === String(c.id) ? ' bank-me' : ''));
+                row.appendChild(calmMake('span', '', c.title || String(c.id))); row.appendChild(bankBar(min, goal)); row.appendChild(calmMake('em', '', Math.min(min, goal) + ' / ' + goal));
+                list.appendChild(row);
+            });
+        }
+        function bankBar(min, goal) { const track = calmMake('s', 'bank-bar'), fill = calmMake('b'); fill.style.width = Math.min(100, Math.round(min / goal * 100)) + '%'; track.appendChild(fill); return track; }
+        function bankSaveSettings() {
+            store.setItem('titan_phone_auto', document.getElementById('bankAuto').checked ? '1' : '0');
+            store.setItem('titan_bank_on', document.getElementById('bankOn').checked ? '1' : '0');
+            store.setItem('titan_bank_compare', document.getElementById('bankCompare').checked ? '1' : '0');
+            const g = parseInt(document.getElementById('bankGoal').value, 10); if (g >= 10 && g <= 100000) store.setItem('titan_bank_goal', String(g));
+            store.setItem('titan_bank_reward', document.getElementById('bankRewardInput').value.trim().slice(0, 60));
+            bankRender(); pushLiveState();
+        }
+        // The top-bar counter: shown only while the bank is on, a class is in session and the light is on.
+        function bankRender() {
+            const chip = document.getElementById('cbBank'); if (!chip || isStudentMode) return;
+            const show = bankOn() && bankInSession && statusLightOn && activeBlockData;
+            chip.style.display = show ? '' : 'none';
+            if (show) { const t = bankText({ min: bankMinutes(activeBlockData.id), goal: bankGoal(), paused: bankPaused() ? bankPausedUntil : 0 }); if (chip.textContent !== t) chip.textContent = t; chip.classList.toggle('cb-bank-paused', bankPaused()); }
+            if (document.getElementById('bankModal').classList.contains('active')) bankRenderModal();
+        }
 
         function checkFloatingTimer() {
             const floatingTimer = document.getElementById('floatingTimer'); if (!floatingTimer) return;
@@ -5107,7 +5268,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
                 if (event.key.toLowerCase() === 'd') toggleModal('eyesUpModal'); if (event.key.toLowerCase() === 'b') togglePointsModal();
                 if (event.key.toLowerCase() === 'm') toggleModal('timerModal'); if (event.key.toLowerCase() === 'e') toggleModal('examModal');
                 if (event.key.toLowerCase() === 'w') expandWarmup(); if (event.key.toLowerCase() === 'n') quickPick();
-                if (event.key.toLowerCase() === 'l') toggleStatusLight();
+                if (event.key.toLowerCase() === 'l') toggleStatusLight(); if (event.key.toLowerCase() === 'f') openBankModal();
                 if (event.key.toLowerCase() === 'a') toggleModal('groupModal'); // Groups lives off the top bar now
                 if (event.key.toLowerCase() === 'q') openQRModal();
                 if (event.code === 'Digit0' || event.code === 'Numpad0' || event.key === ')' || event.key === '0' || event.code === 'KeyO' || event.key.toLowerCase() === 'o') { event.preventDefault(); openSettingsModal(); }
@@ -5277,20 +5438,31 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             // State saved on an earlier day (the board hasn't been opened yet today): yesterday's light, timer and task don't carry over.
             const at = savedAt ? new Date(savedAt) : null;
             if (at && !isNaN(at) && ymdLocal(at) !== ymdLocal(new Date())) state = Object.assign({}, state, { statusLight: { active: false }, timer: { active: false }, work: null });
-            const statusBadge = document.getElementById('studentStatusBadge');
-            if (statusBadge) {
-                if (state.statusLight && state.statusLight.active && state.statusLight.state !== null && STATUS_LIGHT_STATES[state.statusLight.state]) {
-                    const s = STATUS_LIGHT_STATES[state.statusLight.state];
-                    statusBadge.style.display = ''; statusBadge.style.setProperty('--cb-light', s.color);
-                    document.getElementById('studentStatusText').innerText = s.text;
-                } else { statusBadge.style.display = 'none'; }
-            }
+            studentLight = state.statusLight || null;
+            studentBank = state.bank && typeof state.bank === 'object' && Number(state.bank.goal) > 0 ? { min: Math.max(0, Number(state.bank.min) || 0), goal: Number(state.bank.goal), paused: Number(state.bank.paused) || 0 } : null;
             syncedTimerState = state.timer || { active: false };
             renderStudentTimer();
             const notesEl = document.getElementById('studentNotesText');
             if (notesEl) notesEl.innerText = (state.notes && state.notes.trim()) ? state.notes : 'No notes shared yet.';
             const w = state.work && typeof state.work === 'object' && (!state.work.date || state.work.date === ymdLocal(new Date())) ? state.work : null;
             if (JSON.stringify(w) !== JSON.stringify(liveWork)) { liveWork = w; renderStudentWork(); }
+            renderStudentLight();
+        }
+        // Student top bar: the phone light (with the mode's wording) and the class's phone-free minutes.
+        // In Independent Work a student who has tapped I'm done sees "Phones OK" in green on their own screen.
+        function studentIsDone() { const w = liveWork; if (!w) return false; const name = store.getItem(swNameKey(w.id)) || ''; return !!name && store.getItem(swDoneKey(w)) === name; }
+        function renderStudentLight() {
+            const badge = document.getElementById('studentStatusBadge'), L = studentLight;
+            if (badge) {
+                if (L && L.active && L.state !== null && STATUS_LIGHT_STATES[L.state]) {
+                    let s = STATUS_LIGHT_STATES[L.state], text = (L.state === 0 && LIGHT_DETAIL_TEXT[L.detail]) || s.text;
+                    if (L.state === 0 && L.detail === 'work' && studentIsDone()) { s = STATUS_LIGHT_STATES[2]; text = 'Done: phones OK'; }
+                    badge.style.display = ''; badge.style.setProperty('--cb-light', s.color);
+                    document.getElementById('studentStatusText').textContent = text;
+                } else badge.style.display = 'none';
+            }
+            const bank = document.getElementById('studentBankBadge');
+            if (bank) { const show = !!(studentBank && L && L.active); bank.style.display = show ? '' : 'none'; if (show) document.getElementById('studentBankText').textContent = studentBank.paused > Date.now() ? 'Minutes paused' : bankText(studentBank); }
         }
         function renderStudentTimer() {
             const badge = document.getElementById('studentTimerBadge'); if (!badge) return;
@@ -5585,6 +5757,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
                 let endMs = activeBlock.date.getTime() + (activeBlock.end * 60000); let msLeft = endMs - nowMs;
                 cbEnding = msLeft <= 300000 && msLeft > 0; // the clock turns the accent color in the last five minutes
             } else cbEnding = false;
+            bankTick(isGenuinelyInSession);
 
             let currentActiveId = activeBlock ? activeBlock.id : null;
             if (lastActiveBlockId !== currentActiveId || needsDataRender) {
@@ -6159,7 +6332,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             Bold: { hfont: 'brut', emph: 'none', agenda: 'console', surface: 'brutal', bg: 'plain', timer: 'keycap', mode: 'light' }
         };
         const CB_PANELS = { standards: 'Standards', reminders: 'Reminders', participation: 'Participation', message: 'Message', market: 'Market', room: 'Room' };
-        const CB_EXTRAS = { present: 'Present', phone: 'Phone light', ends: 'Period ends', voice: 'Voice level' };
+        const CB_EXTRAS = { present: 'Present', phone: 'Phone light', ends: 'Period ends', voice: 'Voice level', bank: 'Phone-free minutes' };
         const CB_MODS = { agenda: 'Agenda', eq: 'Essential question', clock: 'Clock' };
         const CB_VOICE = ['0 Silent', '1 Whisper', '2 Group'];
         // Every tool, its shortcut (the existing Shift+key, unchanged) and the same function that shortcut calls.
@@ -6167,6 +6340,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             independent: ['Independent work', 'Z', () => modeTap('focus')],
             attendance: ['Attendance', 'W', () => expandWarmup()],
             phone: ['Phone light', 'L', () => calmCycleLight()],
+            bank: ['Phone-free minutes', 'F', () => openBankModal()],
             presentation: ['Present', 'P', () => modeTap('slides')],
             timer: ['Class timer', 'M', () => toggleModal('timerModal')],
             tardy: ['Tardy', 'T', () => toggleModal('tardyModal')],
@@ -6403,7 +6577,7 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
                 const pr = calmPresent(); if (!pr && !calmLightOn()) return null;
                 const pair = calmMake('div', 'cb-pair'), cell = (big, small) => { const d = calmMake('div', '', big); d.appendChild(calmMake('small', '', small)); pair.appendChild(d); };
                 if (pr) cell(pr.here === null ? String(pr.total) : pr.here + ' / ' + pr.total, pr.here === null ? 'On the roster' : 'Present');
-                cell(calmLightOn() ? STATUS_LIGHT_STATES[statusLightState].text : 'Off', 'Phone light');
+                cell(lightLabel(), 'Phone light');
                 bd.appendChild(pair);
             }
             return bd;
@@ -6438,19 +6612,24 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             cbS.extras.forEach(k => {
                 let v = '';
                 if (k === 'present') { const pr = calmPresent(); if (pr) v = pr.here === null ? '' : pr.here + ' / ' + pr.total; }
-                else if (k === 'phone') v = calmLightOn() ? STATUS_LIGHT_STATES[statusLightState].text : 'Off';
+                else if (k === 'phone') v = lightLabel();
+                else if (k === 'bank') v = bankOn() && bankInSession ? bankText({ min: bankMinutes(b.id), goal: bankGoal(), paused: 0 }) : '';
                 else if (k === 'ends') v = b.end > b.start ? calmMinutes(b.end) : '';
                 else if (k === 'voice') v = CB_VOICE[noiseState] || '';
                 if (!v) return; const s = calmMake('span'); s.appendChild(calmMake('b', '', v)); s.appendChild(document.createTextNode(CB_EXTRAS[k])); box.appendChild(s);
             });
         }
         function calmRenderPinned() {
-            const box = calmEl('cbPinned'); box.textContent = '';
+            const box = calmEl('cbPinned'), bank = calmEl('cbBank');
+            if (bank && box.contains(bank)) calmEl('cbLight').after(bank); // keep the minutes counter out of the rebuild
+            box.textContent = '';
             cbS.pinned.forEach(k => {
                 const t = CB_TOOLS[k], btn = calmMake('button', 'cb-link'); btn.type = 'button'; btn.dataset.tool = k; btn.onclick = () => calmTool(k);
-                if (k === 'phone' && calmLightOn()) { btn.appendChild(calmMake('i', 'cb-dot')); btn.appendChild(document.createTextNode(STATUS_LIGHT_STATES[statusLightState].text)); }
+                if (k === 'phone' && calmLightOn()) { btn.appendChild(calmMake('i', 'cb-dot')); btn.appendChild(document.createTextNode(lightLabel())); }
                 else btn.textContent = t[0];
+                btn.classList.toggle('on', CB_TOOL_BOARD[k] === document.body.dataset.board); // a rebuild mid-tick keeps the "showing" mark
                 box.appendChild(btn);
+                if (k === 'phone' && bank) box.appendChild(bank); // the minutes sit right after a pinned phone light
             });
         }
         // Once a second (from updateDashboard): clock, timer state, light, alerts. Panels redraw only when what they show changed.
@@ -6462,14 +6641,15 @@ html.cb-theme .hub-empty-hint{color:var(--cb-dim)!important}
             const lightOn = calmLightOn(), light = lightOn ? STATUS_LIGHT_STATES[statusLightState] : null, lightChip = calmEl('cbLight');
             document.documentElement.style.setProperty('--cb-light', light ? light.color : '#46cf71');
             lightChip.style.display = light && !cbS.pinned.includes('phone') ? '' : 'none';
-            if (light && lightChip.dataset.text !== light.text) { lightChip.textContent = ''; lightChip.appendChild(calmMake('i', 'cb-dot')); lightChip.appendChild(document.createTextNode(light.text)); lightChip.dataset.text = light.text; }
+            if (light && lightChip.dataset.text !== lightLabel()) { lightChip.textContent = ''; lightChip.appendChild(calmMake('i', 'cb-dot')); lightChip.appendChild(document.createTextNode(lightLabel())); lightChip.dataset.text = lightLabel(); }
+            bankRender();
             const wrap = calmEl('cbTimerWrap'), has = totalTimeMs > 0 && (remainingMs > 0 || isRunning);
             if (!isStudentMode) { // students: renderStudentTimer shows the teacher's timer
             wrap.classList.toggle('cb-timer-idle', !has); wrap.classList.toggle('cb-timer-paused', has && !isRunning);
             calmEl('cbTimerLabel').textContent = !has ? 'Timer: tap to set' : isRunning ? 'Activity timer' : 'Paused'; }
             const b = activeBlockData; let tracker = '';
             if (b) tracker = store.getItem('titan_tracker_' + b.id) || '';
-            const pr = calmPresent(), sig = [b ? b.id : '', tracker, pr ? pr.here + '/' + pr.total : '', lightOn ? statusLightState : 'off', noiseState, cbS.pinned.join()].join('|');
+            const pr = calmPresent(), sig = [b ? b.id : '', tracker, pr ? pr.here + '/' + pr.total : '', lightOn ? statusLightState + lightDetail : 'off', noiseState, cbS.pinned.join(), b && bankOn() && bankInSession ? bankMinutes(b.id) + '/' + bankGoal() : ''].join('|');
             if (sig !== cbTickSig) { cbTickSig = sig; calmRenderStack(); calmRenderExtras(); calmRenderPinned(); }
         }
         // Which board is showing: a way home from every other board, and the matching pinned tool underlined.
